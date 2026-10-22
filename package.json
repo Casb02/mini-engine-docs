@@ -1,0 +1,17 @@
+{
+  "name": "mini-engine-docs",
+  "private": true,
+  "type": "module",
+  "description": "Statische documentatiesite voor Mini Engine en de Mini Engine SDK",
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "node scripts/serve.mjs",
+    "check": "node build.mjs && node scripts/check-links.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "marked": "18.0.14"
+  }
+}

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#EEF0EC" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141B17" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="{{root}}favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="{{root}}fonts/dm-sans.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="{{root}}site.css">
+</head>
+<body class="layout-{{layout}} {{has_toc}}">
+  <a class="skip" href="#inhoud">Naar de inhoud</a>
+  <header class="site-header">
+    <a class="brand" href="{{root}}index.html" aria-label="Mini Engine Docs, naar de startpagina">
+      <picture>
+        <source srcset="{{root}}brand/woordmerk-donker.svg" media="(prefers-color-scheme: dark)">
+        <img src="{{root}}brand/woordmerk-licht.svg" alt="miniengine" width="132" height="23">
+      </picture>
+      <span class="brand-docs">docs</span>
+    </a>
+    <a class="header-pdf" href="{{pdf}}" download>API-referentie (pdf)</a>
+  </header>
+  <details class="menu">
+    <summary>Menu</summary>
+    <nav class="nav" aria-label="Documentatie (menu)">{{nav}}</nav>
+  </details>
+  <div class="shell">
+    <nav class="nav sidebar" aria-label="Documentatie">{{nav}}</nav>
+    <main id="inhoud" class="main">
+      <article class="article">
+        {{crumb}}
+        {{toc_inline}}
+        {{content}}
+      </article>
+      {{pager}}
+      <footer class="site-footer">
+        <p>Documentatie voor Mini Engine {{version}} en de Mini Engine SDK. <a href="{{pdf}}" download>Download de API-referentie (pdf)</a>.</p>
+      </footer>
+    </main>
+    {{toc}}
+  </div>
+</body>
+</html>
