@@ -179,7 +179,7 @@ Deze documentatie hoort bij deze versies:
 | Mini Engine SDK | 0.5.1 |
 | me-CLI | 0.5.1 |
 | Documentatie | 0.5 |
-| API-referentie (pdf) | Editie 0.5, zonder de toevoegingen van 0.5.1; edities 0.4, 0.3 en 0.2 blijven te downloaden |
+| API-referentie (pdf) | Editie 0.5, bijgewerkt voor 0.5.1; edities 0.4, 0.3 en 0.2 blijven te downloaden |
 
 Nieuw in 0.5.1:
 
