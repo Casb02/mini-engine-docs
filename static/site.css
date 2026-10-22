@@ -1014,3 +1014,44 @@ blockquote > :last-child {
   width: fit-content;
   margin: 2px 0;
 }
+
+.downloads {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--me-s3);
+  margin: var(--me-s5) 0 var(--me-s7);
+}
+.download {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: var(--me-s4) var(--me-s5);
+  border: 1px solid var(--line);
+  border-radius: var(--me-r-vlak);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+}
+.download strong {
+  font-family: var(--me-display);
+  font-weight: 500;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+.download strong::after {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 0.55em;
+  margin-left: 0.5em;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-0.15em) rotate(45deg);
+}
+.download span {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.download:hover {
+  border-color: var(--muted);
+}

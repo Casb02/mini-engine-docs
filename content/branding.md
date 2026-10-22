@@ -1,11 +1,16 @@
 ---
-title: Merk
-description: Naam, logo, kleuren en lettertypes van Mini Engine, en waar je de logobestanden vindt.
-section: Merk
+title: Branding
+description: Download het brandbook en de logobestanden van Mini Engine, met naam, logo, kleuren en lettertypes.
+section: Branding
 order: 1
 ---
 
-# Merk
+# Branding
+
+<div class="downloads">
+  <a class="download" href="{{root}}downloads/MiniEngine-Brandbook.pdf" download><strong>Brandbook</strong><span>pdf, 16 pagina's, 1,2 MB</span></a>
+  <a class="download" href="{{root}}downloads/MiniEngine-logos.zip" download><strong>Logobestanden</strong><span>zip met woordmerken, symbool, app-icoon en tokens</span></a>
+</div>
 
 Mini Engine heeft een rustige schil en laat elk spel zijn eigen sfeer meebrengen. Deze pagina vat de merkregels samen voor wie een spel, een scherm of een presentatie maakt.
 
@@ -13,7 +18,7 @@ Mini Engine heeft een rustige schil en laat elk spel zijn eigen sfeer meebrengen
 
 - In lopende tekst: **Mini Engine**, twee woorden met hoofdletters.
 - Als logo: het woordmerk, altijd uit de bestanden en nooit nagetypt.
-- Producten: Mini Engine, Mini Engine SDK en Mini Engine Docs.
+- Producten: Mini Engine, Mini Engine SDK, Mini Engine CLI en Mini Engine Docs.
 
 ## Logo
 
@@ -29,7 +34,7 @@ Het woordmerk zet *mini* in Space Grotesk SemiBold en *engine* in een lichtere t
 - Houd rondom minstens de x-hoogte vrij. Het woordmerk is minimaal 96 pixels breed.
 - Niet doen: het symbool vervangen door een tekstteken, de kleuren omdraaien, het woordmerk in hoofdletters zetten, schaduwen of verlopen toevoegen.
 
-Deze site gebruikt het woordmerk en het symbool voor licht en donker: [woordmerk licht]({{root}}brand/woordmerk-licht.svg), [woordmerk donker]({{root}}brand/woordmerk-donker.svg), [symbool licht]({{root}}brand/symbool-licht.svg) en [symbool donker]({{root}}brand/symbool-donker.svg). De volledige set, met ook de `currentColor`-varianten en de design tokens, staat in het merkpakket van Mini Engine in `bron/master/`. Vraag het pakket op bij de beheerder van de engine.
+Deze site gebruikt het woordmerk en het symbool voor licht en donker: [woordmerk licht]({{root}}brand/woordmerk-licht.svg), [woordmerk donker]({{root}}brand/woordmerk-donker.svg), [symbool licht]({{root}}brand/symbool-licht.svg) en [symbool donker]({{root}}brand/symbool-donker.svg). De [logobestanden]({{root}}downloads/MiniEngine-logos.zip) bevatten ook de `currentColor`-varianten, de lockups voor SDK, docs en CLI, het app-icoon en de design tokens (`tokens.css`).
 
 ## Kleur
 

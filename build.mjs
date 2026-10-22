@@ -43,7 +43,7 @@ const SECTIONS = [
   'SDK-referentie',
   'HTTP API',
   'Bouwen met AI',
-  'Merk',
+  'Branding',
 ];
 
 const PDF = 'downloads/MiniEngine-API-v0.3.pdf';
