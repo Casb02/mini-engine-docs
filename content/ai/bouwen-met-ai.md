@@ -71,7 +71,7 @@ Je kunt hem ook bij naam aanroepen: `/build-mini-engine-game`.
 - **Agents zonder skills** wijs je direct naar het bestand: *Lees skills/build-mini-engine-game/SKILL.md in de Mini Engine SDK en volg het.*
 - Geef de agent ook `types/mini-engine.d.ts` uit de SDK. Daarin staan alle methoden en types exact.
 
-De bouwskill test een spel eerst met [`me dev`](../publiceren/cli.md#me-dev) uit de CLI, een nagebootste engine op je eigen computer. Daarna speelt hij het op een echte engine: een engine-checkout, of een draaiende engine waar je met de CLI naar uploadt. Voor `create-mini-game` gaan de skills uit van een SDK-checkout. Ontbreekt iets, dan wijst de agent je erop. De SDK is openbaar; voor de engine-repository heb je GitHub-toegang nodig. Wil je alleen publiceren naar een draaiende engine, dan heb je genoeg aan de CLI.
+De bouwskill test een spel eerst met [`me dev`](../publiceren/cli.md#me-dev) uit de CLI, een nagebootste engine op je eigen computer. Daarna speelt hij het op een echte engine: een engine-checkout, of een draaiende engine waar je met de CLI naar uploadt. Een nieuw spel maakt de agent met `npx -p @casb02/mini-engine-sdk create-mini-game` of `me game new`; een SDK-checkout is daarvoor niet nodig. Ontbreekt iets, dan wijst de agent je erop. De SDK is openbaar; voor de engine-repository heb je GitHub-toegang nodig. Wil je alleen publiceren naar een draaiende engine, dan heb je genoeg aan de CLI.
 
 ## Wat je de agent meegeeft
 
