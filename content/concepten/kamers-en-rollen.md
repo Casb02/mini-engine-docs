@@ -21,7 +21,7 @@ Een kamercode bestaat uit zes letters uit `ABCDEFGHJKLMNPQRSTUVWXYZ`: geen I en 
 | `player` | Bij meedoen met een naam | Klaarzetten, acties sturen, de kamer verlaten |
 | `display` | Via de schermsleutel van de host | Alleen meekijken |
 
-Een maker die meespeelt, houdt de rol `host` en krijgt daarnaast een spelersplek met een eigen `player_id`. Een aparte spelleider heeft `player_id: null`. Zie [spelleidermodi](spelleidermodi.md).
+Een maker die meespeelt, houdt de rol `host` en krijgt daarnaast een spelersplek met een eigen `player_id`. Een aparte spelleider heeft `player_id: null`. Sinds 0.5.1 kan de maker ook in een eigen browserspel meespelen, als het spel dat toestaat. Zie [spelleidermodi](spelleidermodi.md).
 
 ## Sleutels
 
@@ -45,6 +45,7 @@ Elke rol krijgt een eigen projectie van de kamer, de *snapshot*.
 | `player_states` (alle spelers) | ja | nee | nee |
 | `private_state` (eigen deel) | als de host meespeelt | ja | nee |
 | Namen, aanwezigheid, klaarstatus, account-id's | ja | ja | ja |
+| `host_player_id` (sinds 0.5.1) | ja | ja | ja |
 | `settings` en `config` | ja | ja | ja |
 
 De openbare route `/api/v1/rooms/{code}/info` geeft alleen code, spel, status, aantallen, capaciteit, runtime en config. Geen namen en geen spelstand.
@@ -62,19 +63,23 @@ Zo ziet de snapshot van een speler eruit (ID's ingekort):
   "max_players": 24,
   "settings": { "prompt": "Nog een ronde?", "allow_change": true },
   "host_connected": true,
+  "host_player_id": "a71e…",
   "players": [
+    { "id": "a71e…", "name": "Dani", "connected": true, "ready": true, "account_id": null },
     { "id": "5f0c…", "name": "Sander", "connected": true, "ready": true, "account_id": null }
   ],
   "public_state": { "votes": {} },
   "you": { "role": "player", "player_id": "5f0c…" },
   "runtime": "host",
-  "config": { "host_mode": "moderator", "display_enabled": true, "allow_late_join": false },
+  "config": { "host_mode": "playing", "display_enabled": true, "allow_late_join": false },
   "round_id": "9b1e…",
   "private_state": null
 }
 ```
 
-Dit is een stemspel uit de [scaffolder](../game-bouwen/eerste-game.md) met een aparte spelleider. `host_connected` zegt alleen of de host verbonden is. Serveracties hangen niet van die vlag af. Meer over `version` en het bijwerken van state staat bij [state en versies](state-en-versies.md).
+Dit is het stemspel uit de [scaffolder](../game-bouwen/eerste-game.md), waarin de maker Dani meespeelt. Sander ziet het vanaf zijn eigen telefoon. `host_connected` zegt alleen of de host verbonden is.
+
+`host_player_id` is de spelersplek van de maker als die meespeelt, zoals hier, en anders `null`. Elke rol krijgt het veld, zodat iedere pagina de spelleider in de spelerslijst kan aanwijzen, bijvoorbeeld als *Dani (spelleider)*. Het veld bestaat sinds 0.5.1; een snapshot van een oudere engine heeft het niet. Serveracties hangen niet van die vlag af. Meer over `version` en het bijwerken van state staat bij [state en versies](state-en-versies.md).
 
 ## Kameropties
 

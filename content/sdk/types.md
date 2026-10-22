@@ -1,6 +1,6 @@
 ---
 title: Types
-description: De belangrijkste TypeScript-types van de SDK, zoals Snapshot, Manifest, RoomCredentials, ActionPayloads, de realtimetypes, achievements en sets, en waar het volledige declaratiebestand staat.
+description: De belangrijkste TypeScript-types van de SDK, zoals Snapshot met host_player_id, Manifest met icon, RoomCredentials, ActionPayloads, de realtimetypes, achievements en sets, en waar het volledige declaratiebestand staat.
 section: SDK-referentie
 order: 6
 toc_depth: 3
@@ -50,6 +50,7 @@ interface Snapshot<PublicState = Json, Settings = Record<string, Json>, PrivateS
   version: number;
   max_players: number;
   host_connected: boolean;
+  host_player_id?: string | null;       // sinds 0.5.1; plek van een meespelende maker, anders null
   players: Player[];
   public_state: PublicState;
   settings: Settings;
@@ -63,6 +64,8 @@ interface Snapshot<PublicState = Json, Settings = Record<string, Json>, PrivateS
   private_state?: PrivateState;         // speler, of meespelende host
 }
 ```
+
+`host_player_id` is optioneel in het type, omdat een engine van vóór 0.5.1 het veld niet stuurt. Een engine van 0.5.1 stuurt het altijd, aan iedere rol: de `player_id` van de maker als die meespeelt, anders `null`. Zie [spelleidermodi](../concepten/spelleidermodi.md#meespelen-in-een-eigen-spel).
 
 ### Player
 
@@ -131,6 +134,7 @@ interface Manifest<Settings = Record<string, Json>> {
   host_modes?: HostMode[];
   default_host_mode?: HostMode;
   supports_late_join?: boolean;
+  icon?: string;                          // sinds 0.5.1: 'assets/<naam>.svg'
   achievements?: AchievementDefinition[]; // sinds 0.5
   set_kinds?: SetKind[];                  // sinds 0.5
 }
@@ -142,6 +146,8 @@ interface SettingsProperty {
   title?: string; description?: string; default?: Json;
 }
 ```
+
+`icon` is het pad van een SVG-icoon in het package, sinds SDK 0.5.1 (engine 0.5.1). De regels staan bij [package en manifest](../game-bouwen/package-en-manifest.md#icon). Een manifest zonder `host_modes` geldt als `['moderator']`; een nieuw spel uit de scaffolder heeft `['playing', 'moderator']` met `default_host_mode: 'playing'`.
 
 ### Achievements en soorten sets
 

@@ -32,7 +32,7 @@ cd ../mini-engine
 cargo run
 ```
 
-Open `/home`, kies **Mijn Spel** en maak een kamer. Doe mee vanaf een tweede browser of apparaat, zet je klaar, en start de stemronde op de spelleiderspagina.
+Open `/home`, kies **Mijn Spel** en maak een kamer. Je speelt zelf mee: sinds SDK 0.5.1 is `playing` de standaardmodus van het voorbeeld, en je plek staat meteen klaar. Doe mee vanaf een tweede browser of apparaat, zet je daar klaar, en start de stemronde op de spelleiderspagina. Daar stem je zelf ook.
 
 ## Sneller testen met `me dev`
 
@@ -110,7 +110,7 @@ Wil je de SDK in een ander project gebruiken zonder de repository, maak dan een 
 npm pack
 
 # in je eigen project
-npm install /absoluut/pad/naar/mini-engine-sdk/casb02-mini-engine-sdk-0.5.0.tgz
+npm install /absoluut/pad/naar/mini-engine-sdk/casb02-mini-engine-sdk-0.5.1.tgz
 npx create-mini-game mijn-spel --directory /pad/naar/engine/games/mijn-spel
 ```
 

@@ -29,8 +29,8 @@ Maakt een kamer. **Toegang:** iedereen. Met een optionele accountsleutel koppelt
 | Veld | Verplicht | Regel |
 | --- | --- | --- |
 | `game_id` | ja | Een geïnstalleerd spel |
-| `name` | nee | Naam van een meespelende maker, 1 tot 24 tekens; standaard `Spelleider` |
-| `max_players` | nee | Binnen `min_players` en `max_players` van het spel. Standaard het maximum van het spel, begrensd op 24 |
+| `name` | nee | Naam van een meespelende maker, 1 tot 24 tekens; standaard `Spelleider`. Op de pagina voor een nieuwe kamer is dit het veld *Jouw naam* |
+| `max_players` | nee | Binnen `min_players` en `max_players` van het spel. Standaard het maximum van het spel, begrensd op 24. Een meespelende maker telt mee |
 | `settings` | nee | Wordt over `default_settings` gelegd en daarna gecontroleerd |
 | `config` | nee | Weggelaten velden: de standaardmodus van het spel, `display_enabled` gelijk aan `has_display`, `allow_late_join: false` |
 | `set_id` | nee | Sinds 0.5. Een [eigen set](../concepten/eigen-sets.md) van het ingelogde account voor dit spel. Vraagt de accountsleutel. |
@@ -43,13 +43,19 @@ Maakt een kamer. **Toegang:** iedereen. Met een optionele accountsleutel koppelt
 
 Bij `host_mode: "moderator"` is `player_id` `null`. Staat het scherm uit, dan ontbreekt `display_token`.
 
+Sinds 0.5.1 kan `host_mode: "playing"` ook bij een eigen spel (`runtime: "host"`), als het manifest die modus in `host_modes` heeft. Net als bij een serverspel is de sleutel van de maker dan tegelijk host en speler: `role` is `host`, `player_id` is de spelersplek van de maker, de naam komt uit `name` en het account uit de accountsleutel. Die plek staat meteen klaar.
+
+```json
+{ "game_id": "vier-pionnen", "name": "Dani", "config": { "host_mode": "playing" } }
+```
+
 Met `set_id` controleert de engine dat de set van jouw account is, bij `game_id` hoort, en dat zijn soort voorkomt in de versie van het spel die de kamer krijgt. Daarna controleert hij de inhoud opnieuw tegen die versie. De kamer krijgt een kopie: wijzig of verwijder je de set later, dan blijft de kamer met de kopie spelen. De snapshot toont welke set het is in het veld [`set`](#get-api-v1-rooms-code).
 
 ```json
 { "game_id": "jeopardy", "settings": { "team_count": 3 }, "set_id": "8a41c2d0-…" }
 ```
 
-**Fouten:** `400 invalid_request` (onbekende modus, capaciteit, instellingen of config; later aansluiten of scherm bij een spel dat het niet ondersteunt; een hostspel met een andere modus dan `moderator`; een set van een ander spel, van een soort die deze versie niet kent of met inhoud die niet past), `401 unauthorized` (ongeldige accountsleutel, of `set_id` zonder accountsleutel), `404 game_not_found`, `404 set_not_found`, `409 release_changed` (het spel kreeg net een nieuwe versie; probeer het opnieuw), `429 rate_limit`, `503 room_limit`.
+**Fouten:** `400 invalid_request` (onbekende modus, capaciteit, instellingen of config; later aansluiten of scherm bij een spel dat het niet ondersteunt; een hostspel met `hostless`, of met een modus die niet in `host_modes` van het spel staat; een set van een ander spel, van een soort die deze versie niet kent of met inhoud die niet past), `401 unauthorized` (ongeldige accountsleutel, of `set_id` zonder accountsleutel), `404 game_not_found`, `404 set_not_found`, `409 release_changed` (het spel kreeg net een nieuwe versie; probeer het opnieuw), `429 rate_limit`, `503 room_limit`.
 
 ### POST /api/v1/rooms/{code}/join
 
@@ -95,7 +101,7 @@ Ook een eigen set staat er niet in; welke set de kamer speelt, zie je alleen in 
 
 De snapshot voor de rol van de sleutel. **Toegang:** host, speler of scherm.
 
-Elke snapshot bevat `code`, `game_id`, `game_version`, `status`, `version`, `max_players`, `settings`, `host_connected`, `players`, `public_state`, `you`, `runtime`, `config`, `round_id` en `set`. De host krijgt ook `host_state` en `player_states`, en `private_state` als hij meespeelt. Een speler krijgt `private_state`. Zie [kamers en rollen](../concepten/kamers-en-rollen.md#een-snapshot).
+Elke snapshot bevat `code`, `game_id`, `game_version`, `status`, `version`, `max_players`, `settings`, `host_connected`, `host_player_id`, `players`, `public_state`, `you`, `runtime`, `config`, `round_id` en `set`. De host krijgt ook `host_state` en `player_states`, en `private_state` als hij meespeelt. Een speler krijgt `private_state`. Zie [kamers en rollen](../concepten/kamers-en-rollen.md#een-snapshot).
 
 `set` is sinds 0.5 de [eigen set](../concepten/eigen-sets.md) waarmee de kamer speelt, voor alle rollen zichtbaar, of `null`:
 
@@ -104,6 +110,12 @@ Elke snapshot bevat `code`, `game_id`, `game_version`, `status`, `version`, `max
 ```
 
 De inhoud van de set staat nooit in een snapshot.
+
+`host_player_id` is sinds 0.5.1 de spelersplek van de maker als die meespeelt, anders `null`. Iedere rol krijgt het, zodat elke pagina de spelleider in de spelerslijst kan aanwijzen:
+
+```json
+{ "host_player_id": "5f0c…", "you": { "role": "player", "player_id": "8d2a…" } }
+```
 
 **Fouten:** `401 unauthorized`, `404 room_not_found`.
 
@@ -122,6 +134,8 @@ De geheime speldata. **Toegang:** host.
 
 Zet je klaarstatus. **Toegang:** deelnemer met een spelersplek, alleen in de lobby.
 
+Bij een eigen spel staat de plek van een meespelende maker altijd klaar. Een `ready` vanaf de hostsleutel mag wel en verandert alleen die vlag; het starten houdt er geen rekening mee.
+
 ```json
 { "ready": true }
 ```
@@ -132,7 +146,7 @@ Zet je klaarstatus. **Toegang:** deelnemer met een spelersplek, alleen in de lob
 
 ### POST /api/v1/rooms/{code}/actions
 
-Stuurt een actie. **Toegang:** bij een serverspel deelnemers en de host, volgens de spelregels; bij een hostspel alleen spelers. Het scherm nooit.
+Stuurt een actie. **Toegang:** bij een serverspel deelnemers en de host, volgens de spelregels; bij een hostspel alleen spelers. Het scherm nooit. Ook een meespelende maker in een hostspel stuurt geen actie (`403 forbidden`): de hostpagina past de eigen zetten zelf toe met [`PUT /api/v1/rooms/{code}/state`](#put-api-v1-rooms-code-state).
 
 ```json
 { "name": "roll", "data": { "held": [0, 2] }, "action_id": "3d6c1b0e-…" }
@@ -185,15 +199,17 @@ Sinds 0.5. Kent een [achievement](../concepten/achievements.md) van het spel toe
 
 De engine bewaart de achievement op het account van de speler met `source: "game"`, en stuurt de kamer een websocketbericht `achievement`. Had de speler hem al, dan verandert er niets, komt er geen bericht en is `already_earned` `true`.
 
-De speler moet in de kamer zitten en een account hebben. Het id moet voorkomen in de versie van het spel die de kamer speelt. De kamer moet gemaakt zijn door iemand die was ingelogd, en de speler mag niet hetzelfde account hebben als de host.
+De speler moet in de kamer zitten en een account hebben. Het id moet voorkomen in de versie van het spel die de kamer speelt. De kamer moet gemaakt zijn door iemand die was ingelogd, en de speler mag niet hetzelfde account hebben als de host. Sinds 0.5.1 geldt die laatste regel niet voor de eigen plek van een meespelende maker (`host_player_id`): die verdient achievements zoals elke speler. Een spelleider die met hetzelfde account ook als speler meedoet, kan zichzelf nog steeds niets geven.
 
-**Fouten:** `invalid_json`, `401 unauthorized`, `403 forbidden` (geen host, of een serverspel), `403 not_eligible` (gast, kamer zonder account gemaakt, of je eigen account), `404 achievement_unknown`, `404 player_not_found`, `404 room_not_found`, `409 game_not_running` (de kamer staat in de lobby), `429 rate_limit` (meer dan 30 per kamer per minuut).
+**Fouten:** `invalid_json`, `401 unauthorized`, `403 forbidden` (geen host, of een serverspel), `403 not_eligible` (gast, kamer zonder account gemaakt, of je eigen account op een andere plek dan `host_player_id`), `404 achievement_unknown`, `404 player_not_found`, `404 room_not_found`, `409 game_not_running` (de kamer staat in de lobby), `429 rate_limit` (meer dan 30 per kamer per minuut).
 
 ## Beheren
 
 ### PUT /api/v1/rooms/{code}/settings
 
 Vervangt alle instellingen. **Toegang:** host.
+
+Gebruik deze route alleen als je spel het echt nodig heeft. De maker kiest de instellingen bij het maken van de kamer, en regels die veranderen terwijl mensen spelen, maken een spel oneerlijk. Zie [instellingen liggen vast](../game-bouwen/package-en-manifest.md#instellingen-liggen-vast-tijdens-het-spelen).
 
 ```json
 { "expected_version": 4, "settings": { "dice_count": 3, "sides": 20, "roll_permission": "everyone", "theme": "candy" } }
@@ -223,7 +239,7 @@ Wijzigt de levensloop. **Toegang:** host.
 { "status": "running" }
 ```
 
-Toegestaan: `lobby → running`, `running → finished`, `finished → lobby`. Starten vraagt dat alle deelnemers klaarstaan. Terug naar de lobby geeft een nieuw `round_id` en reset klaarstatus en spelstand.
+Toegestaan: `lobby → running`, `running → finished`, `finished → lobby`. Starten vraagt dat alle deelnemers klaarstaan. Bij een eigen spel telt de plek van een meespelende maker daarbij niet mee. Terug naar de lobby geeft een nieuw `round_id` en reset klaarstatus en spelstand; de plek van een meespelende maker in een eigen spel staat daarna meteen weer klaar.
 
 **Fouten:** `403 forbidden`, `409 invalid_transition`, `409 players_not_ready`, `409 teams_required` (Jeopardy).
 
@@ -249,7 +265,7 @@ De speler verlaat de kamer en zijn sleutel wordt ingetrokken. **Toegang:** spele
 
 Verwijdert een speler en trekt diens sleutel in. **Toegang:** host. **Antwoord:** `204`.
 
-De maker kan zijn eigen spelersplek niet verwijderen.
+De maker kan zijn eigen spelersplek niet verwijderen. De hostsleutel kan ook niet `leave` gebruiken.
 
 **Fouten:** `400 invalid_request`, `403 forbidden`, `404 player_not_found`.
 

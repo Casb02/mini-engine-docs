@@ -69,6 +69,41 @@ Bij de websocket komt de nieuwe snapshot vóór de bevestiging. Als `await clien
 
 Krijg je toch een conflict, kijk dan opnieuw naar de actuele state. Speel een onzekere actie niet blind opnieuw af.
 
+## Als de maker meespeelt
+
+Sinds 0.5.1 kan de maker meespelen in een eigen spel, als het manifest `playing` in [`host_modes`](package-en-manifest.md#host-modes) heeft. Een nieuw spel uit `me game new` doet dat standaard. De hostpagina is dan scheidsrechter én de spelerspagina van de maker. Je ziet het aan de snapshot: `client.room.you.player_id` is de spelersplek van de maker, en `client.room.host_player_id` is hetzelfde id voor iedere rol.
+
+De hostverbinding kan geen `action` sturen; dat geeft `403 forbidden`. De hostpagina past de zet van de maker daarom zelf toe, in dezelfde wachtrij als de acties van spelers:
+
+```js
+function applyVote(room, playerId, yes) {
+  const votes = { ...(room.public_state?.votes ?? {}), [playerId]: yes };
+  return client.setState({ expected_version: room.version, public_state: { votes } });
+}
+
+client.on('action', (action) => enqueue(async () => {
+  const room = client.room;
+  const yes = action.data && typeof action.data === 'object' ? action.data.yes : undefined;
+  if (!room || room.status !== 'running' || action.name !== 'vote' || typeof yes !== 'boolean') return;
+  if (!room.players.some((player) => player.id === action.player_id)) return;
+  await applyVote(room, action.player_id, yes);
+}));
+
+// De stemknoppen op de hostpagina, alleen als de maker meespeelt
+yesButton.onclick = () => enqueue(async () => {
+  const room = client.room;
+  if (!room || room.status !== 'running' || !room.you.player_id) return;
+  await applyVote(room, room.you.player_id, true);
+});
+```
+
+Verder:
+
+- **Klaar.** De plek van de maker staat altijd klaar en houdt het starten niet tegen. Toon op de hostpagina dus geen klaarknop voor de maker.
+- **Geheimen.** Wat alleen de maker als speler mag zien, staat in `player_states[host_player_id]`; de hostpagina krijgt het terug als `private_state`. Bedenk dat de hostpagina ook `host_state` en alle `player_states` ziet. Een spel met geheime kaarten per speler is met een meespelende maker dus niet eerlijk tegenover de anderen; bied voor zo'n spel alleen `moderator` aan.
+- **Spelerslijst.** Gebruik `host_player_id` om de maker in de lijst aan te wijzen op elke pagina, bijvoorbeeld *Dani (spelleider)*.
+- **Achievements.** De maker is een speler zoals iedereen en kan op zijn eigen plek (`host_player_id`) een achievement krijgen.
+
 ## Wat de ack wel en niet betekent
 
 Voor een speler betekent de bevestiging van een actie in een hostspel alleen: *de actie staat in de wachtrij van de host*. Niet: *de host heeft haar verwerkt*. Valt de host weg, dan kan de actie verloren gaan. Is de host offline op het moment dat een speler een actie stuurt, dan krijgt de speler `409 host_offline`.
@@ -101,7 +136,7 @@ enqueue(async () => {
 });
 ```
 
-Alleen spelers met een account kunnen een achievement krijgen, en alleen als jij de kamer met een account maakte. Omdat de server niet kan nagaan of de achievement verdiend is, staat hij op het account apart, onder *Toegekend door eigen spellen*. Zie [achievements](../concepten/achievements.md#eigen-spellen).
+Alleen spelers met een account kunnen een achievement krijgen, en alleen als jij de kamer met een account maakte. Speel je zelf mee, dan kun je ze op je eigen plek ook verdienen. Alleen een spelleider die met hetzelfde account ook als gewone speler meedoet, kan zichzelf niets geven. Omdat de server niet kan nagaan of de achievement verdiend is, staat hij op het account apart, onder *Toegekend door eigen spellen*. Zie [achievements](../concepten/achievements.md#eigen-spellen).
 
 ## Realtime
 

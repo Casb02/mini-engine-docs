@@ -13,7 +13,7 @@ De Mini Engine SDK is een getypeerde browser- en Node-client zonder runtime-afha
 | | |
 | --- | --- |
 | Pakketnaam | `@casb02/mini-engine-sdk` |
-| Versie | `0.5.0`, voor engine 0.5 |
+| Versie | `0.5.1`, voor engine 0.5 |
 | Repository | [Casb02/mini-engine-sdk](https://github.com/Casb02/mini-engine-sdk) (openbaar, MIT) |
 | Node.js | 22 of nieuwer |
 | npm | GitHub Packages, of rechtstreeks uit de repository |
@@ -58,7 +58,7 @@ npm install @casb02/mini-engine-sdk
 Zonder token installeer je rechtstreeks uit de repository; npm bouwt het pakket dan zelf:
 
 ```sh
-npm install github:Casb02/mini-engine-sdk#v0.5.0
+npm install github:Casb02/mini-engine-sdk#v0.5.1
 ```
 
 ```ts

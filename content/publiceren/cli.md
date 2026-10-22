@@ -40,7 +40,7 @@ Laat zien als wie je bent ingelogd, of vergeet de key.
 | `me game upload [map] [--activate] [--dry-run]` | Pakt de map in en uploadt een nieuwe versie; `--dry-run` laat alleen zien wat meegaat |
 | `me game versions <id>` | Alle bewaarde versies; welke actief is en welke een kamer gebruikt |
 | `me game activate <id> <versie>` | Maakt een versie actief, ook om terug te gaan |
-| `me game enable <id>` / `me game disable <id>` | Toont of verbergt de game op `/home` |
+| `me game enable <id>` / `me game disable <id>` | Toont of verbergt de game op `/home`; kan sinds 0.5.1 ook op de accountpagina |
 | `me game delete-version <id> <versie>` | Verwijdert één oude versie |
 | `me game prune <id> [--keep N] [--dry-run]` | Verwijdert oude versies, behalve de actieve, de nieuwste N (standaard 3) en versies in gebruik |
 | `me game delete <id>` | Verwijdert de hele game (vraagt om bevestiging, of `--yes`) |
@@ -77,6 +77,7 @@ me dev --set sets/filmavond.json --no-open
 
 - Pas je iets aan in de map, dan laden de stoelen opnieuw en blijft de kamer bestaan. Een fout in het manifest zie je in het overzicht en in de terminal.
 - Iedere speler telt als speler met een account, zodat je achievements kunt testen. Gekregen achievements verschijnen in de terminal.
+- Sinds CLI 0.5.1 controleert `me dev` ook het [icoon](../game-bouwen/package-en-manifest.md#icon) en volgt hij de regels voor een [meespelende maker](../concepten/spelleidermodi.md#meespelen-in-een-eigen-spel): diens plek staat klaar en de snapshot heeft `host_player_id`.
 - Alles staat alleen in het geheugen. Stoppen doe je met Ctrl+C.
 - De server luistert alleen op je eigen computer (`127.0.0.1`). Telefoons op je wifi kunnen er niet bij.
 
