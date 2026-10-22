@@ -1,6 +1,6 @@
 ---
 title: Hosten op Coolify
-description: Zet Mini Engine 0.4 in productie op een eigen Coolify-server, met DNS, bevestigingsmails via SMTP, back-ups en updates.
+description: Zet Mini Engine 0.4 in productie op een eigen Coolify-server, met DNS, zelf verstuurde bevestigingsmails, een robotcheck, back-ups en updates.
 section: Snel aan de slag
 order: 4
 toc_depth: 3
@@ -26,27 +26,33 @@ Coolify vraagt zelf een Let's Encrypt-certificaat aan zodra de records naar de s
 
 ## 2. Mail en mail-DNS
 
-Accounts krijgen een bevestigingsmail (zie [accounts](../concepten/accounts.md#e-mailbevestiging)). Daarvoor heb je een SMTP-dienst nodig die mail mag versturen namens je domein, bijvoorbeeld Postmark, Brevo, Mailgun, Resend of de SMTP van je eigen mailhosting. Voeg het domein daar toe; de provider geeft je de DNS-records om het te verifiëren. Meestal zijn dat:
+Accounts krijgen een bevestigingsmail (zie [accounts](../concepten/accounts.md#e-mailbevestiging)). De engine kan die mail zelf versturen, rechtstreeks naar de mailserver van de ontvanger, of via een SMTP-dienst. Zolang je niets instelt, schrijft de engine de bevestigingslinks in de log.
 
-| Type | Naam | Waarde |
-| --- | --- | --- |
-| `TXT` | `@` | SPF-record van je provider |
-| `TXT` of `CNAME` | `<selector>._domainkey` | DKIM-sleutel van de provider |
-| `TXT` | `_dmarc` | DMARC-beleid |
-| `CNAME` | bijvoorbeeld `pm-bounces` | Bounce-domein, als je provider dat vraagt |
+### Zelf versturen
 
-SPF en DMARC zien er ongeveer zo uit:
+De engine zoekt het MX-record van de ontvanger op, levert de mail af op poort 25 (met TLS als de ontvanger dat aanbiedt) en ondertekent hem met DKIM. Dat gebeurt op de achtergrond; bij een tijdelijke weigering probeert de engine het na 2, 10 en 30 minuten opnieuw. Alleen mailservers met een publiek IP-adres komen in aanmerking.
 
-```text
-@        TXT  v=spf1 include:<provider> ~all
-_dmarc   TXT  v=DMARC1; p=quarantine; rua=mailto:dmarc@miniengine.nl
-```
+1. **Poort 25 moet uitgaand open staan.** Veel cloudproviders blokkeren die standaard. Bij Hetzner Cloud vraag je het deblokkeren aan via **Limits → Request change → Unblock ports** in de Console.
+2. **Reverse DNS**: zet de PTR van het server-IP (IPv4 en IPv6) op een hostnaam, bijvoorbeeld `mail.miniengine.nl`. Bij Hetzner staat dat onder **IPs → Edit Reverse DNS**.
+3. **DKIM-sleutel**: open in Coolify de terminal van de service `engine` en draai `mini-engine dkim`. De eerste keer maakt dat een sleutel in het datavolume (`/app/data/dkim.pem`); het commando toont het TXT-record dat erbij hoort. De geheime sleutel verlaat de server nooit.
+4. **DNS-records**, bij Cloudflare zonder proxy:
 
-Een domein heeft één SPF-record. Heb je er al een, voeg de include dan toe aan dat record.
+   | Type | Naam | Waarde |
+   | --- | --- | --- |
+   | `A` en `AAAA` | `mail` | De IP-adressen van de server, dezelfde naam als in de reverse DNS |
+   | `TXT` | `@` | `v=spf1 ip4:<IPv4> ip6:<IPv6-blok> ~all` |
+   | `TXT` | `mini._domainkey` | Het record uit `mini-engine dkim` |
+   | `TXT` | `_dmarc` | `v=DMARC1; p=none;`, na een paar weken `p=quarantine` |
 
-Begin eventueel met DMARC op `p=none`, kijk een paar dagen mee in de rapporten en ga dan naar `quarantine`.
+5. Zet `MINI_ENGINE_SMTP_URL` op `direct://mail.miniengine.nl` en deploy opnieuw. In de log staat per mail `mail bezorgd` of de reden waarom niet.
 
-De engine verwacht de SMTP-gegevens als één URL:
+Zet `direct://` pas aan als poort 25 open is. Anders blijft een mail ruim een half uur hangen en staat de link niet meer in de log. Bij het opstarten vergelijkt de engine zijn sleutel met het DKIM-record in de DNS; klopt dat niet, dan staat er een waarschuwing met het juiste record in de log.
+
+Een nieuw mail-IP heeft nog geen reputatie, dus de eerste mails belanden soms in de spam. Markeer ze als "geen spam"; na een tijdje herkennen mailproviders je server.
+
+### Via een SMTP-dienst
+
+Liever een dienst als Postmark, Brevo, Mailgun, Resend of de SMTP van je eigen mailhosting? Voeg je domein daar toe en zet de DNS-records die de provider geeft (SPF, DKIM, eventueel een bounce-domein). Een domein heeft één SPF-record; heb je er al een, voeg de include dan toe. Zet daarna `MINI_ENGINE_SMTP_URL` op de SMTP-gegevens als één URL:
 
 ```text
 smtps://GEBRUIKER:WACHTWOORD@smtp.provider.example:465
@@ -54,6 +60,10 @@ smtp://GEBRUIKER:WACHTWOORD@smtp.provider.example:587?tls=required
 ```
 
 Tekens als `@`, `:` of `/` in de gebruikersnaam of het wachtwoord moet je URL-coderen; `@` wordt `%40`.
+
+### Robotcheck met Cloudflare Turnstile
+
+Om te voorkomen dat bots accounts aanmaken of je mail laten versturen, vragen registreren en het (opnieuw) versturen van een bevestigingsmail om een Turnstile-check zodra je beide sleutels zet. Maak in Cloudflare onder **Turnstile** een widget voor je domein en zet `MINI_ENGINE_TURNSTILE_SITE_KEY` en `MINI_ENGINE_TURNSTILE_SECRET`. De engine controleert elk token bij Cloudflare: één keer bruikbaar, met de juiste actie en voor je eigen domein. Zonder de sleutels werkt alles zoals eerder.
 
 ## 3. De applicatie in Coolify
 
@@ -68,16 +78,17 @@ Tekens als `@`, `:` of `/` in de gebruikersnaam of het wachtwoord moet je URL-co
 | Variabele | Waarde |
 | --- | --- |
 | `MINI_ENGINE_ADMIN_TOKEN` | Verplicht. De uitvoer van `openssl rand -hex 32`; minstens 32 tekens. Bewaar hem in je wachtwoordmanager. |
-| `MINI_ENGINE_SMTP_URL` | Verplicht. De SMTP-URL uit stap 2. Markeer hem als secret. |
+| `MINI_ENGINE_SMTP_URL` | `direct://mail.miniengine.nl` om zelf te versturen, of een SMTP-URL uit stap 2 (markeer die als secret). Leeg: links in de log. |
+| `MINI_ENGINE_TURNSTILE_SITE_KEY`, `MINI_ENGINE_TURNSTILE_SECRET` | De sleutels van je Turnstile-widget; markeer het secret als secret en zet het op niet beschikbaar tijdens de build. |
 | `MINI_ENGINE_MAIL_FROM` | `Mini Engine <noreply@miniengine.nl>` (standaard) |
 | `MINI_ENGINE_PUBLIC_URL` | `https://miniengine.nl` (standaard). De basis voor links in mails. |
-| `MINI_ENGINE_TRUST_PROXY` | `x-forwarded-for` (standaard). Staat Cloudflare als proxy voor Coolify, gebruik dan `cf-connecting-ip`. |
+| `MINI_ENGINE_TRUST_PROXY` | `cloudflare` (standaard). Neemt het bezoekersadres uit `CF-Connecting-IP`, maar alleen als het verzoek echt via Cloudflare binnenkwam. Zonder Cloudflare werkt het als `x-forwarded-for`. |
 | `MINI_ENGINE_ORIGINS` | Leeg, tenzij een ander adres de engine vanuit de browser moet aanroepen |
 | `RUST_LOG` | `mini_engine=info,tower_http=warn` (standaard) |
 
 Het compose-bestand zet de paden zelf: de database op `/app/data/mini-engine.sqlite`, de spellen in `/app/games` en de demo in `/app/web`. Ontbreekt een verplichte variabele, dan start de deploy niet.
 
-`MINI_ENGINE_TRUST_PROXY` bepaalt van welk IP-adres een verzoek komt, en dus voor wie de [aanvraaglimieten](../api/limieten.md#aanvragen-per-ip-adres) tellen. Zonder deze variabele delen alle bezoekers het adres van de proxy. Zet hem alleen als de engine uitsluitend via die proxy bereikbaar is.
+`MINI_ENGINE_TRUST_PROXY` bepaalt van welk IP-adres een verzoek komt, en dus voor wie de [aanvraaglimieten](../api/limieten.md#aanvragen-per-ip-adres) tellen. Met `cloudflare` telt de engine `CF-Connecting-IP` alleen als het verzoek van een Cloudflare-adres kwam; wie de server rechtstreeks aanspreekt, wordt op zijn eigen adres geteld. Gebruik geen kale headernaam zoals `cf-connecting-ip`: die is te vervalsen zodra de server ook direct bereikbaar is.
 
 ### Healthcheck en opslag
 
@@ -97,7 +108,7 @@ De database staat in het volume `mini-engine-data` (`/app/data`). Dat volume bli
 
    De CLI praat standaard met `https://miniengine.nl`. Voor een ander domein voeg je `--server https://jouw-domein` toe.
 
-3. Komt er geen mail aan, kijk dan bij **Logs** van de service. Een SMTP-fout staat daar als `bevestigingsmail niet verstuurd`. Zonder `MINI_ENGINE_SMTP_URL` schrijft de engine de bevestigingslink in de log. Als beheerder kun je een adres ook met de hand bevestigen met `me admin account verify <gebruikersnaam>`; zie [beheer](../publiceren/beheer.md#e-mailadres-met-de-hand-bevestigen).
+3. Komt er geen mail aan, kijk dan bij **Logs** van de service. Bij `direct://` staat daar `mail bezorgd`, `mail geweigerd` met de reden van de ontvanger, of `mail nog niet bezorgd; later opnieuw`. Een SMTP-fout staat er als `bevestigingsmail niet verstuurd`. Zonder `MINI_ENGINE_SMTP_URL` schrijft de engine de bevestigingslink in de log. Als beheerder kun je een adres ook met de hand bevestigen met `me admin account verify <gebruikersnaam>`; zie [beheer](../publiceren/beheer.md#e-mailadres-met-de-hand-bevestigen).
 
 ## 5. Back-ups
 
@@ -108,6 +119,8 @@ mini-engine backup /app/data/backups/mini-engine-$(date +%F).sqlite && ls -1t /a
 ```
 
 `mini-engine backup <bestand>` maakt een consistente kopie van de database (`VACUUM INTO`), ook terwijl er gespeeld wordt. Het doelbestand mag nog niet bestaan; ontbrekende mappen maakt het commando zelf. Het tweede deel bewaart alleen de drie nieuwste kopieën, zodat de schijf niet volloopt. Het draait alleen als de nieuwe back-up gelukt is. Wil je er meer bewaren, verhoog dan de `4` in `tail -n +4` (aantal plus één).
+
+`mini-engine backup` zet ook de DKIM-sleutel (`dkim.pem`) in de back-upmap. Bewaar die samen met de database: zonder die sleutel past het DKIM-record in je DNS niet meer na een herstel.
 
 De back-ups staan dan nog op dezelfde server. Haal de map `backups/` geregeld naar een andere plek, bijvoorbeeld met `rsync` naar een andere machine.
 
@@ -132,10 +145,13 @@ Deze documentatie draait op GitHub Pages onder `https://docs.miniengine.nl/`. Zo
 | `MINI_ENGINE_BIND` | `0.0.0.0:3000` | Adres en poort |
 | `MINI_ENGINE_DB` | `/app/data/mini-engine.sqlite` | SQLite-database |
 | `MINI_ENGINE_PUBLIC_URL` | `https://miniengine.nl` | Basis voor links in mails |
-| `MINI_ENGINE_SMTP_URL` | verplicht | SMTP voor bevestigingsmails |
+| `MINI_ENGINE_SMTP_URL` | leeg | `direct://<hostnaam>` of een SMTP-URL; leeg betekent links in de log |
+| `MINI_ENGINE_DKIM_KEY_FILE` | `dkim.pem` naast de database | DKIM-sleutel voor `direct://` |
+| `MINI_ENGINE_DKIM_SELECTOR` | `mini` | DKIM-selector |
+| `MINI_ENGINE_TURNSTILE_SITE_KEY`, `_SECRET` | leeg | Cloudflare Turnstile voor registreren en bevestigingsmails |
 | `MINI_ENGINE_MAIL_FROM` | `noreply@miniengine.nl` | Afzender, met de naam Mini Engine |
 | `MINI_ENGINE_ADMIN_TOKEN` | verplicht | Beheer en dev-keys, minstens 32 tekens |
-| `MINI_ENGINE_TRUST_PROXY` | `x-forwarded-for` | Waar het IP-adres van de bezoeker vandaan komt |
+| `MINI_ENGINE_TRUST_PROXY` | `cloudflare` in Coolify | Waar het IP-adres van de bezoeker vandaan komt |
 | `MINI_ENGINE_ORIGINS` | leeg | Extra toegestane browser-origins |
 | `RUST_LOG` | `mini_engine=info,…` | Logniveau |
 

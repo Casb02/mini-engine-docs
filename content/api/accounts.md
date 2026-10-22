@@ -47,7 +47,7 @@ Accounts zijn optioneel. Ze gelden voor alle spellen op één engine. Achtergron
 
 Extra velden, zoals een eigen `account_id`, worden geweigerd. Na het aanmaken stuurt de engine een bevestigingsmail; zie [e-mailbevestiging](#e-mailbevestiging). Het account kan meteen inloggen en spelen.
 
-**Fouten:** `400 invalid_request`, `409 username_taken`, `409 email_taken` (het adres is al bevestigd door een ander account), `429 rate_limit`.
+**Fouten:** `400 invalid_request`, `409 username_taken`, `409 email_taken` (het adres is al bevestigd door een ander account), `429 rate_limit`, en de [robotcheck](#robotcheck)-fouten.
 
 ## POST /api/v1/accounts/login
 
@@ -114,7 +114,25 @@ Voegt een adres toe, wijzigt het, of stuurt de link opnieuw als het adres gelijk
 { "account": Account, "verification_sent": true }
 ```
 
-**Fouten:** `400 invalid_request` (geen geldig adres), `401 unauthorized`, `409 email_already_verified` (dit adres is al bevestigd voor dit account), `409 email_taken` (bevestigd door een ander account), `429 rate_limit`: er is in de afgelopen minuut al een bevestigingsmail voor dit account verstuurd, of dit IP-adres heeft de mailgrens bereikt (zie [limieten](limieten.md#aanvragen-per-ip-adres)).
+**Fouten:** `400 invalid_request` (geen geldig adres), `401 unauthorized`, de [robotcheck](#robotcheck)-fouten, `409 email_already_verified` (dit adres is al bevestigd voor dit account), `409 email_taken` (bevestigd door een ander account), `429 rate_limit`: er is in de afgelopen minuut al een bevestigingsmail voor dit account verstuurd, of dit IP-adres heeft de mailgrens bereikt (zie [limieten](limieten.md#aanvragen-per-ip-adres)).
+
+## Robotcheck
+
+Op een server met Cloudflare Turnstile (zie [hosten op Coolify](../aan-de-slag/coolify.md#robotcheck-met-cloudflare-turnstile)) vragen `register` en `PUT /api/v1/accounts/email` een token van het Turnstile-widget, in de header `X-Turnstile-Token`. Het widget gebruikt de actie `register` of `email`. Een token werkt één keer; render na elke poging een nieuw token.
+
+### GET /api/v1/accounts/config
+
+```json
+{ "turnstile_site_key": "0x4AAAAAAAxxxxxxxxxxxxxx" }
+```
+
+De sitekey om het widget mee te tonen, of `null` als de robotcheck uitstaat.
+
+| Fout | Wanneer |
+| --- | --- |
+| `400 turnstile_required` | De header ontbreekt of is leeg. |
+| `400 turnstile_failed` | Cloudflare keurt het token af, het is al gebruikt, de actie of het domein klopt niet. |
+| `503 turnstile_unavailable` | Cloudflare is niet bereikbaar; probeer het zo opnieuw. |
 
 ## POST /api/v1/accounts/logout
 
