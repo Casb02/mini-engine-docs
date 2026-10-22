@@ -7,7 +7,7 @@ order: 1
 
 # De engine draaien
 
-Mini Engine is één Rust-programma. Het serveert de API, de websockets, de demopagina en de geïnstalleerde spellen vanaf één adres. Je hebt geen aparte frontend-build nodig om te spelen.
+Mini Engine is één Rust-programma. Het serveert de API, de websockets, de eigen pagina's onder `/home` en de geïnstalleerde spellen vanaf één adres. Je hebt geen aparte frontend-build nodig om te spelen.
 
 ## Wat je nodig hebt
 
@@ -23,7 +23,7 @@ Vanuit de root van de checkout:
 cargo run
 ```
 
-Open [localhost:3000/demo](http://localhost:3000/demo). Kies een spel, stel de kamer in en deel de code. `/` verwijst zelf door naar `/demo`.
+Open [localhost:3000/home](http://localhost:3000/home). Kies een spel, stel de kamer in en deel de code. `/` verwijst zelf door naar `/home`; oude adressen onder `/demo` sturen ook door.
 
 Standaard luistert de engine alleen op `127.0.0.1:3000`, dus alleen deze computer kan meedoen.
 
@@ -35,7 +35,7 @@ Laat de engine op alle netwerkinterfaces luisteren:
 MINI_ENGINE_BIND=0.0.0.0:3000 cargo run
 ```
 
-Open op de telefoons `http://<LAN-IP>:3000/demo`, bijvoorbeeld `http://192.168.1.20:3000/demo`. Gebruik dat LAN-adres ook op de computer van de spelleider, zodat alle apparaten dezelfde origin gebruiken.
+Open op de telefoons `http://<LAN-IP>:3000/home`, bijvoorbeeld `http://192.168.1.20:3000/home`. Gebruik dat LAN-adres ook op de computer van de spelleider, zodat alle apparaten dezelfde origin gebruiken.
 
 > **Waarom dezelfde origin?** De engine weigert browserverzoeken van een andere origin met `403 origin_forbidden`. Een verzoek met een `Origin`-header moet overeenkomen met het adres waarop de engine wordt bezocht, of in `MINI_ENGINE_ORIGINS` staan.
 
@@ -46,7 +46,7 @@ Open op de telefoons `http://<LAN-IP>:3000/demo`, bijvoorbeeld `http://192.168.1
 | `MINI_ENGINE_BIND` | `127.0.0.1:3000` | Adres en poort waarop de engine luistert |
 | `MINI_ENGINE_DB` | `data/mini-engine.sqlite` | SQLite-bestand voor kamers, accounts en resultaten |
 | `MINI_ENGINE_GAMES` | `games` | Map met gamepackages |
-| `MINI_ENGINE_WEB` | `web` | Map met de demopagina en de SDK-bundle |
+| `MINI_ENGINE_WEB` | `web` | Map met de pagina's onder `/home` en de SDK-bundle |
 | `MINI_ENGINE_ORIGINS` | leeg | Extra toegestane browser-origins, kommagescheiden, met schema en poort |
 | `MINI_ENGINE_ADMIN_TOKEN` | leeg | Zet [beheer](../publiceren/beheer.md) aan; minstens 32 tekens |
 | `MINI_ENGINE_PUBLIC_URL` | `http://localhost:3000` | Publiek adres voor links in bevestigingsmails, zonder `/` aan het eind |
@@ -81,7 +81,7 @@ De engine laadt gamepackages bij het opstarten. Na het toevoegen of wijzigen van
 curl http://localhost:3000/api/health
 ```
 
-Het antwoord is `{"status":"ok","version":"0.4.0"}`, met de versie uit `Cargo.toml`. De spellencatalogus staat op `/api/v1/games`.
+Het antwoord is `{"status":"ok","version":"0.5.0"}`, met de versie uit `Cargo.toml`. De spellencatalogus staat op `/api/v1/games`.
 
 In een container doet `mini-engine healthcheck` hetzelfde: het commando slaagt als `/api/health` een 200 geeft.
 

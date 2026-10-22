@@ -18,6 +18,9 @@ Waar de spelregels draaien, bepaalt het manifestveld `runtime`. Er zijn twee soo
 | Acties | Verwerkt en opgeslagen door de server | Doorgestuurd naar de host |
 | Deduplicatie met `action_id` | Ja, begrensd | Nee |
 | Accountresultaten | Ja, bij afronden van de ronde | Nee |
+| [Achievements](achievements.md) | De server kent ze toe bij afronden van de ronde | De host kent ze toe; ze staan apart, als niet gecontroleerd |
+| [Eigen sets](eigen-sets.md) | De engine gebruikt de set in plaats van `data.json` | De host leest de set met `gameData()` |
+| [Realtime](realtime.md) | Ja | Ja |
 | Spelleidermodi | Zoals het spel aangeeft | Alleen `moderator` |
 
 ## Serverruntime
@@ -43,4 +46,4 @@ De hostruntime is gemaakt voor vertrouwde spellen binnen je vriendengroep. Hoe j
 
 ## Welke kies ik?
 
-Voor een eigen spel is de keuze gemaakt: `host`, ook voor uploads. De scaffolder genereert een werkend voorbeeld. Wil je dat de engine zelf de regels bewaakt, of dat resultaten in accountstatistieken komen, dan moet de regelverwerking als Rust-runtime in de engine komen.
+Voor een eigen spel is de keuze gemaakt: `host`, ook voor uploads. De scaffolder genereert een werkend voorbeeld. Wil je dat de engine zelf de regels bewaakt, of dat resultaten in accountstatistieken komen, dan moet de regelverwerking als Rust-runtime in de engine komen. Achievements kan een eigen spel wel toekennen, maar die toont de accountpagina apart, omdat de server ze niet kan controleren.

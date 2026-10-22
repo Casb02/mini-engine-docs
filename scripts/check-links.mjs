@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = join(ROOT, 'site');
 const BASE = process.env.DOCS_BASE ?? '/mini-engine-docs/';
-const PDF = 'downloads/MiniEngine-API-v0.2.pdf';
+const PDF = (await readFile(join(ROOT, 'build.mjs'), 'utf8')).match(/^const PDF = '([^']+)';$/m)[1];
 const allowMissingPdf = process.argv.includes('--allow-missing-pdf');
 
 if (!existsSync(SITE)) {

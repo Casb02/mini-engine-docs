@@ -1,6 +1,6 @@
 ---
 title: Acties en action-id's
-description: Hoe spelers en spelleiders acties sturen, wat een action_id doet en waarom de SDK nooit automatisch opnieuw probeert.
+description: Hoe spelers en spelleiders acties sturen, wat een action_id doet, waarom de SDK nooit automatisch opnieuw probeert, en hoe acties en realtime samengaan.
 section: Concepten
 order: 5
 ---
@@ -60,6 +60,20 @@ Een eigen spel met `runtime: "host"` kent geen deduplicatie in de engine. De eng
 ```
 
 De `player_id` komt van de engine en is betrouwbaar. De `data` komt van de speler en is dat niet: controleer altijd de vorm, de spelfase en de spelregels voordat je de state wijzigt. De bevestiging aan de speler betekent alleen dat de actie in de wachtrij van de host staat.
+
+## Acties en realtime
+
+Een [realtime-event](realtime.md) lijkt op een actie, maar is het niet:
+
+| | Actie | Realtime-event |
+| --- | --- | --- |
+| Verwerkt door | De spelregels: de server of de host | Niemand; het gaat rechtstreeks naar de ontvangers |
+| Opgeslagen | Ja, als onderdeel van de spelstand | Nee |
+| Bevestiging | `ack` | Geen |
+| `action_id` en deduplicatie | Ja, bij serverspellen | Nee |
+| Kan wegvallen | Nee, na een `ack` | Ja |
+
+Gebruik een actie voor alles wat telt. Gebruik realtime voor wat je meteen wilt laten zien. Ze gaan goed samen: in Jeopardy stuurt een speler bij het drukken een event `pressed` én de actie `buzz`. Host en scherm tonen het event direct, met het verschil in milliseconden; de actie beslist wie de vraag krijgt.
 
 ## De acties van de ingebouwde spellen
 

@@ -32,7 +32,7 @@ cd ../mini-engine
 cargo run
 ```
 
-Open `/demo`, kies **Mijn Spel** en maak een kamer. Doe mee vanaf een tweede browser of apparaat, zet je klaar, en start de stemronde op de spelleiderspagina.
+Open `/home`, kies **Mijn Spel** en maak een kamer. Doe mee vanaf een tweede browser of apparaat, zet je klaar, en start de stemronde op de spelleiderspagina.
 
 ## De slug
 
@@ -100,11 +100,11 @@ Wil je de SDK in een ander project gebruiken zonder de repository, maak dan een 
 npm pack
 
 # in je eigen project
-npm install /absoluut/pad/naar/mini-engine-sdk/casb02-mini-engine-sdk-0.3.1.tgz
+npm install /absoluut/pad/naar/mini-engine-sdk/casb02-mini-engine-sdk-0.5.0.tgz
 npx create-mini-game mijn-spel --directory /pad/naar/engine/games/mijn-spel
 ```
 
-`npx` gebruikt hier de lokaal geïnstalleerde CLI. Het pakket staat niet op npm.
+`npx` gebruikt hier de lokaal geïnstalleerde CLI. Je kunt het pakket ook uit GitHub Packages installeren; zie [het SDK-overzicht](../sdk/overzicht.md#in-een-eigen-project).
 
 > Open gegenereerde HTML niet via `file://` of een losse static server. De engine levert de API, de kamersessies, de websockets en de assetroutes.
 

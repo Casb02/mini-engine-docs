@@ -1,6 +1,6 @@
 ---
 title: Events en fouten
-description: De events van de MiniEngine-client, de verbindingsstatussen, MiniEngineError en de foutcodes die de SDK zelf maakt.
+description: De events van de websocketclient, de verbindingsstatussen, MiniEngineError en de foutcodes die de SDK zelf maakt.
 section: SDK-referentie
 order: 4
 ---
@@ -24,6 +24,15 @@ off(); // afmelden
 | `status` | `ConnectionStatus` | De verbinding verandert |
 | `error` | `Error` | Een fout van de server of de verbinding |
 | `closed` | `string` | De verbinding is definitief gesloten, met de reden |
+| `achievement` | `{ player_id, achievement: { id, title, description } }` | Sinds 0.5. Iemand in de kamer verdiende een [achievement](../concepten/achievements.md#vieren-in-het-spel) voor het eerst |
+| `throttled` | `{ dropped }` | Sinds 0.5. Er vielen realtimeberichten van jou weg omdat je te veel stuurde; hoogstens eens per 5 seconden |
+
+Realtime-events en -waarden hebben hun eigen handlers: `client.realtime.on` en `client.realtime.onValue`. Zie [realtime](realtime-client.md#realtime).
+
+```ts
+client.on('achievement', ({ player_id, achievement }) => celebrate(player_id, achievement.title));
+client.on('throttled', ({ dropped }) => console.warn(`${dropped} realtimeberichten niet verstuurd`));
+```
 
 ### Verbindingsstatus
 

@@ -1,6 +1,6 @@
 ---
 title: ApiClient
-description: De HTTP-client van de SDK met alle methoden voor spellen, kamers, schermsleutels en accounts, plus de losse http-helpers.
+description: De HTTP-client van de SDK met alle methoden voor spellen, kamers, schermsleutels, accounts, achievements en eigen sets, plus de losse http-helpers.
 section: SDK-referentie
 order: 2
 toc_depth: 3
@@ -54,7 +54,7 @@ De metadata van één spel. Onbekend: `404 game_not_found`.
 createRoom(options: CreateRoomOptions): Promise<RoomCredentials>
 ```
 
-Maakt een kamer en geeft de hostsleutel terug. Met een `accountToken` koppelt de engine het account aan de spelersplek van de maker.
+Maakt een kamer en geeft de hostsleutel terug. Met een `accountToken` koppelt de engine het account aan de spelersplek van de maker en onthoudt hij het als account van de host.
 
 ```ts
 const credentials = await api.createRoom({
@@ -65,6 +65,14 @@ const credentials = await api.createRoom({
   config: { host_mode: 'hostless', display_enabled: true, allow_late_join: false },
 });
 // { code: 'HWKRTZ', token: '…', role: 'host', player_id: '…', display_token: '…' }
+```
+
+Met `set_id` speelt de kamer met een [eigen set](../concepten/eigen-sets.md) van het ingelogde account. Dat vraagt een `accountToken`:
+
+```ts
+api.accountToken = token;
+const { sets } = await api.listSets({ game_id: 'jeopardy', kind: 'board' });
+const room = await api.createRoom({ game_id: 'jeopardy', set_id: sets[0].id });
 ```
 
 ### joinRoom(code, name)
@@ -101,7 +109,7 @@ Openbare kamerinfo, zonder namen of spelstand.
 gameData<T = unknown>(code: string, token: string): Promise<T>
 ```
 
-De geheime `data.json` van het spel. Alleen met een hostsleutel.
+De geheime `data.json` van het spel, of de eigen set als de kamer daarmee speelt (`room.set` is dan gevuld). Alleen met een hostsleutel.
 
 ### displayToken(code, token)
 
@@ -119,7 +127,7 @@ Maakt een nieuwe schermsleutel; de vorige werkt daarna niet meer. Alleen voor de
 register(input: { username: string; password: string; display_name: string; email: string }): Promise<AccountSession>
 ```
 
-Sinds engine 0.4 is `email` verplicht. De engine stuurt een bevestigingsmail met een link naar `/demo/account?verify=<token>`.
+Sinds engine 0.4 is `email` verplicht. De engine stuurt een bevestigingsmail met een link naar `/home/account?verify=<token>`.
 
 ### login(input)
 
@@ -173,6 +181,14 @@ stats(): Promise<AccountStats>
 
 Totalen, cijfers per spel en de laatste twintig resultaten.
 
+### achievements(accountToken?)
+
+```ts
+achievements(accountToken?: string): Promise<{ achievements: AccountAchievement[] }>
+```
+
+Sinds SDK 0.5.0. De verdiende [achievements](../concepten/achievements.md) van het account, nieuwste eerst. Standaard met `api.accountToken`. Let op `source`: `'game'` betekent toegekend door een eigen spel en niet gecontroleerd door de server.
+
 ### logout()
 
 ```ts
@@ -181,13 +197,65 @@ logout(): Promise<null>
 
 Trekt de huidige sessie in en wist `api.accountToken` als de server dat bevestigt.
 
+## Eigen sets
+
+Sinds SDK 0.5.0. Alle methoden gebruiken `api.accountToken`. Zie [eigen sets](../concepten/eigen-sets.md) en de [routes](../api/accounts.md#sets).
+
+### listSets(filter?)
+
+```ts
+listSets(filter?: { game_id?: string; kind?: string }): Promise<{ sets: SetSummary[] }>
+```
+
+Jouw sets zonder inhoud, laatst gewijzigd eerst.
+
+### getSet(id)
+
+```ts
+getSet<Data = Json>(id: string): Promise<SavedSet<Data>>
+```
+
+Eén set met inhoud. Een set van een ander account geeft `set_not_found`.
+
+### createSet(input)
+
+```ts
+createSet<Data extends Json = Json>(input: { game_id: string; kind: string; title: string; data: Data }): Promise<SavedSet<Data>>
+```
+
+```ts
+const board = await api.createSet({
+  game_id: 'jeopardy',
+  kind: 'board',
+  title: "Dani's filmavond",
+  data: { categories: [{ title: 'Films', clues: [/* vijf vragen */] }] },
+});
+```
+
+De soort moet in de actieve versie van het spel staan en de inhoud moet aan het schema voldoen. Een fout noemt het pad, zoals `categories[0].clues[2].question: gebruik 1–240 tekens.` Bij 50 sets volgt `quota_sets`.
+
+### updateSet(id, input)
+
+```ts
+updateSet<Data extends Json = Json>(id: string, input: { title: string; data: Data }): Promise<SavedSet<Data>>
+```
+
+Vervangt titel en inhoud. Kamers die de set al gebruiken, houden hun kopie.
+
+### deleteSet(id)
+
+```ts
+deleteSet(id: string): Promise<null>
+```
+
 ## Welke sleutel gaat waarheen?
 
 | Methode | Sleutel |
 | --- | --- |
 | `createRoom`, `joinRoom` | `accountToken`, als die er is |
 | `getRoom`, `gameData`, `displayToken` | De meegegeven kamersleutel |
-| `me`, `stats`, `logout`, `verifyEmail`, `setEmail` | `accountToken` |
+| `me`, `stats`, `achievements`, `logout`, `verifyEmail`, `setEmail` | `accountToken` |
+| `listSets`, `getSet`, `createSet`, `updateSet`, `deleteSet` | `accountToken` |
 | `getGames`, `getGame`, `roomInfo`, `register`, `login` | Geen |
 
 ## Losse functies

@@ -13,14 +13,14 @@ Deze routes zijn openbaar en hebben geen sleutel nodig.
 ## GET /api/health
 
 ```json
-{ "status": "ok", "version": "0.4.0" }
+{ "status": "ok", "version": "0.5.0" }
 ```
 
 `version` is de gebouwde versie van de engine.
 
 ## GET /api/v1/games
 
-Alle geïnstalleerde spellen, met metadata en instellingenschema.
+Alle spellen die aanstaan, met metadata, instellingenschema, achievements en soorten sets.
 
 ```json
 {
@@ -43,13 +43,34 @@ Alle geïnstalleerde spellen, met metadata en instellingenschema.
       },
       "runtime": "server",
       "host_modes": ["moderator"],
-      "default_host_mode": "moderator"
+      "default_host_mode": "moderator",
+      "achievements": [
+        { "id": "eerste-antwoord", "title": "Eerste goede antwoord", "description": "Geef een goed antwoord in een show." },
+        { "id": "winnaar", "title": "Winnaar", "description": "Win een show met je team." },
+        { "id": "foutloos", "title": "Foutloos", "description": "Geef minstens drie goede antwoorden in één show, zonder fout." },
+        { "id": "eigen-bord", "title": "Eigen bord", "description": "Speel een show op een eigen vragenbord." }
+      ],
+      "set_kinds": [
+        {
+          "id": "board",
+          "title": "Vragenbord",
+          "description": "Eén tot zes categorieën met elk vijf vragen.",
+          "schema": {
+            "type": "object",
+            "properties": { "categories": { "type": "array", "minItems": 1, "maxItems": 6, "items": { "…": "…" } } },
+            "required": ["categories"],
+            "additionalProperties": false
+          }
+        }
+      ]
     }
   ]
 }
 ```
 
-Ontbrekende manifestvelden krijgen hier hun standaardwaarde: `runtime: "host"`, `host_modes: ["moderator"]`, `default_host_mode: "moderator"` en `supports_late_join: true`. Alle velden staan bij [package en manifest](../game-bouwen/package-en-manifest.md#velden).
+Ontbrekende manifestvelden krijgen hier hun standaardwaarde: `runtime: "host"`, `host_modes: ["moderator"]`, `default_host_mode: "moderator"`, `supports_late_join: true`, en lege lijsten voor `achievements` en `set_kinds`. Alle velden staan bij [package en manifest](../game-bouwen/package-en-manifest.md#velden). Het volledige schema van het vragenbord staat bij [eigen sets](../concepten/eigen-sets.md#het-schemadialect).
+
+`achievements` en `set_kinds` zijn er sinds 0.5. Ze komen uit de actieve versie van het spel. Een kamer die een oudere versie speelt, gebruikt de achievements en soorten sets van die versie.
 
 ## GET /api/v1/games/{id}
 
@@ -75,7 +96,12 @@ import { MiniEngine, loadSession } from '/sdk/mini-engine.js';
 
 | Pad | Inhoud |
 | --- | --- |
-| `/` | Doorverwijzing naar `/demo` |
-| `/demo` | De werkbank: kamers maken, meedoen, account |
+| `/` | Doorverwijzing naar `/home` |
+| `/home` | De startpagina: een kamercode invullen of een spel kiezen |
+| `/home/new/{id}` | Een kamer maken voor een spel; een onbekend spel geeft 404 |
+| `/home/join` | Meedoen met een naam, met `?room=CODE` |
+| `/home/account` | Inloggen, een account maken, resultaten en achievements |
+| `/home/sets`, `/home/sets/{id}` | Mijn sets: eigen sets bekijken, maken en bewerken (sinds 0.5) |
+| `/demo/…` | Oude adressen; ze sturen door naar hetzelfde pad onder `/home`, met de query erbij |
 | `/room/{code}/{role}` | De kamerinterface die de rolpagina van het spel laadt |
 | `/static/{name}` | Bestanden uit de webmap van de engine |

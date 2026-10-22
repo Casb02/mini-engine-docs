@@ -40,7 +40,7 @@ Laat zien als wie je bent ingelogd, of vergeet de key.
 | `me game upload [map] [--activate] [--dry-run]` | Pakt de map in en uploadt een nieuwe versie; `--dry-run` laat alleen zien wat meegaat |
 | `me game versions <id>` | Alle bewaarde versies; welke actief is en welke een kamer gebruikt |
 | `me game activate <id> <versie>` | Maakt een versie actief, ook om terug te gaan |
-| `me game enable <id>` / `me game disable <id>` | Toont of verbergt de game op `/demo` |
+| `me game enable <id>` / `me game disable <id>` | Toont of verbergt de game op `/home` |
 | `me game delete-version <id> <versie>` | Verwijdert één oude versie |
 | `me game prune <id> [--keep N] [--dry-run]` | Verwijdert oude versies, behalve de actieve, de nieuwste N (standaard 3) en versies in gebruik |
 | `me game delete <id>` | Verwijdert de hele game (vraagt om bevestiging, of `--yes`) |

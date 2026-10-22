@@ -32,11 +32,11 @@ Mini Engine is een kleine Rust-engine voor gezelschapsspellen met vrienden. Eén
 
 <ol class="steps">
   <li><div><strong>Iemand maakt een kamer</strong>Op een laptop of telefoon kies je een spel en stel je de kamer in. Je krijgt een code van zes letters.</div></li>
-  <li><div><strong>De rest doet mee op de eigen telefoon</strong>Iedereen opent de demopagina, vult de code en een naam in en krijgt een eigen plek aan tafel. De tv toont het gedeelde scherm.</div></li>
+  <li><div><strong>De rest doet mee op de eigen telefoon</strong>Iedereen opent de startpagina, vult de code en een naam in en krijgt een eigen plek aan tafel. De tv toont het gedeelde scherm.</div></li>
   <li><div><strong>Iedereen zet zich klaar, het spel begint</strong>Als alle spelers klaarstaan, start de ronde. Elke telefoon ziet direct dezelfde worp, vraag of score.</div></li>
 </ol>
 
-Spelen kan zonder account. Wie er wel een maakt, ziet de resultaten van afgeronde rondes terug in een profiel dat voor alle spellen op dezelfde engine geldt.
+Spelen kan zonder account. Wie er wel een maakt, ziet resultaten en achievements terug in een profiel dat voor alle spellen op dezelfde engine geldt, en kan eigen inhoud bewaren, zoals een eigen Jeopardy-bord.
 
 ## Voor wie is dit?
 
@@ -47,6 +47,6 @@ Mini Engine is gemaakt voor een vriendengroep die eigen spellen wil spelen en bo
 <ul class="routes">
   <li><a href="aan-de-slag/engine-draaien.md"><strong>De engine draaien</strong><span>Start Mini Engine op je computer en speel met telefoons op je wifi.</span></a></li>
   <li><a href="game-bouwen/eerste-game.md"><strong>Een game bouwen</strong><span>Maak met de scaffolder in vijf minuten een speelbaar stemspel en pas het aan.</span></a></li>
-  <li><a href="concepten/kamers-en-rollen.md"><strong>De concepten</strong><span>Kamers, rollen, spelleidermodi, state en acties: hoe de onderdelen samenwerken.</span></a></li>
-  <li><a href="api/overzicht.md"><strong>De HTTP- en websocket-API</strong><span>Alle routes, berichten, foutcodes en limieten van versie 0.4.</span></a></li>
+  <li><a href="concepten/kamers-en-rollen.md"><strong>De concepten</strong><span>Kamers, rollen, state, acties, realtime, achievements en eigen sets: hoe de onderdelen samenwerken.</span></a></li>
+  <li><a href="api/overzicht.md"><strong>De HTTP- en websocket-API</strong><span>Alle routes, berichten, foutcodes en limieten van versie 0.5.</span></a></li>
 </ul>

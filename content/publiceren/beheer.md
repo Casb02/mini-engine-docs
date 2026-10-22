@@ -22,7 +22,7 @@ Zonder deze variabele geven alle routes onder `/api/v1/admin` 404 `admin_disable
 
 ## Iemand uitnodigen
 
-1. Laat diegene een account maken op `/demo/account` en het e-mailadres bevestigen via de link in de mail.
+1. Laat diegene een account maken op `/home/account` en het e-mailadres bevestigen via de link in de mail.
 2. Maak een dev-key:
 
    ```sh
@@ -42,7 +42,7 @@ Komt de bevestigingsmail niet aan, bijvoorbeeld omdat SMTP nog niet is ingesteld
 me admin account verify sander
 ```
 
-Dat bevestigt het adres dat bij het account staat. Heeft het account geen adres, dan volgt 409 `email_missing`; laat diegene dan eerst een adres invullen op `/demo/account`. Zonder `MINI_ENGINE_SMTP_URL` staat de bevestigingslink ook in de log van de engine.
+Dat bevestigt het adres dat bij het account staat. Heeft het account geen adres, dan volgt 409 `email_missing`; laat diegene dan eerst een adres invullen op `/home/account`. Zonder `MINI_ENGINE_SMTP_URL` staat de bevestigingslink ook in de log van de engine.
 
 ## Keys en games beheren
 

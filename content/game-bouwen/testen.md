@@ -12,7 +12,7 @@ Een spel voor een hele tafel test je met een hele tafel. Je hebt minimaal een sp
 ## Opzet
 
 1. Start de engine op je netwerk: `MINI_ENGINE_BIND=0.0.0.0:3000 cargo run`.
-2. Open `http://<LAN-IP>:3000/demo` op je computer en maak een kamer.
+2. Open `http://<LAN-IP>:3000/home` op je computer en maak een kamer.
 3. Doe mee met twee telefoons, of met twee privévensters. Kamersleutels staan in `sessionStorage` per tabblad, dus elk tabblad is een eigen deelnemer.
 4. Open het gedeelde scherm vanuit de spelleiderspagina.
 

@@ -22,7 +22,7 @@ removeSession(code: string, role: Role, storage?: SessionStorage): void
 mini-engine:HWKRTZ:player
 ```
 
-`sessionKey` zet de code om naar hoofdletters. De demopagina, de kamerinterface en alle spelpagina's gebruiken dezelfde indeling, zodat een spel de sessie terugvindt die de demo heeft bewaard.
+`sessionKey` zet de code om naar hoofdletters. De pagina's onder `/home`, de kamerinterface en alle spelpagina's gebruiken dezelfde indeling, zodat een spel de sessie terugvindt die de startpagina heeft bewaard.
 
 ## Gebruik
 
@@ -56,7 +56,7 @@ saveSession(credentials, storage);
 
 ## Wat hier niet in hoort
 
-- **Accountsleutels.** Die bewaart de SDK niet. De demo zet ze in `localStorage` onder `mini-engine:account`; in een eigen app kies je zelf.
+- **Accountsleutels.** Die bewaart de SDK niet. De pagina's onder `/home` zetten ze in `localStorage` onder `mini-engine:account`; in een eigen app kies je zelf.
 - **Sleutels in de URL.** Gebruik nooit een queryparameter. De enige uitzondering is de schermlink, die de sleutel in het fragment draagt; de kamerinterface haalt hem daar meteen weg.
 
 Gamecode op dezelfde origin kan deze opslag lezen. Installeer alleen spellen die je vertrouwt.

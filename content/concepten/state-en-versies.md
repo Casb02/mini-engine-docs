@@ -1,6 +1,6 @@
 ---
 title: State en versies
-description: Publieke, host- en spelersstate, het versienummer van een kamer en hoe je versieconflicten afhandelt.
+description: Publieke, host- en spelersstate, het versienummer van een kamer, hoe je versieconflicten afhandelt, en waarom realtime daarbuiten staat.
 section: Concepten
 order: 4
 ---
@@ -53,3 +53,18 @@ Duurzame wijzigingen worden opgeslagen voordat de nieuwe snapshot verschijnt. Mi
 ## Volgorde bij de websocket
 
 Bij een geslaagde mutatie via de websocket stuurt de engine eerst de bijgewerkte snapshot en daarna de bevestiging. De bevestiging (`ack`) bevat zelf geen state. Ga dus uit van de snapshot, niet van de ack.
+
+## Realtime staat erbuiten
+
+[Realtime](realtime.md) hoort niet bij de spelstand. Events en waarden:
+
+- worden nooit opgeslagen, alleen in het geheugen bewaard;
+- verhogen de versie niet en vragen geen `expected_version`;
+- krijgen geen `ack` en staan niet in de snapshot;
+- hebben geen vaste volgorde ten opzichte van snapshots.
+
+Na een herstart van de engine is de spelstand er weer, maar zijn alle realtimewaarden weg. Wat telt voor de uitslag, zet je daarom in de state, via een actie of `set_state`. Realtime is voor wat je onderweg laat zien.
+
+Ook het websocketbericht `achievement`, dat de kamer krijgt als iemand een [achievement](achievements.md#vieren-in-het-spel) verdient, valt buiten de state: het heeft geen versie en staat niet in de snapshot. De achievement zelf staat op het account.
+
+Het snapshotveld `set` verandert nooit tijdens de kamer. Een [eigen set](eigen-sets.md) ligt vast bij het maken van de kamer, net als de versie van het spel.

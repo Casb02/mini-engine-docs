@@ -1,6 +1,6 @@
 ---
 title: Limieten
-description: Alle grenzen van Mini Engine 0.4 op één plek, van kamercodes en namen tot berichtgroottes, aanvraaglimieten en gamepackages.
+description: Alle grenzen van Mini Engine 0.5 op één plek, van kamercodes en namen tot berichtgroottes, realtime, achievements, eigen sets, aanvraaglimieten en gamepackages.
 section: HTTP API
 order: 8
 ---
@@ -36,10 +36,47 @@ order: 8
 | HTTP-body | 96 KiB |
 | Websocketbericht | 96 KiB |
 | Websocket-authenticatie | Binnen 5 seconden |
-| Websocketberichten | 240 per seconde voor de host, 60 voor andere rollen |
+| Websocketopdrachten | 240 per seconde voor de host, 60 voor andere rollen; realtime telt niet mee |
 | `request_id` | 64 bytes |
 | Heartbeat | Ping elke 15 seconden; sluiten na 45 seconden stilte |
 | Gelijktijdige websocketverbindingen | 1024 per engine |
+
+## Realtime (vanaf 0.5)
+
+| Grens | Waarde |
+| --- | --- |
+| Realtimeberichten | 60 per seconde per verbinding, pieken tot 120 |
+| `data` van een event, `value` van een waarde | 2 KiB als JSON |
+| Kanaalnaam en sleutel | 1 tot 64 tekens: letters, cijfers, `_`, `.`, `:`, `-` |
+| Ontvangers van een event | `all`, `host`, `players`, `display` of hoogstens 16 speler-id's |
+| Sleutels per afzender | 64 |
+| Waarden per kamer | 256 KiB samen |
+| Wachtrij per kamer | 1024 berichten; wie achterloopt, mist de oudste |
+| Melding `rt.throttled` | Hoogstens eens per 5 seconden per verbinding |
+
+Wat boven het budget of de grenzen voor waarden komt, valt weg. De verbinding blijft open. Zie [realtime](../concepten/realtime.md#grenzen).
+
+## Achievements (vanaf 0.5)
+
+| Grens | Waarde |
+| --- | --- |
+| Achievements per spel | 50 |
+| `id` | 1 tot 48 tekens: kleine letters, cijfers, `_` of `-`, beginnend met een letter of cijfer |
+| `title` | 1 tot 60 tekens |
+| `description` | 1 tot 160 tekens |
+| Toekennen door de host | 30 per kamer per minuut |
+| Per account | Elke achievement één keer per spel |
+
+## Eigen sets (vanaf 0.5)
+
+| Grens | Waarde |
+| --- | --- |
+| Soorten sets per spel (`set_kinds`) | 4 |
+| `id`, `title`, `description` van een soort | Als bij achievements: 48, 60 en 160 tekens |
+| Schema | Hoogstens 8 niveaus diep en 256 onderdelen; `enum` hoogstens 256 teksten |
+| Titel van een set | 1 tot 80 tekens |
+| Inhoud van een set | 64 KiB als JSON |
+| Sets per account | 50 |
 
 ## Aanvragen per IP-adres
 
@@ -51,6 +88,7 @@ order: 8
 | Alle routes onder `/api/v1/admin/` | 30 per minuut |
 | `POST`, `PUT` en `DELETE` onder `/api/v1/dev/` | 60 per minuut |
 | Uploads (`POST /api/v1/dev/games/{id}/versions`) | 20 per 10 minuten |
+| Sets: `POST`, `PUT` en `DELETE` onder `/api/v1/accounts/sets` (vanaf 0.5) | 30 per minuut |
 | Verkeerde admin- of dev-sleutel (401 op `/admin` of `/dev`) | na 10 in 10 minuten wordt dat adres 10 minuten geweigerd, ook met de goede sleutel |
 
 Daarboven volgt `429 rate_limit`. De tellers zijn per IP-adres, en per /64-blok voor IPv6. Registreren telt zowel mee voor de accountgrens als voor de mailgrens. Daarnaast wacht een gebruikersnaam een kwartier na tien mislukte inlogpogingen, van welk adres ook; een geslaagde login zet de teller terug.

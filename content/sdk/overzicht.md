@@ -13,22 +13,22 @@ De Mini Engine SDK is een getypeerde browser- en Node-client zonder runtime-afha
 | | |
 | --- | --- |
 | Pakketnaam | `@casb02/mini-engine-sdk` |
-| Versie | `0.3.1`, voor engine 0.4 |
+| Versie | `0.5.0`, voor engine 0.5 |
 | Repository | [Casb02/mini-engine-sdk](https://github.com/Casb02/mini-engine-sdk) (openbaar, MIT) |
 | Node.js | 22 of nieuwer |
-| npm | Niet gepubliceerd; gebruik de lokale build of een tarball |
+| npm | GitHub Packages, of rechtstreeks uit de repository |
 
 ## Wat erin zit
 
 | Export | Waarvoor |
 | --- | --- |
-| [`ApiClient`](api-client.md) | HTTP: spellen, kamers maken en meedoen, snapshots, geheime speldata, schermsleutels, accounts |
-| [`MiniEngine`](realtime-client.md) | De realtime websocketclient: snapshots, acties, klaarzetten, state, levensloop |
+| [`ApiClient`](api-client.md) | HTTP: spellen, kamers maken en meedoen, snapshots, geheime speldata, schermsleutels, accounts, achievements, eigen sets |
+| [`MiniEngine`](realtime-client.md) | De websocketclient: snapshots, acties, klaarzetten, state, levensloop, achievements toekennen, en realtime met `client.realtime` |
 | [`http`, `getGames`, `createRoom`, `joinRoom`](api-client.md#losse-functies) | Losse HTTP-helpers op de huidige origin |
 | [`sessionKey`, `saveSession`, `loadSession`, `removeSession`](sessies.md) | Kamersleutels bewaren in `sessionStorage` |
 | [`MiniEngineError`](events-en-fouten.md#miniengineerror) | Fouten met een `code` en optioneel een HTTP-`status` |
 | `normalizeCode`, `endpoint` | Kamercode naar hoofdletters; URL samenstellen |
-| [Types](types.md) | `Snapshot`, `Manifest`, `RoomCredentials` en meer |
+| [Types](types.md) | `Snapshot`, `Manifest`, `RoomCredentials`, `Realtime`, `SavedSet` en meer |
 
 ## In een spelpagina
 
@@ -42,23 +42,30 @@ Dat is één gebundelde ES-module, `dist/mini-engine.js`. De engine bewaart een 
 
 ## In een eigen project
 
-Bouw de SDK uit de checkout, of installeer een lokale tarball:
+Het pakket staat in GitHub Packages. Wijs de scope `@casb02` daar één keer naartoe, in de `.npmrc` van je project of in `~/.npmrc`:
+
+```ini
+@casb02:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+GitHub Packages vraagt ook voor een openbaar pakket een token. Maak een *personal access token (classic)* met alleen `read:packages` en zet het in `GITHUB_TOKEN`. Daarna:
 
 ```sh
-# in de SDK-checkout
-npm ci
-npm run build
-npm pack
+npm install @casb02/mini-engine-sdk
+```
 
-# in je eigen project
-npm install /absoluut/pad/naar/casb02-mini-engine-sdk-0.3.1.tgz
+Zonder token installeer je rechtstreeks uit de repository; npm bouwt het pakket dan zelf:
+
+```sh
+npm install github:Casb02/mini-engine-sdk#v0.5.0
 ```
 
 ```ts
 import { ApiClient, MiniEngine, saveSession } from '@casb02/mini-engine-sdk';
 ```
 
-Het pakket bevat `dist/mini-engine.js`, de typedeclaraties in `types/mini-engine.d.ts` en de CLI in `bin/`.
+Het pakket bevat `dist/mini-engine.js`, de typedeclaraties in `types/mini-engine.d.ts`, de scaffolder in `bin/` en de skills voor AI-agents in `skills/`.
 
 ## Van buiten een browser
 

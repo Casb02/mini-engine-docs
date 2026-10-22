@@ -54,6 +54,6 @@ me game prune mijn-spel --keep 3     # houdt de actieve, de nieuwste 3 en versie
 
 ## Aan en uit
 
-`me game disable mijn-spel` haalt de game van `/demo` en uit `GET /api/v1/games`. Nieuwe kamers kunnen dan niet meer, lopende kamers spelen door met hun eigen versie. `me game enable` zet hem terug.
+`me game disable mijn-spel` haalt de game van `/home` en uit `GET /api/v1/games`. Nieuwe kamers kunnen dan niet meer, lopende kamers spelen door met hun eigen versie. `me game enable` zet hem terug.
 
 Blokkeert de eigenaar je game, dan is dat een noodstop: de engine serveert er niets meer van, ook niet aan lopende kamers, en je kunt hem niet zelf weer aanzetten.
