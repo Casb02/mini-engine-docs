@@ -12,7 +12,7 @@ De Mini Engine SDK bevat een scaffolder, `create-mini-game`. Die maakt een compl
 ## Wat je nodig hebt
 
 - Node.js 22 of nieuwer.
-- Toegang tot de privérepository `Casb02/mini-engine-sdk`. Log eerst in bij GitHub.
+- Een checkout van de openbare SDK-repository [`Casb02/mini-engine-sdk`](https://github.com/Casb02/mini-engine-sdk), of `me game new` uit de [CLI](../publiceren/cli.md).
 - Een checkout van Mini Engine naast de SDK, bijvoorbeeld in `../mini-engine`.
 
 ## In vijf minuten

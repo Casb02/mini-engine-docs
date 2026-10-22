@@ -15,7 +15,7 @@ npm install -g github:Casb02/mini-engine-cli
 me --help
 ```
 
-De repository is privé: je hebt GitHub-toegang nodig om hem te installeren.
+De CLI is openbaar en valt onder de MIT-licentie.
 
 ## Snel aan de slag
 

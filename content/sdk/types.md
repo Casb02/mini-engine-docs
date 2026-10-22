@@ -8,7 +8,7 @@ toc_depth: 3
 
 # Types
 
-De SDK is in TypeScript geschreven. Alle declaraties staan in één bestand: [`types/mini-engine.d.ts`](https://github.com/Casb02/mini-engine-sdk/blob/main/types/mini-engine.d.ts) in de SDK-repository (privé). Het wordt bij `npm run build` uit `src/` gegenereerd. De engine heeft een kopie in `web/mini-engine.d.ts`, en de scaffolder zet er een in `types/` van elk nieuw spel.
+De SDK is in TypeScript geschreven. Alle declaraties staan in één bestand: [`types/mini-engine.d.ts`](https://github.com/Casb02/mini-engine-sdk/blob/main/types/mini-engine.d.ts) in de SDK-repository. Het wordt bij `npm run build` uit `src/` gegenereerd. De engine heeft een kopie in `web/mini-engine.d.ts`, en de scaffolder zet er een in `types/` van elk nieuw spel.
 
 ## Gebruik in gewone JavaScript
 
