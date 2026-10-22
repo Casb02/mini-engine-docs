@@ -133,7 +133,7 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | `GET /api/v1/accounts/me` | Account | Accountobject |
 | `POST /api/v1/accounts/logout` | Account | 204 |
 | `GET /api/v1/accounts/stats` | Account | Statistieken |
-| `GET /releases/{id}/{version}/{path}` | Openbaar | Assets van één versie van een geüploade game |
+| `GET /releases/{id}/{version}/{path}` | Openbaar | Assets van de actieve versie, of van een versie die een lopende kamer speelt |
 | `GET /api/v1/dev/me` | Dev-key | Account en key |
 | `GET /api/v1/dev/games` | Dev-key | Jouw games |
 | `GET`, `PUT`, `DELETE /api/v1/dev/games/{id}` | Dev-key | Eén game bekijken, aan/uit zetten, verwijderen |

@@ -75,7 +75,7 @@ Zet de game uit of aan en geeft de DevGame terug. Uit betekent: weg uit `GET /ap
 
 ### DELETE /api/v1/dev/games/{id}
 
-Verwijdert de game met alle versies: 204. Zolang een kamer hem speelt: 409 `game_in_use`.
+Verwijdert de game met alle versies: 204. Zolang een kamer hem speelt: 409 `game_in_use`. Een geblokkeerde game kun je niet verwijderen (403 `game_blocked`); alleen de beheerder kan de blokkade opheffen.
 
 ## Versies
 
@@ -131,4 +131,4 @@ Verwijdert één versie: 204.
 
 ## Kamers en versies
 
-Elke kamer onthoudt zijn versie in `game_version` (in `GET /api/v1/rooms/{code}/info` en in snapshots). `GET /api/v1/games/{id}/{role}?room=CODE` serveert de HTML van die versie, met asset-URL's onder `GET /releases/{id}/{version}/assets/…`. Zie [versies en kamers](../publiceren/versies.md).
+Elke kamer onthoudt zijn versie in `game_version` (in `GET /api/v1/rooms/{code}/info` en in snapshots). `GET /api/v1/games/{id}/{role}?room=CODE` serveert de HTML van die versie, met asset-URL's onder `GET /releases/{id}/{version}/assets/…`. Die route serveert alleen de actieve versie van een game die aan staat, of een versie die een lopende kamer speelt. Zie [versies en kamers](../publiceren/versies.md).
