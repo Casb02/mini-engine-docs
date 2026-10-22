@@ -43,12 +43,16 @@ order: 8
 
 ## Aanvragen per IP-adres
 
-| Route | Per minuut |
+| Route | Limiet |
 | --- | --- |
-| `POST /api/v1/rooms` en `POST /api/v1/rooms/{code}/join` | 60 |
-| `POST /api/v1/accounts/register` en `POST /api/v1/accounts/login` | 10 |
+| `POST /api/v1/rooms` en `POST /api/v1/rooms/{code}/join` | 60 per minuut |
+| `POST /api/v1/accounts/register` en `POST /api/v1/accounts/login` | 10 per minuut |
+| Alle routes onder `/api/v1/admin/` | 30 per minuut |
+| `POST`, `PUT` en `DELETE` onder `/api/v1/dev/` | 60 per minuut |
+| Uploads (`POST /api/v1/dev/games/{id}/versions`) | 20 per 10 minuten |
+| Verkeerde admin- of dev-sleutel (401 op `/admin` of `/dev`) | na 10 in 10 minuten wordt dat adres 10 minuten geweigerd, ook met de goede sleutel |
 
-Daarboven volgt `429 rate_limit`.
+Daarboven volgt `429 rate_limit`. De tellers zijn per IP-adres; achter een reverse proxy delen alle bezoekers het adres van de proxy.
 
 ## Accounts
 
