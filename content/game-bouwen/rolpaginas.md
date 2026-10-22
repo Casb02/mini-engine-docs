@@ -11,7 +11,7 @@ Elk spel heeft een pagina per rol: `host.html`, `player.html` en, als het spel e
 
 ## Hoe een pagina laadt
 
-1. De demopagina bewaart de kamersleutel in `sessionStorage` en opent `/room/CODE/ROL`.
+1. De pagina's onder `/home` bewaren de kamersleutel in `sessionStorage` en openen `/room/CODE/ROL`.
 2. De kamerinterface op die URL vraagt de openbare kamerinfo op en laadt de spelpagina in een iframe: `/api/v1/games/{id}/{rol}?room=CODE`.
 3. Je spelpagina leest de code uit `?room=` en haalt de sleutel uit de sessie.
 

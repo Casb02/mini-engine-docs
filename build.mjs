@@ -46,8 +46,8 @@ const SECTIONS = [
   'Branding',
 ];
 
-const PDF = 'downloads/MiniEngine-API-v0.4.pdf';
-const VERSION = '0.4';
+const PDF = 'downloads/MiniEngine-API-v0.5.pdf';
+const VERSION = '0.5';
 
 // ---------- helpers ----------
 

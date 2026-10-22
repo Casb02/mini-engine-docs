@@ -1,6 +1,6 @@
 ---
 title: Hosten op Coolify
-description: Zet Mini Engine 0.4 in productie op een eigen Coolify-server, met DNS, zelf verstuurde bevestigingsmails, een robotcheck, back-ups en updates.
+description: Zet Mini Engine 0.5 in productie op een eigen Coolify-server, met DNS, zelf verstuurde bevestigingsmails, een robotcheck, back-ups en updates.
 section: Snel aan de slag
 order: 4
 toc_depth: 3
@@ -8,7 +8,7 @@ toc_depth: 3
 
 # Hosten op Coolify
 
-Deze pagina beschrijft hoe Mini Engine 0.4 in productie draait op een eigen [Coolify](https://coolify.io)-server, met `https://miniengine.nl` als voorbeeld en bevestigingsmails vanaf `noreply@miniengine.nl`. Vervang die adressen door je eigen domein.
+Deze pagina beschrijft hoe Mini Engine 0.5 in productie draait op een eigen [Coolify](https://coolify.io)-server, met `https://miniengine.nl` als voorbeeld en bevestigingsmails vanaf `noreply@miniengine.nl`. Vervang die adressen door je eigen domein.
 
 Alles wat de engine nodig heeft, staat in de repository: een `Dockerfile` met healthcheck, het compose-bestand `compose.coolify.yaml` en de omgevingsvariabelen hieronder.
 
@@ -86,7 +86,7 @@ Om te voorkomen dat bots accounts aanmaken of je mail laten versturen, vragen re
 | `MINI_ENGINE_ORIGINS` | Leeg, tenzij een ander adres de engine vanuit de browser moet aanroepen |
 | `RUST_LOG` | `mini_engine=info,tower_http=warn` (standaard) |
 
-Het compose-bestand zet de paden zelf: de database op `/app/data/mini-engine.sqlite`, de spellen in `/app/games` en de demo in `/app/web`. Ontbreekt een verplichte variabele, dan start de deploy niet.
+Het compose-bestand zet de paden zelf: de database op `/app/data/mini-engine.sqlite`, de spellen in `/app/games` en de webpagina's in `/app/web`. Ontbreekt een verplichte variabele, dan start de deploy niet.
 
 `MINI_ENGINE_TRUST_PROXY` bepaalt van welk IP-adres een verzoek komt, en dus voor wie de [aanvraaglimieten](../api/limieten.md#aanvragen-per-ip-adres) tellen. Met `cloudflare` telt de engine `CF-Connecting-IP` alleen als het verzoek van een Cloudflare-adres kwam; wie de server rechtstreeks aanspreekt, wordt op zijn eigen adres geteld. Gebruik geen kale headernaam zoals `cf-connecting-ip`: die is te vervalsen zodra de server ook direct bereikbaar is.
 
@@ -98,7 +98,7 @@ De database staat in het volume `mini-engine-data` (`/app/data`). Dat volume bli
 
 ## 4. Na de eerste deploy
 
-1. Open `https://miniengine.nl/demo/account`, maak je eigen account en bevestig je e-mailadres via de mail.
+1. Open `https://miniengine.nl/home/account`, maak je eigen account en bevestig je e-mailadres via de mail.
 2. Log met de [me-CLI](../publiceren/cli.md) in als beheerder en maak dev-keys voor mensen met een bevestigd adres:
 
    ```sh

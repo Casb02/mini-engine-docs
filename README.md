@@ -66,7 +66,7 @@ Alle pagina's linken relatief, dus de site werkt onder elk pad, ook als losse be
 
 ## De API-referentie als pdf
 
-De site linkt naar `downloads/MiniEngine-API-v0.4.pdf` (`PDF` in `build.mjs`). Zet het bestand in `static/downloads/MiniEngine-API-v0.4.pdf`; oudere edities blijven ernaast staan. De build kopieert het naar `site/downloads/`. Zolang het ontbreekt, meldt de build een waarschuwing en faalt de strikte linkcontrole.
+De site linkt naar `downloads/MiniEngine-API-v0.5.pdf` (`PDF` in `build.mjs`; `scripts/check-links.mjs` leest dezelfde waarde). Zet het bestand in `static/downloads/MiniEngine-API-v0.5.pdf`; oudere edities blijven ernaast staan. De build kopieert het naar `site/downloads/`. Zolang het ontbreekt, meldt de build een waarschuwing en faalt de strikte linkcontrole. `VERSION` in `build.mjs` is de versie in de voettekst.
 
 ## Publiceren op GitHub Pages
 

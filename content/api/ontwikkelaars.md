@@ -71,7 +71,7 @@ Eén DevGame. Een game van iemand anders geeft 404 `game_not_found`.
 { "enabled": false }
 ```
 
-Zet de game uit of aan en geeft de DevGame terug. Uit betekent: weg uit `GET /api/v1/games` en `/demo`, geen nieuwe kamers en geen HTML of assets zonder kamer; lopende kamers spelen door via hun eigen versie. Heeft de beheerder de game geblokkeerd, dan geeft aanzetten 403 `game_blocked`.
+Zet de game uit of aan en geeft de DevGame terug. Uit betekent: weg uit `GET /api/v1/games` en `/home`, geen nieuwe kamers en geen HTML of assets zonder kamer; lopende kamers spelen door via hun eigen versie. Heeft de beheerder de game geblokkeerd, dan geeft aanzetten 403 `game_blocked`.
 
 ### DELETE /api/v1/dev/games/{id}
 

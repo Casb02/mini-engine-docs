@@ -15,7 +15,7 @@ De repository bevat een `Dockerfile` en een `compose.yaml`. Daarmee draait de en
 docker compose up --build
 ```
 
-Open daarna `http://localhost:3000/demo`. De container luistert op poort 3000.
+Open daarna `http://localhost:3000/home`. De container luistert op poort 3000.
 
 ## Wat Compose instelt
 
@@ -61,7 +61,7 @@ Bij een normale stop (SIGTERM) sluit de engine de websockets met de reden `serve
 
 ## Hosting
 
-Gebruik voor hosting buiten je eigen netwerk HTTPS en WSS achter een reverse proxy. Stuur tokens buiten lokale ontwikkeling alleen over HTTPS. Staat de demopagina op een ander adres dan de engine ziet, voeg dat adres toe aan `MINI_ENGINE_ORIGINS`. Zet achter een proxy ook `MINI_ENGINE_TRUST_PROXY`, anders delen alle bezoekers één limiet.
+Gebruik voor hosting buiten je eigen netwerk HTTPS en WSS achter een reverse proxy. Stuur tokens buiten lokale ontwikkeling alleen over HTTPS. Openen spelers de engine via een ander adres dan de engine zelf ziet, voeg dat adres toe aan `MINI_ENGINE_ORIGINS`. Zet achter een proxy ook `MINI_ENGINE_TRUST_PROXY`, anders delen alle bezoekers één limiet.
 
 Een complete route met domein, mail en back-ups staat bij [hosten op Coolify](coolify.md).
 

@@ -1,7 +1,7 @@
 ---
 title: De ingebouwde spellen
 nav_title: Voorbeelden
-description: Wat Common Dice en Jeopardy laten zien over instellingen, rollen, serveracties, geheime antwoorden en het gedeelde scherm.
+description: Wat Common Dice en Jeopardy laten zien over instellingen, rollen, serveracties, geheime antwoorden, het gedeelde scherm, realtime, achievements en eigen borden.
 section: Een game bouwen
 order: 6
 ---
@@ -32,6 +32,7 @@ Eén worp voor de hele tafel. Echte 3D-dobbelstenen (d4, d6, d8, d10, d12 en d20
 - **Presentatie volgt de state.** De WebGL-animatie toont de uitkomst die al vaststaat; ze bepaalt haar niet. Met `prefers-reduced-motion` tuimelen de stenen niet, en zonder WebGL 2 toont het spel dezelfde getallen als tekst.
 - **Later aansluiten.** Common Dice ondersteunt het.
 - **Lokale assets.** Three.js staat als vendorbestand in `assets/vendor/`; er gaat geen verzoek naar een CDN.
+- **Achievements.** *Dubbel zes* voor minstens twee zessen in één worp, en *Hoogste worp* voor de hoogste losse worp van de ronde. De server kent ze toe bij het afronden.
 
 Een worp met twee vastgehouden stenen:
 
@@ -43,7 +44,7 @@ Vastgehouden indexen verwijzen naar de bestaande worp. Minstens één steen blij
 
 ## Jeopardy
 
-Een quizbord met teams. Meerdere telefoons per team, een buzzer die de server eerlijk afhandelt, scores, geheime antwoorden en een expliciete onthulling. De quizmaster kiest en beoordeelt; de server bewaakt spelregels en scores.
+Een quizbord met teams. Meerdere telefoons per team, een buzzer die de server afhandelt, scores, geheime antwoorden en een expliciete onthulling. De quizmaster kiest en beoordeelt; de server bewaakt spelregels en scores.
 
 ### Instellingen en rollen
 
@@ -69,8 +70,11 @@ Jeopardy gebruikt alleen de modus `moderator` en ondersteunt geen later aansluit
 - **Geheimen in `host_state`.** Het actieve antwoord ziet alleen de quizmaster, tot de onthulling.
 - **Eenmalige scores.** Een herhaalde `judge` met dezelfde action-id telt niet dubbel.
 - **De buzzer volgt aankomst bij de server.** Netwerkvertraging tussen apparaten speelt dus mee.
+- **Realtime naast de actie.** Bij het drukken stuurt de speler ook een [realtime-event](../concepten/realtime.md#voorbeeld-een-buzzer) `pressed`. Host en scherm tonen meteen wie er drukte, in volgorde en met het verschil in milliseconden, zoals *Sander +14 ms*. De `buzz`-actie blijft beslissen wie de vraag krijgt.
+- **Eigen borden.** Jeopardy kent de soort set `board`. Wie is ingelogd, maakt op **Mijn sets** een eigen bord en kiest het bij een nieuwe kamer. De lobby toont dan *Bord: …* met de naam van het bord. Zie [eigen sets](../concepten/eigen-sets.md).
+- **Achievements.** *Eerste goede antwoord*, *Winnaar*, *Foutloos* en *Eigen bord*; zie [achievements](../concepten/achievements.md#serverspellen).
 
-Een stukje van `data.json`:
+Een stukje van `data.json`, het standaardbord:
 
 ```json
 {
@@ -86,6 +90,8 @@ Een stukje van `data.json`:
 }
 ```
 
-## Accountresultaten
+Een eigen bord heeft geen id's en waarden; die maakt de engine bij het starten van de kamer. Zie [de Jeopardy-editor](../concepten/eigen-sets.md#de-jeopardy-editor).
 
-Beide spellen schrijven bij het afronden van een ronde resultaten voor deelnemers met een account. Common Dice telt worpen, geworpen stenen en het totaal; Jeopardy bewaart teamscore, winst en goede en foute antwoorden. Zie [accounts](../concepten/accounts.md).
+## Accountresultaten en achievements
+
+Beide spellen schrijven bij het afronden van een ronde resultaten en achievements voor deelnemers met een account. Common Dice telt worpen, geworpen stenen en het totaal; Jeopardy bewaart teamscore, winst en goede en foute antwoorden. Zie [accounts](../concepten/accounts.md) en [achievements](../concepten/achievements.md).

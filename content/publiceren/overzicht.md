@@ -7,11 +7,11 @@ order: 1
 
 # Je game publiceren
 
-Vanaf Mini Engine 0.3 hoef je geen toegang tot de server te hebben om je spel te laten spelen. Met een **dev-key** upload je het naar een draaiende engine, waarna het op `/demo` verschijnt. De eigenaar van de server deelt die keys uit; je krijgt er een als je bent uitgenodigd.
+Vanaf Mini Engine 0.3 hoef je geen toegang tot de server te hebben om je spel te laten spelen. Met een **dev-key** upload je het naar een draaiende engine, waarna het op `/home` verschijnt. De eigenaar van de server deelt die keys uit; je krijgt er een als je bent uitgenodigd.
 
 Zo gaat het:
 
-1. Je maakt een gewoon account op `/demo/account` van die server en bevestigt je e-mailadres via de link in de mail.
+1. Je maakt een gewoon account op `/home/account` van die server en bevestigt je e-mailadres via de link in de mail.
 2. De eigenaar maakt een dev-key voor jouw gebruikersnaam en geeft hem aan je.
 3. Je installeert de [`me`-CLI](cli.md), plakt de key met `me auth` en uploadt je spel met `me game upload`.
 
@@ -43,4 +43,4 @@ Een dev-key kan alleen voor een account met een bevestigd e-mailadres. Krijg je 
 
 ## Vertrouwen
 
-Een geüploade game draait op dezelfde origin als de demo, net als Common Dice en Jeopardy. Hij kan in de browser de kamersleutel van dat tabblad en een eventuele accountsessie lezen. Daarom krijgen alleen uitgenodigde mensen een dev-key. Een aparte origin met een afgeschermde `postMessage`-brug staat in het uploadplan van de engine en is nodig voordat onbekende makers mogen publiceren.
+Een geüploade game draait op dezelfde origin als de pagina's van de engine, net als Common Dice en Jeopardy. Hij kan in de browser de kamersleutel van dat tabblad en een eventuele accountsessie lezen, en met die sessie ook de eigen sets van de speler. Daarom krijgen alleen uitgenodigde mensen een dev-key. Een aparte origin met een afgeschermde `postMessage`-brug staat in het uploadplan van de engine en is nodig voordat onbekende makers mogen publiceren.

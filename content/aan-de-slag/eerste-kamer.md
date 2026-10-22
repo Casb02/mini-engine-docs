@@ -1,26 +1,29 @@
 ---
 title: Je eerste kamer
-description: Open de demo, maak een kamer, laat telefoons meedoen en zet het gedeelde scherm op de tv.
+description: Open de startpagina, maak een kamer, laat telefoons meedoen en zet het gedeelde scherm op de tv.
 section: Snel aan de slag
 order: 2
 ---
 
 # Je eerste kamer
 
-De demo op `/demo` is de speelomgeving van Mini Engine. Elke stap heeft een eigen pagina:
+De pagina's onder `/home` zijn de speelomgeving van Mini Engine. Elke stap heeft een eigen pagina:
 
 | Pagina | Wat je er doet |
 | --- | --- |
-| `/demo` | Een kamercode invullen, of een spel kiezen om zelf te beginnen. |
-| `/demo/new/<spel>` | Een kamer maken voor dat spel. |
-| `/demo/join?room=CODE` | Je naam invullen en meedoen. |
-| `/demo/account` | Inloggen, een account maken en je resultaten bekijken. |
+| `/home` | Een kamercode invullen, of een spel kiezen om zelf te beginnen. |
+| `/home/new/<spel>` | Een kamer maken voor dat spel. |
+| `/home/join?room=CODE` | Je naam invullen en meedoen. |
+| `/home/account` | Inloggen, een account maken, je resultaten en achievements bekijken. |
+| `/home/sets` | Je eigen sets bekijken en maken, zoals een eigen Jeopardy-bord. |
+
+Oude links naar `/demo` werken nog: ze sturen door naar hetzelfde adres onder `/home`.
 
 ## Een kamer maken
 
-1. Open `/demo` op de computer of telefoon van de spelleider.
+1. Open `/home` op de computer of telefoon van de spelleider.
 2. Kies onder **Start een nieuw spel** een spel, bijvoorbeeld Common Dice.
-3. Vul je naam in en kies wie het spel leidt: niemand (jullie spelen samen), jij terwijl je meespeelt, of jij als spelleider. Pas eventueel de spelregels aan. Onder **Meer opties** staan het maximale aantal spelers, het gedeelde scherm en aansluiten tijdens het spel.
+3. Vul je naam in en kies wie het spel leidt: niemand (jullie spelen samen), jij terwijl je meespeelt, of jij als spelleider. Pas eventueel de spelregels aan. Ben je ingelogd en kent het spel eigen sets, zoals Jeopardy, dan kies je hier ook een eigen bord. Onder **Meer opties** staan het maximale aantal spelers, het gedeelde scherm en aansluiten tijdens het spel.
 4. Kies **Maak kamer**. Bovenin de kamer zie je de kamercode van zes tekens; klik erop om de uitnodigingslink te kopiëren.
 
 De spelleidersleutel blijft in het browsertabblad waarmee je de kamer maakte. Ververs je dat tabblad, dan speel je gewoon verder. Een ander apparaat kan die rol niet overnemen: er is nog geen hostoverdracht tussen apparaten.
@@ -29,7 +32,7 @@ De spelleidersleutel blijft in het browsertabblad waarmee je de kamer maakte. Ve
 
 Op elke telefoon:
 
-1. Open `http://<adres-van-de-engine>/demo` en vul de kamercode in, of open de uitnodigingslink (`/demo/join?room=CODE`).
+1. Open `http://<adres-van-de-engine>/home` en vul de kamercode in, of open de uitnodigingslink (`/home/join?room=CODE`).
 2. Vul je naam in. Namen zijn 1 tot 24 tekens en uniek binnen de kamer.
 3. Zet je klaar in de lobby.
 
@@ -49,4 +52,4 @@ Na afloop sluit je de ronde af en ga je terug naar de lobby voor een nieuwe rond
 
 ## Met een account
 
-Accounts zijn optioneel. Op `/demo/account` maak je een gebruikersnaam, wachtwoord en naam aan tafel. Je account wordt bij maken of meedoen aan je spelersplek gekoppeld; resultaten van afgeronde rondes van de ingebouwde spellen komen in je profiel. Zie [accounts](../concepten/accounts.md).
+Accounts zijn optioneel. Op `/home/account` maak je een gebruikersnaam, wachtwoord en naam aan tafel. Je account wordt bij maken of meedoen aan je spelersplek gekoppeld; resultaten en [achievements](../concepten/achievements.md) van afgeronde rondes komen in je profiel. Onder **Mijn sets** maak je [eigen sets](../concepten/eigen-sets.md), zoals een Jeopardy-bord met je eigen vragen. Zie [accounts](../concepten/accounts.md).

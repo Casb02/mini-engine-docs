@@ -32,7 +32,17 @@ cd ../mini-engine
 cargo run
 ```
 
-Open `/demo`, kies **Mijn Spel** en maak een kamer. Doe mee vanaf een tweede browser of apparaat, zet je klaar, en start de stemronde op de spelleiderspagina.
+Open `/home`, kies **Mijn Spel** en maak een kamer. Doe mee vanaf een tweede browser of apparaat, zet je klaar, en start de stemronde op de spelleiderspagina.
+
+## Sneller testen met `me dev`
+
+Tijdens het bouwen gaat het sneller met `me dev` uit de [CLI](../publiceren/cli.md#me-dev), sinds CLI 0.5.0. Die bootst de engine na op je eigen computer en toont de spelleider, het gedeelde scherm en twee spelers naast elkaar in je browser. Vanuit de root van de engine-checkout:
+
+```sh
+me dev games/mijn-spel
+```
+
+Sla je een bestand op, dan laden de pagina's opnieuw en blijft de kamer bestaan. Speel je spel voor een avond met vrienden wel een keer op een echte engine. Zie [testen](testen.md#eerst-lokaal-met-me-dev).
 
 ## De slug
 
@@ -79,7 +89,7 @@ Het stemspel is een complete hostruntime-game: de spelleider controleert stemmen
 | Een andere weergave | `host.html`, `player.html`, `display.html` en `assets/style.css` |
 | Geheime speldata, zoals antwoorden | Een `data.json`, die alleen de host via een beveiligde route leest |
 
-Herstart de engine na elke wijziging aan het package.
+Herstart de engine na elke wijziging aan het package. Met `me dev` hoeft dat niet.
 
 ## Typecontrole in je editor
 
@@ -100,11 +110,11 @@ Wil je de SDK in een ander project gebruiken zonder de repository, maak dan een 
 npm pack
 
 # in je eigen project
-npm install /absoluut/pad/naar/mini-engine-sdk/casb02-mini-engine-sdk-0.3.1.tgz
+npm install /absoluut/pad/naar/mini-engine-sdk/casb02-mini-engine-sdk-0.5.0.tgz
 npx create-mini-game mijn-spel --directory /pad/naar/engine/games/mijn-spel
 ```
 
-`npx` gebruikt hier de lokaal geïnstalleerde CLI. Het pakket staat niet op npm.
+`npx` gebruikt hier de lokaal geïnstalleerde CLI. Je kunt het pakket ook uit GitHub Packages installeren; zie [het SDK-overzicht](../sdk/overzicht.md#in-een-eigen-project).
 
 > Open gegenereerde HTML niet via `file://` of een losse static server. De engine levert de API, de kamersessies, de websockets en de assetroutes.
 

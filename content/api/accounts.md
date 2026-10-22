@@ -1,7 +1,7 @@
 ---
 title: Accounts
 nav_title: Accounts
-description: De accountroutes van de HTTP API voor registreren, e-mailbevestiging, inloggen, uitloggen, het eigen account en statistieken.
+description: De accountroutes van de HTTP API voor registreren, e-mailbevestiging, inloggen, uitloggen, het eigen account, statistieken, achievements en eigen sets.
 section: HTTP API
 order: 4
 toc_depth: 3
@@ -78,7 +78,7 @@ Extra velden, zoals een eigen `account_id`, worden geweigerd. Na het aanmaken st
 
 ## E-mailbevestiging
 
-De bevestigingsmail bevat een link naar `MINI_ENGINE_PUBLIC_URL/demo/account?verify=<token>` en noemt het account (`@gebruikersnaam`) waarvoor hij is. De accountpagina van de demo laat je eerst inloggen en stuurt het token daarna naar de route hieronder. Een eigen app doet hetzelfde.
+De bevestigingsmail bevat een link naar `MINI_ENGINE_PUBLIC_URL/home/account?verify=<token>` en noemt het account (`@gebruikersnaam`) waarvoor hij is. De accountpagina op `/home/account` laat je eerst inloggen en stuurt het token daarna naar de route hieronder. Een eigen app doet hetzelfde. Links uit oudere mails wijzen naar `/demo/account`; die sturen door naar `/home/account`, met het token erbij.
 
 - Een link werkt alleen voor het ingelogde account waarvoor hij is verstuurd. Wie zich met jouw adres registreert, krijgt het dus niet bevestigd doordat jij op de link klikt.
 - Een link verloopt na 48 uur, werkt één keer en vervalt zodra het adres van het account verandert.
@@ -173,6 +173,117 @@ De sitekey om het widget mee te tonen, of `null` als de robotcheck uitstaat.
 - `display_name` in een resultaat is de naam op het moment van spelen.
 
 Resultaten komen alleen uit afgeronde rondes van serverspellen. Er is geen route om zelf scores te posten.
+
+## GET /api/v1/accounts/achievements
+
+Sinds 0.5. **Toegang:** accountsleutel. **Antwoord** `200`, nieuwste eerst:
+
+```json
+{
+  "achievements": [
+    {
+      "game_id": "jeopardy",
+      "game_title": "Jeopardy",
+      "id": "winnaar",
+      "title": "Winnaar",
+      "description": "Win een show met je team.",
+      "source": "server",
+      "awarded_at": 1792656419
+    }
+  ]
+}
+```
+
+- `source` is `server` als een serverspel de achievement toekende, en `game` als de host van een eigen spel dat deed. Die laatste heeft de server niet gecontroleerd; zie [achievements](../concepten/achievements.md#server-of-spel).
+- `title` en `description` zijn zoals ze waren bij het verdienen. `game_title` is de huidige titel van het spel, of `null` als de engine het spel niet meer kent.
+- `awarded_at` is in Unix-seconden. Elke achievement staat er één keer per spel.
+
+Toekennen gaat niet via deze route, maar door de server zelf of door de host van een kamer: zie [`POST /api/v1/rooms/{code}/achievements`](kamers.md#post-api-v1-rooms-code-achievements).
+
+**Fouten:** `401 unauthorized`.
+
+## Sets
+
+Sinds 0.5. Een set is eigen inhoud voor een spel, zoals een Jeopardy-bord; zie [eigen sets](../concepten/eigen-sets.md). Alle routes vragen een accountsleutel. Een bevestigd e-mailadres is niet nodig.
+
+Een **set** ziet er zo uit:
+
+```json
+{
+  "id": "uuid",
+  "game_id": "jeopardy",
+  "kind": "board",
+  "title": "Dani's filmavond",
+  "data": { "categories": [ { "title": "Films", "clues": [ { "question": "…", "answer": "…" } ] } ] },
+  "size": 1834,
+  "created_at": 1792656419,
+  "updated_at": 1792660019
+}
+```
+
+`size` is het aantal bytes van `data` als JSON. Tijden zijn in Unix-seconden. In een lijst ontbreekt `data`.
+
+Een set van een ander account bestaat voor jou niet: elke route geeft dan `404 set_not_found`.
+
+### GET /api/v1/accounts/sets
+
+Jouw sets zonder inhoud, laatst gewijzigd eerst. Filter optioneel met `?game_id=jeopardy` en `?kind=board`.
+
+**Antwoord** `200`: `{ "sets": [Set, …] }`, zonder `data`.
+
+**Fouten:** `401 unauthorized`.
+
+### POST /api/v1/accounts/sets
+
+```json
+{
+  "game_id": "jeopardy",
+  "kind": "board",
+  "title": "Dani's filmavond",
+  "data": { "categories": [ … ] }
+}
+```
+
+| Veld | Regel |
+| --- | --- |
+| `game_id` | Een spel dat aanstaat |
+| `kind` | Een soort set uit `set_kinds` van de **actieve** versie van dat spel |
+| `title` | Getrimd; 1 tot 80 tekens zonder controletekens |
+| `data` | Voldoet aan het schema van de soort, hoogstens 64 KiB als JSON. Ingebouwde spellen hebben eigen regels: Jeopardy wil unieke categorienamen en geen lege teksten. |
+
+**Antwoord** `201`: de set, met `data`.
+
+Past `data` niet, dan noemt de foutmelding het pad, bijvoorbeeld `categories[0].clues[2].question: gebruik 1–240 tekens.`
+
+**Fouten:** `400 invalid_request` (titel, onbekende soort, inhoud past niet), `invalid_json` (onbekende velden of geen geldige JSON; status 400 of 422), `401 unauthorized`, `404 game_not_found`, `409 quota_sets` (al 50 sets), `413 set_too_large`, `429 rate_limit`.
+
+### GET /api/v1/accounts/sets/{id}
+
+Eén set, met `data`.
+
+**Fouten:** `401 unauthorized`, `404 set_not_found`.
+
+### PUT /api/v1/accounts/sets/{id}
+
+Vervangt titel en inhoud. Spel en soort liggen vast.
+
+```json
+{ "title": "Dani's filmavond", "data": { "categories": [ … ] } }
+```
+
+De controle is dezelfde als bij aanmaken, tegen de actieve versie van het spel. Kamers die de set al gebruiken, houden hun eigen kopie.
+
+**Antwoord** `200`: de bijgewerkte set, met `data`.
+
+**Fouten:** als bij aanmaken, plus `404 set_not_found`.
+
+### DELETE /api/v1/accounts/sets/{id}
+
+**Antwoord** `204`. Kamers die de set al gebruiken, spelen door.
+
+**Fouten:** `401 unauthorized`, `404 set_not_found`, `429 rate_limit`.
+
+Aanmaken, wijzigen en verwijderen samen mag 30 keer per minuut per IP-adres; zie [limieten](limieten.md#aanvragen-per-ip-adres).
 
 ## Sessies
 

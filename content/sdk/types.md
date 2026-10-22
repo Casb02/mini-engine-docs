@@ -1,6 +1,6 @@
 ---
 title: Types
-description: De belangrijkste TypeScript-types van de SDK, zoals Snapshot, Manifest, RoomCredentials en ActionPayloads, en waar het volledige declaratiebestand staat.
+description: De belangrijkste TypeScript-types van de SDK, zoals Snapshot, Manifest, RoomCredentials, ActionPayloads, de realtimetypes, achievements en sets, en waar het volledige declaratiebestand staat.
 section: SDK-referentie
 order: 6
 toc_depth: 3
@@ -56,6 +56,7 @@ interface Snapshot<PublicState = Json, Settings = Record<string, Json>, PrivateS
   runtime?: 'host' | 'server';
   config?: RoomConfig;
   round_id?: string;
+  set?: RoomSet | null;                 // sinds 0.5; null zonder eigen set
   you: { role: Role; player_id?: string | null };
   host_state?: Json;                    // alleen host
   player_states?: Record<string, Json>; // alleen host
@@ -68,6 +69,14 @@ interface Snapshot<PublicState = Json, Settings = Record<string, Json>, PrivateS
 ```ts
 interface Player { id: string; name: string; connected: boolean; ready?: boolean; account_id?: string | null }
 ```
+
+### RoomSet
+
+```ts
+interface RoomSet { id: string; kind: string; title: string }
+```
+
+De [eigen set](../concepten/eigen-sets.md) waarmee de kamer speelt. Iedere rol ziet dit; de inhoud leest alleen de host, met `gameData()`.
 
 ### RoomConfig
 
@@ -87,6 +96,7 @@ interface CreateRoomOptions {
   settings?: Record<string, Json>;
   name?: string;
   config?: Partial<RoomConfig>;
+  set_id?: string; // sinds 0.5: een set van het ingelogde account; vraagt accountToken
 }
 ```
 
@@ -121,6 +131,8 @@ interface Manifest<Settings = Record<string, Json>> {
   host_modes?: HostMode[];
   default_host_mode?: HostMode;
   supports_late_join?: boolean;
+  achievements?: AchievementDefinition[]; // sinds 0.5
+  set_kinds?: SetKind[];                  // sinds 0.5
 }
 
 interface SettingsProperty {
@@ -130,6 +142,34 @@ interface SettingsProperty {
   title?: string; description?: string; default?: Json;
 }
 ```
+
+### Achievements en soorten sets
+
+Sinds SDK 0.5.0 (engine 0.5).
+
+```ts
+interface AchievementDefinition {
+  id: string;          // ^[a-z0-9][a-z0-9_-]{0,47}$, uniek binnen het spel
+  title: string;       // 1–60 tekens
+  description: string; // 1–160 tekens
+}
+
+interface SetKind {
+  id: string;          // zelfde regel als een achievement-id
+  title: string;       // 1–60 tekens
+  description: string; // 1–160 tekens
+  schema: SetSchema;
+}
+
+type SetSchema =
+  | { type: 'object'; properties: Record<string, SetSchema>; required?: string[]; additionalProperties: false; title?: string; description?: string }
+  | { type: 'array'; items: SetSchema; minItems?: number; maxItems?: number; title?: string; description?: string }
+  | { type: 'string'; minLength?: number; maxLength?: number; enum?: string[]; title?: string; description?: string }
+  | { type: 'integer' | 'number'; minimum?: number; maximum?: number; title?: string; description?: string }
+  | { type: 'boolean'; title?: string; description?: string };
+```
+
+De grenzen van het schemadialect staan bij [eigen sets](../concepten/eigen-sets.md#het-schemadialect).
 
 ## Websocketberichten
 
@@ -141,6 +181,39 @@ interface ActionEnvelope {
   request_id?: string; action_id?: string;
 }
 ```
+
+### Achievement verdiend
+
+```ts
+interface AchievementEarned { player_id: string; achievement: AchievementDefinition }
+```
+
+De waarde van het event `achievement`.
+
+### Realtime
+
+Sinds SDK 0.5.0 (engine 0.5).
+
+```ts
+interface RealtimeFrom { role: Role; player_id: string | null }
+type RealtimeTarget = 'all' | 'host' | 'players' | 'display' | string[];
+interface RealtimeEmitOptions { to?: RealtimeTarget; echo?: boolean }
+interface RealtimeThrottled { dropped: number }
+
+type RealtimeEventHandler = (data: Json, from: RealtimeFrom, ts: number, channel: string) => void;
+type RealtimeValueHandler = (value: Json, from: RealtimeFrom, ts: number, key: string) => void;
+
+interface Realtime {
+  emit(channel: string, data?: Json, options?: RealtimeEmitOptions): boolean;
+  on(channel: string, fn: RealtimeEventHandler): () => void;
+  set(key: string, value: Json): void;
+  value(from: string | RealtimeFrom, key: string): Json | undefined;
+  onValue(key: string, fn: RealtimeValueHandler): () => void;
+  reset(): void;
+}
+```
+
+`ts` is de ontvangsttijd op de server in milliseconden sinds de Unix-epoch. De opties van `MiniEngine` hebben `realtime?: { setInterval?: number }`. Zie [de websocketclient](realtime-client.md#realtime).
 
 ### ActionPayloads
 
@@ -182,3 +255,36 @@ interface AccountStats {
 ```
 
 `email` en `email_verified` zijn er sinds SDK 0.3.1 (engine 0.4). `email` is `null` bij een account zonder adres.
+
+### Achievements van een account
+
+Sinds SDK 0.5.0 (engine 0.5).
+
+```ts
+type AchievementSource = 'server' | 'game';
+
+interface AccountAchievement {
+  game_id: string;
+  game_title: string | null; // huidige titel, of null als de engine het spel niet meer kent
+  id: string;
+  title: string;
+  description: string;
+  source: AchievementSource; // 'game': toegekend door een eigen spel, niet gecontroleerd
+  awarded_at: number;        // Unix-seconden
+}
+```
+
+### Sets
+
+Sinds SDK 0.5.0 (engine 0.5).
+
+```ts
+interface SetSummary {
+  id: string; game_id: string; kind: string; title: string;
+  size: number;                         // bytes van de inhoud als JSON, hoogstens 64 KiB
+  created_at: number; updated_at: number; // Unix-seconden
+}
+interface SavedSet<Data = Json> extends SetSummary { data: Data }
+interface NewSet<Data = Json> { game_id: string; kind: string; title: string; data: Data }
+interface SetFilter { game_id?: string; kind?: string }
+```

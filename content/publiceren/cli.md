@@ -1,6 +1,6 @@
 ---
 title: De me-CLI
-description: Installeer de Mini Engine CLI en gebruik me auth, me game, me skill, me setup en me admin.
+description: Installeer de Mini Engine CLI en gebruik me auth, me game, me dev, me skill, me setup en me admin.
 section: Publiceren
 order: 2
 toc_depth: 3
@@ -40,7 +40,7 @@ Laat zien als wie je bent ingelogd, of vergeet de key.
 | `me game upload [map] [--activate] [--dry-run]` | Pakt de map in en uploadt een nieuwe versie; `--dry-run` laat alleen zien wat meegaat |
 | `me game versions <id>` | Alle bewaarde versies; welke actief is en welke een kamer gebruikt |
 | `me game activate <id> <versie>` | Maakt een versie actief, ook om terug te gaan |
-| `me game enable <id>` / `me game disable <id>` | Toont of verbergt de game op `/demo` |
+| `me game enable <id>` / `me game disable <id>` | Toont of verbergt de game op `/home` |
 | `me game delete-version <id> <versie>` | Verwijdert één oude versie |
 | `me game prune <id> [--keep N] [--dry-run]` | Verwijdert oude versies, behalve de actieve, de nieuwste N (standaard 3) en versies in gebruik |
 | `me game delete <id>` | Verwijdert de hele game (vraagt om bevestiging, of `--yes`) |
@@ -48,6 +48,39 @@ Laat zien als wie je bent ingelogd, of vergeet de key.
 ### Wat `me game upload` meestuurt
 
 Alle bestanden in de map, behalve verborgen bestanden en mappen (`.git`, `.DS_Store`), `node_modules/`, `tests/` en patronen uit een `.meignore`-bestand. Symlinks worden geweigerd. De CLI controleert de grenzen al voordat hij iets verstuurt.
+
+## Lokaal testen
+
+### `me dev`
+
+Sinds CLI 0.5.0. Test een game met `runtime: "host"` zonder engine:
+
+```sh
+cd mijn-spel
+me dev
+```
+
+`me dev` controleert eerst `manifest.json` zoals `me game upload` dat doet en start dan een kleine server die de engine nabootst: kamers, spelers en klaar zijn, state met versies, acties naar de spelleider, realtime, achievements en game-data. In de browser zie je de spelleider, het gedeelde scherm en de spelers naast elkaar. Elke stoel draait op een eigen poort, dus elke speler heeft een eigen sessie, net als op een eigen telefoon. Met **Speler toevoegen** komt er iemand bij, met **Nieuwe kamer** begin je opnieuw.
+
+| Optie | Wat het doet |
+| --- | --- |
+| `[map]` | De map van de game; standaard de map waarin je staat |
+| `--port POORT` | Poort van het overzicht (standaard 3170); de stoelen krijgen de poorten erna. `0` kiest vrije poorten |
+| `--players N` | Aantal spelers bij de start (standaard 2) |
+| `--set BESTAND` | JSON-bestand dat de game krijgt in plaats van `data.json`, gecontroleerd als [eigen set](../concepten/eigen-sets.md) |
+| `--no-open` | Geen browser openen |
+
+```sh
+me dev ./ja-of-nee --players 4
+me dev --set sets/filmavond.json --no-open
+```
+
+- Pas je iets aan in de map, dan laden de stoelen opnieuw en blijft de kamer bestaan. Een fout in het manifest zie je in het overzicht en in de terminal.
+- Iedere speler telt als speler met een account, zodat je achievements kunt testen. Gekregen achievements verschijnen in de terminal.
+- Alles staat alleen in het geheugen. Stoppen doe je met Ctrl+C.
+- De server luistert alleen op je eigen computer (`127.0.0.1`). Telefoons op je wifi kunnen er niet bij.
+
+`me dev` is een nabootsing. Hij volgt het protocol van de engine, en de tests van de CLI draaien hem met dezelfde stappen als de echte engine. Test je game voor een avond met vrienden toch ook een keer op een echte server, bijvoorbeeld met een testversie via `me game upload`. Zie ook [testen](../game-bouwen/testen.md).
 
 ## Skills voor AI-agents
 

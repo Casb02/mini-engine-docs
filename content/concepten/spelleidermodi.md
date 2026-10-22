@@ -15,7 +15,7 @@ De spelleidermodus (`host_mode`) bepaalt of de maker van de kamer meespeelt en w
 | `playing` | Host met spelersplek | De maker speelt mee en houdt de beheermogelijkheden. |
 | `moderator` | Host zonder spelersplek, `player_id: null` | Een aparte spelleider bedient het spel en speelt niet mee. |
 
-In de demo heten ze *zonder spelleider*, *meespelende eigenaar* en *aparte spelleider*.
+Op de pagina voor een nieuwe kamer kies je wie het spel leidt: *Niemand* (`hostless`), *Ik, en ik speel mee* (`playing`) of *Ik, als spelleider* (`moderator`).
 
 ## Welk spel ondersteunt wat?
 

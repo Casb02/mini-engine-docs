@@ -2,7 +2,7 @@
 title: Klaarzetten en rondes
 description: De levensloop van een kamer, klaarzetten in de lobby, nieuwe rondes met een nieuw round_id en later aansluiten.
 section: Concepten
-order: 6
+order: 7
 ---
 
 # Klaarzetten en rondes
@@ -35,7 +35,7 @@ await client.lifecycle('running');
 
 ## Afronden
 
-De overgang naar `finished` sluit de ronde af. Bij een serverspel legt de engine op dat moment de accountresultaten vast, in dezelfde transactie als de afgeronde kamer. Jeopardy gaat zelf naar `finished` als alle vragen gespeeld zijn.
+De overgang naar `finished` sluit de ronde af. Bij een serverspel legt de engine op dat moment de accountresultaten en de verdiende [achievements](achievements.md) vast, in dezelfde transactie als de afgeronde kamer. Nieuwe achievements meldt de engine daarna aan de hele kamer. Jeopardy gaat zelf naar `finished` als alle vragen gespeeld zijn.
 
 ## Een nieuwe ronde
 
@@ -46,7 +46,7 @@ Terug naar de lobby betekent een schone lei:
 - de spelstand wordt gereset;
 - een nieuw venster voor de deduplicatie van action-id's.
 
-Spelers en instellingen blijven; de spelstand niet. Wil je een score over meerdere rondes bijhouden, speel die rondes dan binnen één `running`-fase en houd de stand bij in de state. Terug naar de lobby betekent een nieuw spel. Bewaar geen spelgegevens alleen in de DOM van een pagina: na een herverbinding rendert elke pagina opnieuw vanuit de snapshot.
+Spelers, instellingen en een eventuele [eigen set](eigen-sets.md) blijven; de spelstand niet. Realtimewaarden blijven ook staan, tot de host ze wist. Wil je een score over meerdere rondes bijhouden, speel die rondes dan binnen één `running`-fase en houd de stand bij in de state. Terug naar de lobby betekent een nieuw spel. Bewaar geen spelgegevens alleen in de DOM van een pagina: na een herverbinding rendert elke pagina opnieuw vanuit de snapshot.
 
 ## Instellingen
 

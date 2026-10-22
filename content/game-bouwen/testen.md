@@ -1,6 +1,6 @@
 ---
 title: Testen op meerdere apparaten
-description: Een checklist om een eigen spel te testen met spelleider, twee spelers en een gedeeld scherm, plus de geautomatiseerde controles van de SDK.
+description: Een eigen spel testen, eerst snel lokaal met me dev en dan op een echte engine met spelleider, twee spelers en een gedeeld scherm, plus de geautomatiseerde controles van de SDK.
 section: Een game bouwen
 order: 5
 ---
@@ -9,10 +9,23 @@ order: 5
 
 Een spel voor een hele tafel test je met een hele tafel. Je hebt minimaal een spelleider, twee spelers en een gedeeld scherm nodig. Dat kan in één browser met losse vensters, maar test ook een paar keer op echte telefoons.
 
-## Opzet
+## Eerst lokaal met `me dev`
+
+De snelste manier om te testen is `me dev` uit de [CLI](../publiceren/cli.md#me-dev), sinds CLI 0.5.0. Je hebt er geen engine voor nodig:
+
+```sh
+cd mijn-spel
+me dev --players 3
+```
+
+`me dev` controleert eerst je `manifest.json` en opent dan één overzicht met de spelleider, het gedeelde scherm en de spelers naast elkaar. Elke stoel draait op een eigen poort en heeft dus een eigen sessie, net als een eigen telefoon. Sla je een bestand op, dan laden de stoelen opnieuw en blijft de kamer bestaan; herstarten hoeft niet. Hij bootst kamers, klaar zijn, state met versies, acties, realtime, achievements en game-data na. Met `--set` krijgt de game een [eigen set](../concepten/eigen-sets.md) in plaats van `data.json`.
+
+`me dev` is er voor games met `runtime: "host"`, luistert alleen op je eigen computer en blijft een nabootsing van de engine. Speel je spel daarom voor een avond met vrienden ook een keer op een echte server: op een engine op je eigen netwerk, zoals hieronder, of als testversie via `me game upload`.
+
+## Op een echte engine
 
 1. Start de engine op je netwerk: `MINI_ENGINE_BIND=0.0.0.0:3000 cargo run`.
-2. Open `http://<LAN-IP>:3000/demo` op je computer en maak een kamer.
+2. Open `http://<LAN-IP>:3000/home` op je computer en maak een kamer.
 3. Doe mee met twee telefoons, of met twee privévensters. Kamersleutels staan in `sessionStorage` per tabblad, dus elk tabblad is een eigen deelnemer.
 4. Open het gedeelde scherm vanuit de spelleiderspagina.
 

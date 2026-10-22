@@ -1,6 +1,6 @@
 ---
 title: Package en manifest
-description: De mapstructuur van een gamepackage, alle velden van manifest.json, het settings_schema en de grenzen die de engine bij het opstarten controleert.
+description: De mapstructuur van een gamepackage, alle velden van manifest.json met achievements en set_kinds, het settings_schema en de grenzen die de engine controleert.
 section: Een game bouwen
 order: 2
 toc_depth: 3
@@ -24,7 +24,7 @@ games/mijn-spel/
 
 - De mapnaam is gelijk aan de `id` in het manifest: 1 tot 48 kleine ASCII-letters, cijfers of streepjes.
 - Alleen bestanden onder `assets/` zijn publiek, op `/games/{id}/assets/…`.
-- `data.json` leest alleen de host, via `GET /api/v1/rooms/{code}/game-data`. Zet antwoorden daar, nooit in `assets/` of in de HTML.
+- `data.json` leest alleen de host, via `GET /api/v1/rooms/{code}/game-data`. Zet antwoorden daar, nooit in `assets/` of in de HTML. Speelt een kamer met een [eigen set](../concepten/eigen-sets.md), dan geeft die route de set in plaats van `data.json`.
 - Symlinks zijn niet toegestaan, net als bestanden die buiten de map wijzen.
 
 ### Grenzen van een package
@@ -82,6 +82,8 @@ Het manifest van het stemspel uit de scaffolder:
 | `host_modes` | lijst | Standaard `["moderator"]`; bij `runtime: "host"` precies `["moderator"]` |
 | `default_host_mode` | string | Standaard `"moderator"`; moet in `host_modes` staan |
 | `supports_late_join` | boolean | Standaard `true` voor oudere manifests |
+| `achievements` | lijst | Optioneel, sinds 0.5. Hoogstens 50; zie [achievements](#achievements) |
+| `set_kinds` | lijst | Optioneel, sinds 0.5. Hoogstens 4 soorten eigen sets; zie [set_kinds](#set-kinds) |
 
 Kies `supports_late_join` voor een nieuw spel bewust. De kamer zet later aansluiten pas aan met `allow_late_join: true`, en de engine weigert dat als het spel het niet ondersteunt.
 
@@ -130,6 +132,60 @@ Een voorbeeld met grenzen en een keuzelijst:
 
 Bij het maken van een kamer worden de meegegeven instellingen over `default_settings` heen gelegd. Daarna vervangt de host instellingen altijd als geheel object.
 
+## achievements
+
+Sinds 0.5 kan een spel [achievements](../concepten/achievements.md) declareren:
+
+```json
+"achievements": [
+  { "id": "winnaar", "title": "Winnaar", "description": "Win de ronde." },
+  { "id": "unaniem", "title": "Unaniem", "description": "Iedereen stemde hetzelfde als jij." }
+]
+```
+
+| Veld | Regel |
+| --- | --- |
+| `id` | 1 tot 48 tekens: kleine letters, cijfers, `_` of `-`, beginnend met een letter of cijfer. Uniek binnen het spel. |
+| `title` | 1 tot 60 tekens, niet leeg, geen controletekens |
+| `description` | 1 tot 160 tekens, niet leeg, geen controletekens |
+
+In een eigen spel kent de host ze toe met `client.award(playerId, achievementId)`. De engine bewaart ze apart van die van serverspellen, omdat de server ze niet kan controleren.
+
+## set_kinds
+
+Sinds 0.5 kan een spel aangeven welke inhoud spelers zelf mogen maken en op hun account bewaren, zoals een eigen vragenbord. Elke soort heeft een schema:
+
+```json
+"set_kinds": [
+  {
+    "id": "deck",
+    "title": "Kaartspel",
+    "description": "Tien tot veertig stellingen om over te stemmen.",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "cards": {
+          "type": "array",
+          "minItems": 10,
+          "maxItems": 40,
+          "items": { "type": "string", "minLength": 1, "maxLength": 120 }
+        }
+      },
+      "required": ["cards"],
+      "additionalProperties": false
+    }
+  }
+]
+```
+
+`id`, `title` en `description` volgen dezelfde regels als bij achievements. Het `schema` gebruikt het schemadialect voor sets: objecten, lijsten, tekst, getallen en booleans, tot 8 niveaus diep. Dat is ruimer dan het platte `settings_schema` hierboven, maar wel begrensd. Alle regels staan bij [eigen sets](../concepten/eigen-sets.md#het-schemadialect).
+
+De host leest de gekozen set met `gameData()`, en de snapshot noemt hem in `room.set`.
+
+## Controle
+
+De engine controleert het hele manifest, ook `achievements` en `set_kinds`, bij het opstarten en bij elke upload. Een fout in een lokaal package laat de engine niet starten; een fout in een upload geeft `400 invalid_request` met de reden.
+
 ## HTML en assets
 
 - Verwijs naar assets en de SDK met absolute paden: `/games/mijn-spel/assets/app.js` en `/sdk/mini-engine.js`.
@@ -138,4 +194,4 @@ Bij het maken van een kamer worden de meegegeven instellingen over `default_sett
 
 ## Vertrouwen
 
-Lokaal geïnstalleerde packages zijn vertrouwde code op dezelfde origin als de engine. Ze kunnen kamersleutels en de accountsleutel van de demo lezen. Uploaden kan vanaf 0.3 alleen met een dev-key van de eigenaar; zie [je game publiceren](../publiceren/overzicht.md). Bekijk een package voordat je het installeert.
+Lokaal geïnstalleerde packages zijn vertrouwde code op dezelfde origin als de engine. Ze kunnen kamersleutels en de accountsleutel uit de browser lezen. Uploaden kan vanaf 0.3 alleen met een dev-key van de eigenaar; zie [je game publiceren](../publiceren/overzicht.md). Bekijk een package voordat je het installeert.
