@@ -52,7 +52,7 @@ order: 8
 | Uploads (`POST /api/v1/dev/games/{id}/versions`) | 20 per 10 minuten |
 | Verkeerde admin- of dev-sleutel (401 op `/admin` of `/dev`) | na 10 in 10 minuten wordt dat adres 10 minuten geweigerd, ook met de goede sleutel |
 
-Daarboven volgt `429 rate_limit`. De tellers zijn per IP-adres, en per /56-blok voor IPv6; achter een reverse proxy delen alle bezoekers het adres van de proxy.
+Daarboven volgt `429 rate_limit`. De tellers zijn per IP-adres, en per /64-blok voor IPv6. Voor verkeerde sleutels geldt daarnaast per netwerk (IPv6 /48, IPv4 /24) een grens van 100 per tien minuten. Achter een reverse proxy delen alle bezoekers het adres van de proxy.
 
 ## Accounts
 
