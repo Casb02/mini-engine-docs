@@ -23,11 +23,11 @@ In de lobby zet elke deelnemer zich klaar:
 await client.ready(true);
 ```
 
-Klaarzetten kan alleen in de lobby (anders `409 room_started`). Een aparte spelleider heeft geen spelersplek en dus geen klaarstatus. Een meespelende maker zet zich wel klaar.
+Klaarzetten kan alleen in de lobby (anders `409 room_started`). Een aparte spelleider heeft geen spelersplek en dus geen klaarstatus. Een meespelende maker zet zich in een serverspel wel klaar. In een eigen spel (`runtime: "host"`) staat de plek van een meespelende maker sinds 0.5.1 altijd klaar: de engine zet hem klaar bij het maken van de kamer en bij elke terugkeer naar de lobby, en die plek houdt het starten nooit tegen. Zie [meespelen in een eigen spel](spelleidermodi.md#meespelen-in-een-eigen-spel).
 
 ## Starten
 
-De overgang naar `running` lukt alleen als alle huidige deelnemers klaarstaan. Anders antwoordt de engine met `409 players_not_ready`. Jeopardy vraagt daarnaast dat iedere speler een team heeft gekozen (`409 teams_required`).
+De overgang naar `running` lukt alleen als alle huidige deelnemers klaarstaan, met uitzondering van de plek van de maker in een eigen spel. Anders antwoordt de engine met `409 players_not_ready`. Jeopardy vraagt daarnaast dat iedere speler een team heeft gekozen (`409 teams_required`).
 
 ```js
 await client.lifecycle('running');

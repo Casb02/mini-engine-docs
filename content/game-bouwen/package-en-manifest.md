@@ -1,6 +1,6 @@
 ---
 title: Package en manifest
-description: De mapstructuur van een gamepackage, alle velden van manifest.json met achievements en set_kinds, het settings_schema en de grenzen die de engine controleert.
+description: De mapstructuur van een gamepackage, alle velden van manifest.json met icon, host_modes, achievements en set_kinds, het settings_schema en de grenzen die de engine controleert.
 section: Een game bouwen
 order: 2
 toc_depth: 3
@@ -18,7 +18,7 @@ games/mijn-spel/
   host.html          verplicht
   player.html        verplicht
   display.html       verplicht bij has_display: true
-  assets/            publieke bestanden: scripts, stijl, beelden, geluid
+  assets/            publieke bestanden: scripts, stijl, beelden, geluid, icoon
   data.json          optioneel: geheime speldata voor de host
 ```
 
@@ -47,8 +47,8 @@ Het manifest van het stemspel uit de scaffolder:
   "description": "A ready-to-play yes/no vote game. Customize the question and start voting.",
   "version": "0.1.0",
   "runtime": "host",
-  "host_modes": ["moderator"],
-  "default_host_mode": "moderator",
+  "host_modes": ["playing", "moderator"],
+  "default_host_mode": "playing",
   "min_players": 1,
   "max_players": 24,
   "has_display": true,
@@ -79,8 +79,9 @@ Het manifest van het stemspel uit de scaffolder:
 | `default_settings` | object | Moet voldoen aan `settings_schema` |
 | `settings_schema` | object | Zie hieronder |
 | `runtime` | `"host"` of `"server"` | Standaard `"host"` |
-| `host_modes` | lijst | Standaard `["moderator"]`; bij `runtime: "host"` precies `["moderator"]` |
+| `host_modes` | lijst | Standaard `["moderator"]`. Niet leeg. Bij `runtime: "host"` een keuze uit `"moderator"` en `"playing"`; zie [host_modes](#host-modes) |
 | `default_host_mode` | string | Standaard `"moderator"`; moet in `host_modes` staan |
+| `icon` | string | Optioneel, sinds 0.5.1. Pad naar een SVG in `assets/`; zie [icon](#icon) |
 | `supports_late_join` | boolean | Standaard `true` voor oudere manifests |
 | `achievements` | lijst | Optioneel, sinds 0.5. Hoogstens 50; zie [achievements](#achievements) |
 | `set_kinds` | lijst | Optioneel, sinds 0.5. Hoogstens 4 soorten eigen sets; zie [set_kinds](#set-kinds) |
@@ -88,6 +89,62 @@ Het manifest van het stemspel uit de scaffolder:
 Kies `supports_late_join` voor een nieuw spel bewust. De kamer zet later aansluiten pas aan met `allow_late_join: true`, en de engine weigert dat als het spel het niet ondersteunt.
 
 `runtime: "server"` kan alleen voor de ingebouwde spellen `common-dice` en `jeopardy`. Een manifest alleen installeert geen serverregels.
+
+### host_modes
+
+`host_modes` zegt wie het spel mag leiden; de maker van de kamer kiest er een op de pagina voor een nieuwe kamer. Zie [spelleidermodi](../concepten/spelleidermodi.md).
+
+| `runtime` | Toegestaan in `host_modes` |
+| --- | --- |
+| `"host"` | `"moderator"`, `"playing"` of allebei. Sinds 0.5.1; daarvoor alleen `["moderator"]` |
+| `"server"` | `"moderator"`, `"playing"` en `"hostless"`, zoals het ingebouwde spel aangeeft |
+
+`hostless` kan niet bij `runtime: "host"`: zonder een verbonden hosttabblad is er geen scheidsrechter. Een lege lijst, `hostless` bij een eigen spel of een `default_host_mode` die niet in de lijst staat, weigert de engine met *Invalid runtime or unsupported host modes.*
+
+Meespelen is het gewone geval: bij bordspellen, kaartspellen en de meeste partyspellen speelt de maker mee zoals iedereen. Daarom zet `me game new` sinds 0.5.1 `["playing", "moderator"]` met `playing` als standaard, zoals in het voorbeeld hierboven. Laat `playing` alleen weg als de maker echt alleen leidt, zoals een quizmaster die de antwoorden kent:
+
+```json
+"host_modes": ["moderator"],
+"default_host_mode": "moderator"
+```
+
+Een manifest zonder `host_modes` betekent `["moderator"]`, zoals vóór 0.5.1. Met `playing` is de hostpagina ook de spelerspagina van de maker: zie [als de maker meespeelt](browserhost.md#als-de-maker-meespeelt).
+
+### icon
+
+Sinds 0.5.1 kan een spel een eigen icoon meenemen. De startpagina, de lijst met alle spellen en de pagina voor een nieuwe kamer tonen het in het vierkantje van 52 pixels naast de titel. Zonder `icon` blijft alles zoals het was: de ingebouwde spellen houden hun eigen teken, andere spellen krijgen een tegel met de eerste letter van de titel.
+
+```json
+"icon": "assets/icon.svg"
+```
+
+De engine controleert het icoon bij het opstarten en bij elke upload, en `me game upload` en `me dev` doen dat al op je eigen computer:
+
+| Regel | Waarde |
+| --- | --- |
+| Pad | Begint met `assets/` en eindigt op `.svg` |
+| Bestand | Staat in het package |
+| Grootte | Hoogstens 64 KiB |
+| Inhoud | Geldige UTF-8 en bevat `<svg` |
+| Niet toegestaan | `<script`, `<foreignObject`, `javascript:` en event-attributen zoals `onload=`, ongeacht hoofdletters |
+
+Een fout geeft *Invalid icon: …* met de reden.
+
+De pagina's van de engine laden het icoon als `<img alt="">`, vanaf het gewone assetadres van de actieve versie: `/games/{id}/{icon}?v={version}`. In een `<img>` voert de browser geen scripts uit een SVG uit.
+
+Zo ontwerp je een icoon dat in de lijst past:
+
+- Een vierkant `viewBox="0 0 48 48"`.
+- Een volle tegel met een eigen achtergrond en afgeronde hoeken (`rx="12"`).
+- Eén of twee eenvoudige vormen in de kleuren van je spel.
+- Geen tekst, geen lettertypes en geen verwijzingen naar andere bestanden.
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <rect width="48" height="48" rx="12" fill="#1f3d2b"/>
+  <circle cx="24" cy="24" r="11" fill="#f2c94c"/>
+</svg>
+```
 
 ## settings_schema
 
@@ -131,6 +188,12 @@ Een voorbeeld met grenzen en een keuzelijst:
 ```
 
 Bij het maken van een kamer worden de meegegeven instellingen over `default_settings` heen gelegd. Daarna vervangt de host instellingen altijd als geheel object.
+
+### Instellingen liggen vast tijdens het spelen
+
+De maker kiest de instellingen in het formulier voor een nieuwe kamer. Daarna liggen ze in de praktijk vast. Toon ze in je spel als gewone tekst, bijvoorbeeld een korte regel *Regels: 5 rondes, 30 seconden per vraag*, en zet er geen knoppen of velden bij om ze te wijzigen.
+
+`setSettings` en `PUT /api/v1/rooms/{code}/settings` bestaan nog voor een spel dat het echt nodig heeft. Maar regels die veranderen terwijl mensen spelen, maken een spel oneerlijk. En een formulier dat bij elke snapshot opnieuw rendert, verliest makkelijk een klik.
 
 ## achievements
 
@@ -184,7 +247,7 @@ De host leest de gekozen set met `gameData()`, en de snapshot noemt hem in `room
 
 ## Controle
 
-De engine controleert het hele manifest, ook `achievements` en `set_kinds`, bij het opstarten en bij elke upload. Een fout in een lokaal package laat de engine niet starten; een fout in een upload geeft `400 invalid_request` met de reden.
+De engine controleert het hele manifest, ook `icon`, `achievements` en `set_kinds`, bij het opstarten en bij elke upload. Een fout in een lokaal package laat de engine niet starten; een fout in een upload geeft `400 invalid_request` met de reden.
 
 ## HTML en assets
 

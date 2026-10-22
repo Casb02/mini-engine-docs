@@ -42,8 +42,8 @@ Elk bericht is JSON-tekst met een `type`. Een optionele `request_id` (string, ma
 
 | `type` | Velden naast `type` en `request_id` | Wie |
 | --- | --- | --- |
-| `action` | `name`, `data`, optioneel `action_id` | Speler; host bij een serverspel |
-| `ready` | `ready` | Deelnemer, lobby |
+| `action` | `name`, `data`, optioneel `action_id` | Speler; host bij een serverspel. Bij een hostspel nooit de host, ook niet als die meespeelt |
+| `ready` | `ready` | Deelnemer, lobby. De plek van een meespelende maker in een hostspel staat al klaar |
 | `configure` | `expected_version`, gedeeltelijke `config` | Host, lobby |
 | `set_state` | `expected_version`, `public_state`, optioneel `host_state` en `player_states` | Host, hostruntime |
 | `settings` | `expected_version`, volledig `settings` | Host |

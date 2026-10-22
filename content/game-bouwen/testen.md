@@ -36,6 +36,8 @@ me dev --players 3
 - Starten lukt pas als iedereen klaarstaat.
 - Afronden en terug naar de lobby reset klaarstatus en spelstand.
 - Een tweede ronde werkt net zo goed als de eerste.
+- Speelt de maker mee, dan staat diens plek klaar zonder knop, telt de zet van de maker net zo goed als die van anderen, en wijzen alle pagina's de maker aan met `host_player_id`.
+- Biedt je spel ook `moderator` aan: speel ook een ronde waarin de maker alleen leidt.
 
 **Later aansluiten**
 
@@ -68,6 +70,9 @@ me dev --players 3
 
 - Bekijk de spelerspagina op een smal scherm (360 pixels breed) zonder horizontaal scrollen.
 - Is het gedeelde scherm leesbaar vanaf de bank?
+- Scan de QR-code op het gedeelde scherm en achter **Toon QR** met een telefoon: je komt op de pagina om mee te doen.
+- Een klik op de kamercode kopieert de uitnodigingslink.
+- De instellingen staan als tekst op de pagina's, zonder knoppen om ze te wijzigen.
 
 ## Geautomatiseerde controles
 

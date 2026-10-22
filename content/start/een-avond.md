@@ -24,7 +24,7 @@ Een kamer verloopt na twaalf uur zonder activiteit.
 
 | Rol | Apparaat | Wat het doet |
 | --- | --- | --- |
-| Spelleider (`host`) | Het apparaat waarop de kamer is gemaakt | Beheert de kamer: start en sluit rondes, wijzigt instellingen, verwijdert spelers |
+| Spelleider (`host`) | Het apparaat waarop de kamer is gemaakt | Beheert de kamer: start en sluit rondes, wijzigt instellingen, verwijdert spelers. Speelt vaak zelf mee |
 | Speler (`player`) | De eigen telefoon van elke deelnemer | Zet zich klaar en speelt: gooit, buzzt, stemt |
 | Gedeeld scherm (`display`) | Een laptop of tv in de kamer | Kijkt alleen mee en toont wat iedereen mag zien |
 
@@ -38,7 +38,7 @@ Elke rol krijgt een eigen sleutel. De engine bepaalt per rol wat een apparaat te
 | Meespelende eigenaar | Speelt mee en start en beheert de ronde | Spelen mee | Kijkt alleen mee |
 | Aparte spelleider | Heeft geen spelersplek | Spelen mee | Kijkt alleen mee |
 
-Common Dice ondersteunt alle drie de modi. Jeopardy gebruikt altijd een aparte spelleider: de quizmaster kiest vragen en beoordeelt antwoorden.
+Common Dice ondersteunt alle drie de modi. Jeopardy gebruikt altijd een aparte spelleider: de quizmaster kiest vragen en beoordeelt antwoorden. Bij eigen spellen speelt de maker meestal mee; sommige laten ook kiezen voor een aparte spelleider.
 
 ## Het verloop van een ronde
 

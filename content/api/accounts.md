@@ -1,7 +1,7 @@
 ---
 title: Accounts
 nav_title: Accounts
-description: De accountroutes van de HTTP API voor registreren, e-mailbevestiging, inloggen, uitloggen, het eigen account, statistieken, achievements en eigen sets.
+description: De accountroutes van de HTTP API voor registreren, e-mailbevestiging, inloggen, uitloggen, het eigen account, statistieken, achievements, eigen sets en je eigen spellen aan- of uitzetten.
 section: HTTP API
 order: 4
 toc_depth: 3
@@ -284,6 +284,26 @@ De controle is dezelfde als bij aanmaken, tegen de actieve versie van het spel. 
 **Fouten:** `401 unauthorized`, `404 set_not_found`, `429 rate_limit`.
 
 Aanmaken, wijzigen en verwijderen samen mag 30 keer per minuut per IP-adres; zie [limieten](limieten.md#aanvragen-per-ip-adres).
+
+## Mijn spellen
+
+Sinds 0.5.1. Wie met een [dev-key](ontwikkelaars.md) spellen uploadde, zet ze ook vanaf de website aan of uit, zonder dev-key. Beide routes vragen een accountsleutel (`Authorization: Bearer <sessiesleutel>`), net als `GET /api/v1/accounts/me`. De accountpagina op `/home/account` gebruikt ze voor het onderdeel **Mijn spellen**; zie [je game publiceren](../publiceren/overzicht.md#aan-of-uit-vanaf-de-accountpagina).
+
+### GET /api/v1/accounts/games
+
+De geüploade spellen van jouw account. **Antwoord** `200`: `{ "games": [DevGame, …] }`, dezelfde objecten als bij [`GET /api/v1/dev/games`](ontwikkelaars.md#get-api-v1-dev-games). Een account zonder eigen spellen krijgt een lege lijst.
+
+**Fouten:** `401 unauthorized`.
+
+### PUT /api/v1/accounts/games/{id}
+
+```json
+{ "enabled": false }
+```
+
+Zet het spel uit of aan. **Antwoord** `200`: het bijgewerkte DevGame-object. Het werkt precies als [`PUT /api/v1/dev/games/{id}`](ontwikkelaars.md#put-api-v1-dev-games-id): een spel dat uit staat, verdwijnt van de startpagina en uit `GET /api/v1/games`, en er kunnen geen nieuwe kamers mee worden gemaakt. Kamers die al spelen, lopen door. Het auditlog noemt `game.enable` of `game.disable` met je gebruikersnaam.
+
+**Fouten:** `invalid_json` (geen geldige body), `401 unauthorized`, `403 game_blocked` (aanzetten van een spel dat de beheerder blokkeerde), `404 game_not_found` (het spel bestaat niet of is niet van jou).
 
 ## Sessies
 

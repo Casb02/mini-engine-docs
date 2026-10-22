@@ -13,14 +13,14 @@ Deze routes zijn openbaar en hebben geen sleutel nodig.
 ## GET /api/health
 
 ```json
-{ "status": "ok", "version": "0.5.0" }
+{ "status": "ok", "version": "0.5.1" }
 ```
 
 `version` is de gebouwde versie van de engine.
 
 ## GET /api/v1/games
 
-Alle spellen die aanstaan, met metadata, instellingenschema, achievements en soorten sets.
+Alle spellen die aanstaan, met metadata, instellingenschema, icoon, achievements en soorten sets.
 
 ```json
 {
@@ -70,6 +70,12 @@ Alle spellen die aanstaan, met metadata, instellingenschema, achievements en soo
 
 Ontbrekende manifestvelden krijgen hier hun standaardwaarde: `runtime: "host"`, `host_modes: ["moderator"]`, `default_host_mode: "moderator"`, `supports_late_join: true`, en lege lijsten voor `achievements` en `set_kinds`. Alle velden staan bij [package en manifest](../game-bouwen/package-en-manifest.md#velden). Het volledige schema van het vragenbord staat bij [eigen sets](../concepten/eigen-sets.md#het-schemadialect).
 
+`icon` staat er sinds 0.5.1, precies zoals het manifest het opgeeft, bijvoorbeeld `"icon": "assets/icon.svg"`. Heeft het spel geen icoon, dan ontbreekt het veld; de ingebouwde spellen hebben er geen. Laad het icoon van het gewone assetadres van de actieve versie, `/games/{id}/{icon}?v={version}`, en toon het als `<img alt="">`, zodat een script in de SVG nooit draait. De regels staan bij [package en manifest](../game-bouwen/package-en-manifest.md#icon).
+
+```json
+{ "id": "vier-pionnen", "title": "Vier pionnen", "version": "0.2.0", "icon": "assets/icon.svg", "…": "…" }
+```
+
 `achievements` en `set_kinds` zijn er sinds 0.5. Ze komen uit de actieve versie van het spel. Een kamer die een oudere versie speelt, gebruikt de achievements en soorten sets van die versie.
 
 ## GET /api/v1/games/{id}
@@ -97,10 +103,11 @@ import { MiniEngine, loadSession } from '/sdk/mini-engine.js';
 | Pad | Inhoud |
 | --- | --- |
 | `/` | Doorverwijzing naar `/home` |
-| `/home` | De startpagina: een kamercode invullen of een spel kiezen |
+| `/home` | De startpagina: een kamercode invullen of een spel kiezen. Bij meer dan vier spellen staan er drie willekeurige, met een knop *Bekijk alle N spellen* |
+| `/home/spellen` | Alle spellen die aanstaan (sinds 0.5.1) |
 | `/home/new/{id}` | Een kamer maken voor een spel; een onbekend spel geeft 404 |
 | `/home/join` | Meedoen met een naam, met `?room=CODE` |
-| `/home/account` | Inloggen, een account maken, resultaten en achievements |
+| `/home/account` | Inloggen, een account maken, resultaten en achievements; sinds 0.5.1 ook **Mijn spellen** voor wie zelf spellen uploadde |
 | `/home/sets`, `/home/sets/{id}` | Mijn sets: eigen sets bekijken, maken en bewerken (sinds 0.5) |
 | `/demo/…` | Oude adressen; ze sturen door naar hetzelfde pad onder `/home`, met de query erbij |
 | `/room/{code}/{role}` | De kamerinterface die de rolpagina van het spel laadt |

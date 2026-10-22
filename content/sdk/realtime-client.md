@@ -115,7 +115,7 @@ Alleen de host. Volgt `lobby → running → finished → lobby`.
 setSettings(settings: S): Promise<Ack>
 ```
 
-Alleen de host. Vervangt het hele instellingenobject; de SDK stuurt de versie van `client.room` als `expected_version` mee.
+Alleen de host. Vervangt het hele instellingenobject; de SDK stuurt de versie van `client.room` als `expected_version` mee. Gebruik het alleen als je spel het echt nodig heeft: de maker kiest de instellingen bij het maken van de kamer, en spellen tonen ze daarna als tekst. Zie [instellingen liggen vast](../game-bouwen/package-en-manifest.md#instellingen-liggen-vast-tijdens-het-spelen).
 
 ### configure(config)
 

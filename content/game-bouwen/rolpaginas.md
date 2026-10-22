@@ -41,7 +41,8 @@ await client.waitForSnapshot();
 Elke snapshot is de volledige, actuele weergave voor jouw rol. Render altijd vanuit de nieuwste snapshot, ook na een herverbinding. Een paar dingen om op te letten:
 
 - Klaarstatus en aanwezigheid veranderen zonder nieuwe versie. Verwerk dus elke snapshot.
-- `you.role` blijft `host` voor de maker, ook als die meespeelt. Kijk naar `you.player_id` om te zien of iemand een spelersplek heeft.
+- `you.role` blijft `host` voor de maker, ook als die meespeelt. Kijk naar `you.player_id` om te zien of iemand een spelersplek heeft. `host_player_id` (sinds 0.5.1) is voor iedere rol de plek van een meespelende maker, of `null`; gebruik het om de spelleider in de spelerslijst aan te wijzen.
+- Toon de instellingen (`room.settings`) als gewone tekst, bijvoorbeeld *Regels: 5 rondes*. De maker koos ze bij het maken van de kamer; zet er geen knoppen bij om ze te wijzigen.
 - Een speler leest zijn eigen geheime deel als `private_state`. Het gedeelde scherm krijgt nooit privégegevens.
 - `client.room` bevat altijd de laatste snapshot; `client.connected` wordt pas `true` na de eerste snapshot.
 
@@ -52,7 +53,8 @@ function render(room) {
     room.status === 'lobby' ? 'Zet je klaar.' : room.status === 'running' ? 'Speel!' : 'Ronde voorbij.';
   const list = room.players.map((player) => {
     const item = document.createElement('li');
-    item.textContent = player.name + (player.ready ? ' (klaar)' : '');
+    const host = player.id === room.host_player_id ? ' (spelleider)' : '';
+    item.textContent = player.name + host + (player.ready ? ' (klaar)' : '');
     return item;
   });
   document.querySelector('#players').replaceChildren(...list);
@@ -66,7 +68,7 @@ Gebruik `textContent` voor namen en andere tekst van spelers, nooit `innerHTML`.
 | Pagina | Doet |
 | --- | --- |
 | `player.html` | Klaarzetten, acties sturen, eigen `private_state` tonen |
-| `host.html` | Rondes starten en afsluiten, instellingen en apparaatopties wijzigen; bij een eigen spel ook acties verwerken en state publiceren |
+| `host.html` | Rondes starten en afsluiten, apparaatopties wijzigen; bij een eigen spel ook acties verwerken en state publiceren, en als de maker meespeelt diens eigen zetten |
 | `display.html` | Alleen `public_state` tonen, groot en leesbaar vanaf de bank |
 
 ## Pagina's sluiten en terugkomen

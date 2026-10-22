@@ -21,6 +21,8 @@ Daarnaast bewaart een account drie soorten gegevens:
 | **[Achievements](achievements.md)** (sinds 0.5) | Mijlpalen die je in een spel verdient | De accountpagina en `GET /api/v1/accounts/achievements` |
 | **[Eigen sets](eigen-sets.md)** (sinds 0.5) | Inhoud die je zelf maakt, zoals een Jeopardy-bord | **Mijn sets** op `/home/sets` en `/api/v1/accounts/sets` |
 
+Heb je met een dev-key zelf spellen geüpload, dan staat op de accountpagina ook **Mijn spellen** (sinds 0.5.1). Daar zet je ze aan of uit; zie [je game publiceren](../publiceren/overzicht.md#aan-of-uit-vanaf-de-accountpagina).
+
 De resultaten per spel:
 
 - **Common Dice** telt per account het aantal worpen, het aantal geworpen stenen en het opgetelde worptotaal. Het kent geen winnaars toe.

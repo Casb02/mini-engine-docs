@@ -60,7 +60,8 @@ Elke fout heeft dezelfde vorm:
 | 401 | `auth_timeout` | Websocket: niet binnen vijf seconden geauthenticeerd |
 | 403 | `forbidden` | Niet toegestaan voor jouw rol, of bij dit soort spel |
 | 403 | `origin_forbidden` | Browserverzoek van een niet-toegestane origin |
-| 403 | `not_eligible` | Achievement toekennen: de speler is een gast, de kamer is zonder account gemaakt, of het is je eigen account |
+| 403 | `game_blocked` | De beheerder blokkeerde dit spel; aanzetten of verwijderen kan niet |
+| 403 | `not_eligible` | Achievement toekennen: de speler is een gast, de kamer is zonder account gemaakt, of het is je eigen account op een andere plek dan die van de meespelende maker |
 | 404 | `not_found` | Onbekende route |
 | 404 | `room_not_found` | De kamer bestaat niet of is verlopen |
 | 404 | `game_not_found` | Het spel is niet geïnstalleerd |
@@ -122,7 +123,7 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | `GET /games/{id}/assets/{path}` | Openbaar | Publieke gameassets |
 | `GET /sdk/mini-engine.js` | Openbaar | De SDK-bundle |
 | `GET /sdk/mini-engine.d.ts` | Openbaar | TypeScript-declaraties van de SDK (`text/plain`) |
-| `GET /home`, `/home/new/{id}`, `/home/join`, `/home/account`, `/home/sets`, `/home/sets/{id}` | Openbaar | De pagina's van de engine: start, kamer maken, meedoen, account, mijn sets. Een onbekend spel in `/home/new/{id}` geeft 404. |
+| `GET /home`, `/home/spellen`, `/home/new/{id}`, `/home/join`, `/home/account`, `/home/sets`, `/home/sets/{id}` | Openbaar | De pagina's van de engine: start, alle spellen, kamer maken, meedoen, account, mijn sets. Een onbekend spel in `/home/new/{id}` geeft 404. |
 | `GET /demo/…` | Openbaar | Doorverwijzing naar hetzelfde pad onder `/home` |
 | `POST /api/v1/rooms` | Gast of account | 201 met hostsleutel |
 | `POST /api/v1/rooms/{code}/join` | Gast of account | 201 met spelerssleutel |
@@ -133,7 +134,7 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | `PUT /api/v1/rooms/{code}/settings` | Host | Instellingen vervangen |
 | `PUT /api/v1/rooms/{code}/config` | Host, lobby | Kameropties wijzigen |
 | `POST /api/v1/rooms/{code}/ready` | Deelnemer, lobby | Klaarzetten |
-| `POST /api/v1/rooms/{code}/actions` | Speler, of host bij serverspel | Actie sturen |
+| `POST /api/v1/rooms/{code}/actions` | Speler, of host bij serverspel; bij een hostspel nooit de host | Actie sturen |
 | `POST /api/v1/rooms/{code}/lifecycle` | Host | Levensloop wijzigen |
 | `POST /api/v1/rooms/{code}/display-token` | Host, scherm aan | Nieuwe schermsleutel |
 | `POST /api/v1/rooms/{code}/leave` | Speler | 204, sleutel ingetrokken |
@@ -149,6 +150,8 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | `GET /api/v1/accounts/achievements` | Account | Verdiende achievements |
 | `GET`, `POST /api/v1/accounts/sets` | Account | Eigen sets bekijken (zonder inhoud) of er een maken |
 | `GET`, `PUT`, `DELETE /api/v1/accounts/sets/{id}` | Account | Eén eigen set lezen, vervangen of verwijderen |
+| `GET /api/v1/accounts/games` | Account | Je eigen geüploade spellen (sinds 0.5.1) |
+| `PUT /api/v1/accounts/games/{id}` | Account | Eigen spel aan of uit zetten (sinds 0.5.1) |
 | `POST /api/v1/accounts/verify-email` | Account waarvoor de link is | E-mailadres bevestigen met het token uit de link |
 | `PUT /api/v1/accounts/email` | Account | E-mailadres toevoegen of wijzigen, of de link opnieuw sturen |
 | `GET /releases/{id}/{version}/{path}` | Openbaar | Assets van de actieve versie, of van een versie die een lopende kamer speelt |
@@ -172,11 +175,22 @@ Deze documentatie hoort bij deze versies:
 
 | Onderdeel | Versie |
 | --- | --- |
-| Mini Engine | 0.5.0 (`GET /api/health` geeft de gebouwde versie) |
-| Mini Engine SDK | 0.5.0 |
-| me-CLI | 0.5.0 |
+| Mini Engine | 0.5.1 (`GET /api/health` geeft de gebouwde versie) |
+| Mini Engine SDK | 0.5.1 |
+| me-CLI | 0.5.1 |
 | Documentatie | 0.5 |
-| API-referentie (pdf) | Editie 0.5; edities 0.4, 0.3 en 0.2 blijven te downloaden |
+| API-referentie (pdf) | Editie 0.5, zonder de toevoegingen van 0.5.1; edities 0.4, 0.3 en 0.2 blijven te downloaden |
+
+Nieuw in 0.5.1:
+
+- Een eigen spel kan de maker laten meespelen: `playing` in `host_modes` bij `runtime: "host"`. Dat is het gewone geval; `me game new` zet `["playing", "moderator"]` met `playing` als standaard. De plek van de maker staat altijd klaar, verdient achievements zoals elke speler, en het snapshotveld `host_player_id` wijst de maker aan. Een manifest zonder `host_modes` blijft `["moderator"]`. Zie [spelleidermodi](../concepten/spelleidermodi.md#meespelen-in-een-eigen-spel).
+- Een spel kan een eigen icoon meenemen met het manifestveld `icon`; `GET /api/v1/games` geeft het mee. Zie [package en manifest](../game-bouwen/package-en-manifest.md#icon).
+- Je zet je eigen spellen aan of uit op de accountpagina, met `GET /api/v1/accounts/games` en `PUT /api/v1/accounts/games/{id}`. Zie [Mijn spellen](accounts.md#mijn-spellen).
+- De startpagina toont bij meer dan vier spellen drie willekeurige en een knop *Bekijk alle N spellen*, naar `/home/spellen`. Beschrijvingen in die lijsten stoppen na twee regels.
+- Een QR-code om mee te doen: het gedeelde scherm toont hem naast de code, en spelleider en spelers hebben een knop *Toon QR*. Een klik op de kamercode kopieert de uitnodigingslink. De uitnodiging noemt alleen het adres van de engine, zoals *Doe mee op miniengine.nl met code HWKRTZ*. MiniEngineUI in SDK 0.5.1 doet hetzelfde voor eigen spellen; zie [bouwen met AI](../ai/bouwen-met-ai.md#miniengineui).
+- Eigen spellen tonen de instellingen als tekst: de maker kiest ze in het formulier voor een nieuwe kamer. Zie [instellingen liggen vast](../game-bouwen/package-en-manifest.md#instellingen-liggen-vast-tijdens-het-spelen).
+
+Alles uit 0.5.0 werkt nog: packages en kamers van 0.5.0 blijven ongewijzigd geldig.
 
 Nieuw in 0.5:
 

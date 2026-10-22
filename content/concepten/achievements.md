@@ -34,7 +34,7 @@ De engine controleert dit bij het opstarten en bij elke upload. De definities zi
 
 Alleen spelers met een spelersplek én een account. Het account komt uit de spelersplek die de engine zelf bijhoudt: het account waarmee iemand de kamer maakte of meedeed. Een client kan nooit zelf een account opgeven.
 
-- Gasten, een aparte spelleider zonder spelersplek en het gedeelde scherm krijgen nooit een achievement.
+- Gasten, een aparte spelleider zonder spelersplek en het gedeelde scherm krijgen nooit een achievement. Een meespelende maker heeft wel een spelersplek en kan ze dus verdienen.
 - Elke achievement verdien je één keer per spel. Nog een keer verdienen verandert niets.
 - De engine bewaart titel en beschrijving zoals ze waren op het moment van verdienen. Ze blijven staan als het spel later verandert, wordt uitgezet of verdwijnt.
 
@@ -73,10 +73,12 @@ Dat kan ook met het websocketbericht `award` of met [`POST /api/v1/rooms/{code}/
 | De speler heeft een account | `403 not_eligible` |
 | Het id staat in de versie van het spel die de kamer speelt | `404 achievement_unknown` |
 | De kamer is gemaakt door iemand die was ingelogd | `403 not_eligible` |
-| Het account van de speler is niet dat van de host | `403 not_eligible`: jezelf iets geven kan niet |
+| Het account van de speler is niet dat van de host, behalve op de eigen plek van een meespelende maker (`host_player_id`) | `403 not_eligible`: een spelleider die met hetzelfde account ook als speler meedoet, kan zichzelf niets geven |
 | Hoogstens 30 toekenningen per kamer per minuut | `429 rate_limit` |
 
 Een achievement die de speler al had, geeft gewoon een bevestiging.
+
+Speelt de maker mee (`host_mode: "playing"`, sinds 0.5.1 ook in eigen spellen), dan is die een speler zoals iedereen. De host mag een achievement toekennen aan de eigen plek van de maker, `host_player_id`, als de maker met een account speelt. Wat niet kan: een spelleider die alleen leidt en met hetzelfde account ook als speler meedoet, kan zichzelf niets geven.
 
 Dit is een bewuste keuze over vertrouwen. Een spelleider kan de achievements van **dat ene spel** toekennen aan andere spelers in **zijn eigen kamer**. Omdat de spelcode in de browser van de host draait, kan de server niet controleren of iemand de achievement echt verdiende. Daarom bewaart de engine deze achievements apart, zie hieronder. Resultaten en statistieken blijven alleen voor serverspellen.
 

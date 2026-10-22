@@ -81,7 +81,7 @@ De engine laadt gamepackages bij het opstarten. Na het toevoegen of wijzigen van
 curl http://localhost:3000/api/health
 ```
 
-Het antwoord is `{"status":"ok","version":"0.5.0"}`, met de versie uit `Cargo.toml`. De spellencatalogus staat op `/api/v1/games`.
+Het antwoord is `{"status":"ok","version":"0.5.1"}`, met de versie uit `Cargo.toml`. De spellencatalogus staat op `/api/v1/games`.
 
 In een container doet `mini-engine healthcheck` hetzelfde: het commando slaagt als `/api/health` een 200 geeft.
 

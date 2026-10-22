@@ -27,7 +27,7 @@ await client.action('roll', { held: [0, 2] });
 | `data` | JSON, maximaal 8 KiB. Serverspellen vragen een object. |
 | `action_id` | Optioneel, 1 tot 64 tekens zonder controletekens |
 
-Wie een actie mag sturen, hangt van de runtime af. Bij een serverspel beslissen de spelregels in Rust; het gedeelde scherm mag nooit acties sturen. Bij een eigen browserspel sturen alleen spelers acties en verwerkt de host ze.
+Wie een actie mag sturen, hangt van de runtime af. Bij een serverspel beslissen de spelregels in Rust; het gedeelde scherm mag nooit acties sturen. Bij een eigen browserspel sturen alleen spelers acties en verwerkt de host ze. Speelt de maker mee, dan stuurt die geen actie: de hostpagina past de eigen zetten direct toe met `setState`.
 
 ## Wat een action-id doet
 

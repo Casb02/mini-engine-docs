@@ -30,11 +30,19 @@ Een dev-key kan alleen voor een account met een bevestigd e-mailadres. Krijg je 
 - **Lopende kamers houden hun versie.** Wie al aan het spelen is, merkt niets van een nieuwe versie.
 - **Je game is van jou.** Niemand anders kan er versies aan toevoegen, hem uitzetten of verwijderen. Alleen de eigenaar van de server kan hem blokkeren.
 
+## Aan of uit vanaf de accountpagina
+
+Sinds 0.5.1 zet je je eigen spellen ook aan of uit zonder CLI. Log in op `/home/account`. Heeft je account minstens één geüpload spel, dan staat daar het onderdeel **Mijn spellen**: per spel de titel, de actieve versie, de stand (*Aan*, *Uit* of *Geblokkeerd door de beheerder*) en een knop *Zet uit* of *Zet aan*. Een geblokkeerd spel heeft geen knop.
+
+Het werkt hetzelfde als `me game disable <id>` en `me game enable <id>` uit de [CLI](cli.md#games): een spel dat uit staat, verdwijnt van de startpagina en er kunnen geen nieuwe kamers mee worden gemaakt. Kamers die al spelen, lopen door. Je hebt er geen dev-key voor nodig, alleen je account. De routes staan bij [accounts](../api/accounts.md#mijn-spellen). Uploaden, versies en verwijderen blijven via de CLI gaan.
+
 ## Wat mag
 
 | Regel | Grens |
 | --- | --- |
-| Runtime | Alleen `host`, met een aparte spelleider (`host_modes: ["moderator"]`). Serverregels zitten in de engine. |
+| Runtime | Alleen `host`. Serverregels zitten in de engine. |
+| Spelleidermodi | `moderator`, `playing` of allebei; `playing` sinds 0.5.1. Geen `hostless`. Zie [host_modes](../game-bouwen/package-en-manifest.md#host-modes) |
+| Icoon | Optioneel, sinds 0.5.1: een SVG in `assets/` van hoogstens 64 KiB, zonder scripts. Zie [icon](../game-bouwen/package-en-manifest.md#icon) |
 | Bestanden | Hoogstens 4096, elk ≤ 2 MiB, samen ≤ 10 MiB |
 | Versienaam | 1–64 tekens `0-9 A-Z a-z . + _ -`, beginnend met een letter of cijfer |
 | Games | 10 per account |

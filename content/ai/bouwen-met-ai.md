@@ -16,7 +16,7 @@ De skills staan in de map `skills/` van de SDK-repository en gaan mee in het pak
 | Skill | Waarvoor |
 | --- | --- |
 | `build-mini-engine-game` | De werkwijze van begin tot eind: scaffolden met `create-mini-game`, manifest en `settings_schema`, de spelleider en de rollen, state in de hostruntime (publiek, alleen host, geheim per speler), rondes, het gedeelde scherm, snel testen met `me dev`, de engine draaien en controleren met meerdere apparaten. Met naslag over de SDK, manifestregels, recepten voor de hostruntime en probleemoplossing, plus `scripts/play.mjs`, dat met Playwright een echte kamer bespeelt. |
-| `design-mini-engine-game-ui` | De drie pagina's: speler (telefoon), scherm (tv aan de overkant van de kamer) en spelleider. Een eigen sfeer per spel, raakvlakken, leesbaarheid, zelf gehoste lettertypes, geen inline scripts onder de CSP van de engine, minder beweging als de gebruiker dat vraagt. |
+| `design-mini-engine-game-ui` | De drie pagina's: speler (telefoon), scherm (tv aan de overkant van de kamer) en spelleider. Een eigen sfeer per spel, raakvlakken, leesbaarheid, zelf gehoste lettertypes, geen inline scripts onder de CSP van de engine, minder beweging als de gebruiker dat vraagt. Instellingen als gewone tekst, een kopieerbare kamercode en een QR-code om mee te doen. |
 | `mini-engine-ui` | **MiniEngineUI**: de rustige stijl van de demospellen als kant-en-klare kit. Een stylesheet, Space Grotesk en DM Sans, en pagina's voor spelleider, speler en scherm die meteen op de scaffold passen. Vier sferen (`kalk`, `nacht`, `vilt`, `studio`) en ruimte voor één eigen blikvanger per spel. |
 
 De bouwskill roept de ontwerpskill zelf aan als hij aan de pagina's toekomt.
@@ -24,6 +24,15 @@ De bouwskill roept de ontwerpskill zelf aan als hij aan de pagina's toekomt.
 ## MiniEngineUI
 
 Heb je alleen een idee en geen ontwerp in je hoofd, kies dan MiniEngineUI. De bouwskill vraagt aan het begin één keer of je die stijl wilt. Zeg je niets, of heb je geen wensen voor het uiterlijk, dan gebruikt hij hem vanzelf. Je spel krijgt dan dezelfde rustige schil als Common Dice en Jeopardy: een balk met de naam van het spel en de kamercode, grote knoppen op de telefoon, een overzicht voor de spelleider en een scherm dat je vanaf de bank kunt lezen. De sfeer van jouw spel zit in één thema en één blikvanger op het speelveld, zoals het vilt bij de dobbelstenen.
+
+Sinds SDK 0.5.1 regelt de kit ook het uitnodigen:
+
+- **De kamercode is een knop.** Op de pagina's van spelleider en spelers kopieert een klik op de code (`me-code`) de uitnodigingslink, `/home/join?room=CODE` op het adres van de engine, en toont even *Gekopieerd*. Op het gedeelde scherm is de code gewone tekst.
+- **Een QR-code op het scherm.** In de lobby toont het gedeelde scherm naast de grote code een QR-code met dezelfde link, groot genoeg om vanaf de bank te scannen. Zodra het spel loopt, verdwijnt de QR; de code blijft in de balk.
+- **Toon QR.** Waar geen vaste QR past, op de pagina's van spelleider en spelers, staat een rustige knop *Toon QR* naast de code. Die opent een venster met een grote QR, de code en *Sluiten*. Zo kan ook een speler een vriend laten scannen.
+- **Een korte uitnodiging.** Het scherm noemt alleen het adres, zonder `/home`: *Ga naar miniengine.nl en vul de code in*. Het adres komt uit `location.host`; de root van de engine stuurt zelf door naar de startpagina.
+
+De QR-code komt uit `kit/ui/qr.js` (de bibliotheek uqr, MIT, met de licentie ernaast) en `kit/ui/invite.js`, dat `joinUrl(code)`, `qrSvg(text)`, `bindCopyCode(button, code)` en `bindQrDialog(button, code)` levert. De stijl staat in de componenten `me-qr` en `me-dialog`.
 
 Wil je het meteen, zeg het er dan bij:
 
@@ -88,7 +97,8 @@ De rest mag de agent aannemen, mits hij zijn aannames aan het eind opsomt.
 
 Een agent schrijft overtuigende code die net naast het contract kan zitten. De bouwskill heeft een eigen afvinklijst; let in elk geval op:
 
-- **De host is de scheidsrechter.** Spelersdata is onbetrouwbaar; `player_id` komt van de engine. Hostknoppen roepen SDK-methoden aan, geen `action()`.
+- **De host is de scheidsrechter.** Spelersdata is onbetrouwbaar; `player_id` komt van de engine. Hostknoppen roepen SDK-methoden aan, geen `action()`. Speelt de maker mee, dan past de hostpagina diens zetten zelf toe met `setState`.
+- **Instellingen als tekst.** De maker kiest ze in het formulier voor een nieuwe kamer; het spel toont ze daarna als een korte regel, zonder knoppen om ze te wijzigen.
 - **Eén wachtrij voor mutaties**, met `expected_version` uit de laatste snapshot.
 - **Rondes met een doorlopende score spelen binnen één `running`-fase.** Terug naar de lobby wist de state.
 - **Geheimen niet in `assets/` of `public_state`**, maar in `data.json`, `host_state` of `player_states`.

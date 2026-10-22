@@ -21,7 +21,7 @@ Waar de spelregels draaien, bepaalt het manifestveld `runtime`. Er zijn twee soo
 | [Achievements](achievements.md) | De server kent ze toe bij afronden van de ronde | De host kent ze toe; ze staan apart, als niet gecontroleerd |
 | [Eigen sets](eigen-sets.md) | De engine gebruikt de set in plaats van `data.json` | De host leest de set met `gameData()` |
 | [Realtime](realtime.md) | Ja | Ja |
-| Spelleidermodi | Zoals het spel aangeeft | Alleen `moderator` |
+| Spelleidermodi | Zoals het spel aangeeft | `moderator` en, sinds 0.5.1, `playing`; nooit `hostless` |
 
 ## Serverruntime
 
@@ -39,6 +39,8 @@ Bij een eigen spel is het tabblad van de spelleider de scheidsrechter. De flow:
 2. De engine stuurt die actie door naar de verbonden host, met de echte `player_id` van de afzender.
 3. De host controleert de actie en publiceert de volledige nieuwe spelstand met `set_state`.
 4. De engine slaat de state op en stuurt elke rol zijn projectie.
+
+Speelt de maker mee (`host_mode: "playing"`), dan stuurt de hostpagina geen actie voor de eigen zetten: de hostverbinding mag geen `action` sturen. De hostpagina past die zetten zelf toe en publiceert de nieuwe spelstand met `set_state`, net als bij stap 3. Zie [spelleidermodi](spelleidermodi.md#meespelen-in-een-eigen-spel).
 
 Dit vraagt een verbonden host. Is de host offline, dan geeft een speleractie `409 host_offline`. Een bevestiging (ack) van zo'n actie betekent alleen dat de actie in de wachtrij van de host staat, niet dat de host haar verwerkt heeft. Acties kunnen bij uitval verloren gaan.
 
