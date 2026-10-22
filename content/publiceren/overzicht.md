@@ -41,7 +41,7 @@ Het werkt hetzelfde als `me game disable <id>` en `me game enable <id>` uit de [
 | Regel | Grens |
 | --- | --- |
 | Runtime | Alleen `host`. Serverregels zitten in de engine. |
-| Spelleidermodi | `moderator`, `playing` of allebei; `playing` sinds 0.5.1. Geen `hostless`. Zie [host_modes](../game-bouwen/package-en-manifest.md#host-modes) |
+| Spelleidermodi | `playing`, `tv` en `moderator`, in elke combinatie; `playing` sinds 0.5.1, `tv` sinds 0.5.2. Geen `hostless`. Zie [host_modes](../game-bouwen/package-en-manifest.md#host-modes) |
 | Icoon | Optioneel, sinds 0.5.1: een SVG in `assets/` van hoogstens 64 KiB, zonder scripts. Zie [icon](../game-bouwen/package-en-manifest.md#icon) |
 | Bestanden | Hoogstens 4096, elk ≤ 2 MiB, samen ≤ 10 MiB |
 | Versienaam | 1–64 tekens `0-9 A-Z a-z . + _ -`, beginnend met een letter of cijfer |

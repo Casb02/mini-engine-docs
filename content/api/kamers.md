@@ -41,12 +41,18 @@ Maakt een kamer. **Toegang:** iedereen. Met een optionele accountsleutel koppelt
 { "code": "HWKRTZ", "token": "HOST_SECRET", "role": "host", "player_id": "creator-uuid", "display_token": "DISPLAY_SECRET" }
 ```
 
-Bij `host_mode: "moderator"` is `player_id` `null`. Staat het scherm uit, dan ontbreekt `display_token`.
+Bij `host_mode: "moderator"` en `"tv"` is `player_id` `null`. Staat het scherm uit, dan ontbreekt `display_token`.
 
 Sinds 0.5.1 kan `host_mode: "playing"` ook bij een eigen spel (`runtime: "host"`), als het manifest die modus in `host_modes` heeft. Net als bij een serverspel is de sleutel van de maker dan tegelijk host en speler: `role` is `host`, `player_id` is de spelersplek van de maker, de naam komt uit `name` en het account uit de accountsleutel. Die plek staat meteen klaar.
 
 ```json
 { "game_id": "vier-pionnen", "name": "Dani", "config": { "host_mode": "playing" } }
+```
+
+Sinds 0.5.2 kan een eigen spel ook `host_mode: "tv"` aanbieden: de sleutel van de maker is dan host zonder spelersplek, en `name` wordt niet gebruikt.
+
+```json
+{ "game_id": "vier-pionnen", "config": { "host_mode": "tv" } }
 ```
 
 Met `set_id` controleert de engine dat de set van jouw account is, bij `game_id` hoort, en dat zijn soort voorkomt in de versie van het spel die de kamer krijgt. Daarna controleert hij de inhoud opnieuw tegen die versie. De kamer krijgt een kopie: wijzig of verwijder je de set later, dan blijft de kamer met de kopie spelen. De snapshot toont welke set het is in het veld [`set`](#get-api-v1-rooms-code).

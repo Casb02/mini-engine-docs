@@ -21,7 +21,7 @@ Waar de spelregels draaien, bepaalt het manifestveld `runtime`. Er zijn twee soo
 | [Achievements](achievements.md) | De server kent ze toe bij afronden van de ronde | De host kent ze toe; ze staan apart, als niet gecontroleerd |
 | [Eigen sets](eigen-sets.md) | De engine gebruikt de set in plaats van `data.json` | De host leest de set met `gameData()` |
 | [Realtime](realtime.md) | Ja | Ja |
-| Spelleidermodi | Zoals het spel aangeeft | `moderator` en, sinds 0.5.1, `playing`; nooit `hostless` |
+| Spelleidermodi | Zoals het spel aangeeft | `moderator`, sinds 0.5.1 `playing` en sinds 0.5.2 `tv`; nooit `hostless` |
 
 ## Serverruntime
 

@@ -47,7 +47,7 @@ Het manifest van het stemspel uit de scaffolder:
   "description": "A ready-to-play yes/no vote game. Customize the question and start voting.",
   "version": "0.1.0",
   "runtime": "host",
-  "host_modes": ["playing", "moderator"],
+  "host_modes": ["playing", "tv"],
   "default_host_mode": "playing",
   "min_players": 1,
   "max_players": 24,
@@ -79,7 +79,7 @@ Het manifest van het stemspel uit de scaffolder:
 | `default_settings` | object | Moet voldoen aan `settings_schema` |
 | `settings_schema` | object | Zie hieronder |
 | `runtime` | `"host"` of `"server"` | Standaard `"host"` |
-| `host_modes` | lijst | Standaard `["moderator"]`. Niet leeg. Bij `runtime: "host"` een keuze uit `"moderator"` en `"playing"`; zie [host_modes](#host-modes) |
+| `host_modes` | lijst | Standaard `["moderator"]`. Niet leeg. Bij `runtime: "host"` een keuze uit `"playing"`, `"tv"` en `"moderator"`; zie [host_modes](#host-modes) |
 | `default_host_mode` | string | Standaard `"moderator"`; moet in `host_modes` staan |
 | `icon` | string | Optioneel, sinds 0.5.1. Pad naar een SVG in `assets/`; zie [icon](#icon) |
 | `supports_late_join` | boolean | Standaard `true` voor oudere manifests |
@@ -96,19 +96,19 @@ Kies `supports_late_join` voor een nieuw spel bewust. De kamer zet later aanslui
 
 | `runtime` | Toegestaan in `host_modes` |
 | --- | --- |
-| `"host"` | `"moderator"`, `"playing"` of allebei. Sinds 0.5.1; daarvoor alleen `["moderator"]` |
+| `"host"` | `"playing"`, `"tv"` en `"moderator"`, in elke combinatie. `playing` sinds 0.5.1, `tv` sinds 0.5.2; daarvoor alleen `["moderator"]` |
 | `"server"` | `"moderator"`, `"playing"` en `"hostless"`, zoals het ingebouwde spel aangeeft |
 
 `hostless` kan niet bij `runtime: "host"`: zonder een verbonden hosttabblad is er geen scheidsrechter. Een lege lijst, `hostless` bij een eigen spel of een `default_host_mode` die niet in de lijst staat, weigert de engine met *Invalid runtime or unsupported host modes.*
 
-Meespelen is het gewone geval: bij bordspellen, kaartspellen en de meeste partyspellen speelt de maker mee zoals iedereen. Daarom zet `me game new` sinds 0.5.1 `["playing", "moderator"]` met `playing` als standaard, zoals in het voorbeeld hierboven. Laat `playing` alleen weg als de maker echt alleen leidt, zoals een quizmaster die de antwoorden kent:
+Een gezelschapsspel (bord, kaart, dobbel, tekenen) biedt `["playing", "tv"]` met `playing` als standaard, zoals in het voorbeeld hierboven: *Iedereen doet mee* of *TV*. Zo zet `me game new` het sinds 0.5.2 ook. Gebruik `moderator` alleen als de maker echt alleen leidt, zoals een quizmaster die de antwoorden kent:
 
 ```json
 "host_modes": ["moderator"],
 "default_host_mode": "moderator"
 ```
 
-Een manifest zonder `host_modes` betekent `["moderator"]`, zoals vóór 0.5.1. Met `playing` is de hostpagina ook de spelerspagina van de maker: zie [als de maker meespeelt](browserhost.md#als-de-maker-meespeelt).
+Een manifest zonder `host_modes` betekent `["moderator"]`, zoals vóór 0.5.1. Met `playing` is de hostpagina ook de spelerspagina van de maker, met `tv` het gedeelde scherm: zie [als de maker meespeelt](browserhost.md#als-de-maker-meespeelt) en [als de host een tv is](browserhost.md#als-de-host-een-tv-is).
 
 ### icon
 

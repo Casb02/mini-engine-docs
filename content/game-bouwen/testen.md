@@ -36,7 +36,9 @@ me dev --players 3
 - Starten lukt pas als iedereen klaarstaat.
 - Afronden en terug naar de lobby reset klaarstatus en spelstand.
 - Een tweede ronde werkt net zo goed als de eerste.
-- Speelt de maker mee, dan staat diens plek klaar zonder knop, telt de zet van de maker net zo goed als die van anderen, en wijzen alle pagina's de maker aan met `host_player_id`.
+- Speelt de maker mee, dan staat diens plek klaar zonder knop, telt de zet van de maker net zo goed als die van anderen, en ziet de hostpagina eruit als de telefoon van een speler.
+- Biedt je spel `tv` aan: maak ook een kamer als TV. Toont de hostpagina het scherm, heeft de tv geen plek, en start het spel vanaf de tv?
+- Bij beurten: zet een telefoon op slot tijdens de eigen beurt. Na 30 seconden hoort die beurt over te slaan.
 - Biedt je spel ook `moderator` aan: speel ook een ronde waarin de maker alleen leidt.
 
 **Later aansluiten**
