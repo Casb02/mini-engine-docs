@@ -17,8 +17,17 @@ De skills staan in de map `skills/` van de SDK-repository en gaan mee in het pak
 | --- | --- |
 | `build-mini-engine-game` | De werkwijze van begin tot eind: scaffolden met `create-mini-game`, manifest en `settings_schema`, de spelleider en de rollen, state in de hostruntime (publiek, alleen host, geheim per speler), rondes, het gedeelde scherm, de engine draaien en controleren met meerdere apparaten. Met naslag over de SDK, manifestregels, recepten voor de hostruntime en probleemoplossing, plus `scripts/play.mjs`, dat met Playwright een echte kamer bespeelt. |
 | `design-mini-engine-game-ui` | De drie pagina's: speler (telefoon), scherm (tv aan de overkant van de kamer) en spelleider. Een eigen sfeer per spel, raakvlakken, leesbaarheid, zelf gehoste lettertypes, geen inline scripts onder de CSP van de engine, minder beweging als de gebruiker dat vraagt. |
+| `mini-engine-ui` | **MiniEngineUI**: de rustige stijl van de demospellen als kant-en-klare kit. Een stylesheet, Space Grotesk en DM Sans, en pagina's voor spelleider, speler en scherm die meteen op de scaffold passen. Vier sferen (`kalk`, `nacht`, `vilt`, `studio`) en ruimte voor één eigen blikvanger per spel. |
 
 De bouwskill roept de ontwerpskill zelf aan als hij aan de pagina's toekomt.
+
+## MiniEngineUI
+
+Heb je alleen een idee en geen ontwerp in je hoofd, kies dan MiniEngineUI. De bouwskill vraagt aan het begin één keer of je die stijl wilt. Zeg je niets, of heb je geen wensen voor het uiterlijk, dan gebruikt hij hem vanzelf. Je spel krijgt dan dezelfde rustige schil als Common Dice en Jeopardy: een balk met de naam van het spel en de kamercode, grote knoppen op de telefoon, een overzicht voor de spelleider en een scherm dat je vanaf de bank kunt lezen. De sfeer van jouw spel zit in één thema en één blikvanger op het speelveld, zoals het vilt bij de dobbelstenen.
+
+Wil je het meteen, zeg het er dan bij:
+
+> Bouw met MiniEngineUI een Mini Engine-spel waarin iedereen in het geheim een getal kiest. Gebruik de sfeer studio.
 
 ## Installeren met de CLI
 
