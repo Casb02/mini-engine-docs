@@ -867,6 +867,21 @@ blockquote > :last-child {
   width: min(100%, 220px);
   height: auto;
 }
+.productmerken {
+  grid-template-columns: repeat(4, 1fr);
+}
+.productmerken figure {
+  padding: var(--me-s5) var(--me-s3);
+  gap: var(--me-s3);
+}
+.productmerken img {
+  width: auto;
+  height: 44px;
+}
+.productmerken figcaption {
+  font-size: 0.875rem;
+  color: var(--me-steen);
+}
 
 @media (max-width: 1180px) {
   .with-toc .shell {
@@ -974,6 +989,9 @@ blockquote > :last-child {
   }
   .logo-samples {
     grid-template-columns: 1fr;
+  }
+  .productmerken {
+    grid-template-columns: 1fr 1fr;
   }
   .tv-code {
     letter-spacing: 0.04em;

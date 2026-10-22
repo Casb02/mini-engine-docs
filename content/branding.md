@@ -8,8 +8,8 @@ order: 1
 # Branding
 
 <div class="downloads">
-  <a class="download" href="{{root}}downloads/MiniEngine-Brandbook.pdf" download><strong>Brandbook</strong><span>pdf, 16 pagina's, 1,2 MB</span></a>
-  <a class="download" href="{{root}}downloads/MiniEngine-logos.zip" download><strong>Logobestanden</strong><span>zip met woordmerken, symbool, app-icoon en tokens</span></a>
+  <a class="download" href="{{root}}downloads/MiniEngine-Brandbook.pdf" download><strong>Brandbook</strong><span>pdf, 16 pagina's, 1,6 MB</span></a>
+  <a class="download" href="{{root}}downloads/MiniEngine-logos.zip" download><strong>Logobestanden</strong><span>zip met woordmerken, productmerken, app-iconen en tokens</span></a>
 </div>
 
 Mini Engine heeft een rustige schil en laat elk spel zijn eigen sfeer meebrengen. Deze pagina vat de merkregels samen voor wie een spel, een scherm of een presentatie maakt.
@@ -34,7 +34,25 @@ Het woordmerk zet *mini* in Space Grotesk SemiBold en *engine* in een lichtere t
 - Houd rondom minstens de x-hoogte vrij. Het woordmerk is minimaal 96 pixels breed.
 - Niet doen: het symbool vervangen door een tekstteken, de kleuren omdraaien, het woordmerk in hoofdletters zetten, schaduwen of verlopen toevoegen.
 
-Deze site gebruikt het woordmerk en het symbool voor licht en donker: [woordmerk licht]({{root}}brand/woordmerk-licht.svg), [woordmerk donker]({{root}}brand/woordmerk-donker.svg), [symbool licht]({{root}}brand/symbool-licht.svg) en [symbool donker]({{root}}brand/symbool-donker.svg). De [logobestanden]({{root}}downloads/MiniEngine-logos.zip) bevatten ook de `currentColor`-varianten, de lockups voor SDK, docs en CLI, het app-icoon en de design tokens (`tokens.css`).
+Deze site gebruikt het woordmerk en het symbool voor licht en donker: [woordmerk licht]({{root}}brand/woordmerk-licht.svg), [woordmerk donker]({{root}}brand/woordmerk-donker.svg), [symbool licht]({{root}}brand/symbool-licht.svg) en [symbool donker]({{root}}brand/symbool-donker.svg). De [logobestanden]({{root}}downloads/MiniEngine-logos.zip) bevatten ook de `currentColor`-varianten, de lockups en productmerken voor SDK, CLI en Docs, de app-iconen, de avatars en de design tokens (`tokens.css`).
+
+## Producten
+
+Mini Engine bestaat uit vier producten. Elk product heeft een eigen merk: het symbool met één teken erbij, getekend met dezelfde ronde lijn als de spaken.
+
+<div class="logo-samples productmerken">
+  <figure class="op-licht"><img src="{{root}}brand/symbool-licht.svg" alt="Het symbool van Mini Engine" width="44" height="44"><figcaption>Engine</figcaption></figure>
+  <figure class="op-licht"><img src="{{root}}brand/merk-sdk-licht.svg" alt="Het merk van Mini Engine SDK: het symbool tussen accolades" width="89" height="44"><figcaption>SDK</figcaption></figure>
+  <figure class="op-licht"><img src="{{root}}brand/merk-cli-licht.svg" alt="Het merk van Mini Engine CLI: een prompt voor het symbool" width="69" height="44"><figcaption>CLI</figcaption></figure>
+  <figure class="op-licht"><img src="{{root}}brand/merk-docs-licht.svg" alt="Het merk van Mini Engine Docs: het symbool met regels tekst" width="83" height="44"><figcaption>Docs</figcaption></figure>
+</div>
+
+- **Engine**: het kale symbool.
+- **SDK**: het symbool tussen accolades, voor code.
+- **CLI**: een prompt voor het symbool, zoals in de terminal.
+- **Docs**: het symbool als voetnoot bij een paar regels tekst.
+
+Het extra teken staat in Steen op licht en in Nevel op donker, net als het productwoord in de lockup (*miniengine✳ sdk*). Het symbool zelf blijft Inkt op licht en Vonk op donker. Onder 48 pixels, zoals in een favicon, staat bij elk product alleen het symbool.
 
 ## Kleur
 
