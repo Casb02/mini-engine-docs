@@ -32,7 +32,7 @@ cd ../mini-engine
 cargo run
 ```
 
-Open `/home`, kies **Mijn Spel** en maak een kamer. Je speelt zelf mee: sinds SDK 0.5.1 is `playing` de standaardmodus van het voorbeeld, en je plek staat meteen klaar. Doe mee vanaf een tweede browser of apparaat, zet je daar klaar, en start de stemronde op de spelleiderspagina. Daar stem je zelf ook.
+Open `/home`, kies **Mijn Spel** en maak een kamer. Je speelt zelf mee: *Iedereen doet mee* (`playing`) is de standaardmodus van het voorbeeld, en je plek staat meteen klaar. Kies je *TV*, dan toont dit tabblad de stemming groot en stem je op de telefoon. Doe mee vanaf een tweede browser of apparaat, zet je daar klaar, en start de stemronde op de spelleiderspagina. Daar stem je zelf ook.
 
 ## Sneller testen met `me dev`
 

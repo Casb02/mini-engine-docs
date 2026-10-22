@@ -101,8 +101,18 @@ Verder:
 
 - **Klaar.** De plek van de maker staat altijd klaar en houdt het starten niet tegen. Toon op de hostpagina dus geen klaarknop voor de maker.
 - **Geheimen.** Wat alleen de maker als speler mag zien, staat in `player_states[host_player_id]`; de hostpagina krijgt het terug als `private_state`. Bedenk dat de hostpagina ook `host_state` en alle `player_states` ziet. Een spel met geheime kaarten per speler is met een meespelende maker dus niet eerlijk tegenover de anderen; bied voor zo'n spel alleen `moderator` aan.
-- **Spelerslijst.** Gebruik `host_player_id` om de maker in de lijst aan te wijzen op elke pagina, bijvoorbeeld *Dani (spelleider)*.
+- **Zelfde scherm.** In een gezelschapsspel is de hostpagina gewoon de spelerspagina: dezelfde opmaak en dezelfde manier van spelen als op een telefoon. Daarbij alleen wat het spel van de maker nodig heeft: *Start het spel* in de lobby in plaats van *Ik ben klaar*, *Nieuw spel* na afloop en een rustige link *Spel stoppen*. Soms heeft een spel een eigen extra stap, zoals in een tekenspel het langslopen van de eindtekeningen. Geen console met overslaanknop, regels of spelerslijst.
+- **Spelerslijst.** De maker is een speler zoals de rest; zet er geen *spelleider* bij. Andere pagina's kunnen met `host_player_id` zeggen wie het spel start: *Dani start het spel als iedereen klaar is.*
 - **Achievements.** De maker is een speler zoals iedereen en kan op zijn eigen plek (`host_player_id`) een achievement krijgen.
+
+## Als de host een tv is
+
+Sinds 0.5.2 kan een spel `tv` in `host_modes` zetten. Het apparaat dat de kamer maakt, is dan het gedeelde scherm en speelt niet mee: `client.room.you.player_id` en `client.room.host_player_id` zijn `null`. Lees de modus uit `client.room.config.host_mode` en toon op de hostpagina het scherm: QR-code en kamercode in de lobby, het spel groot tijdens het spelen, met *Start het spel* en *Nieuw spel*. De scheidsrechter werkt precies als bij `playing`.
+
+Twee dingen helpen bij een spel met beurten, in beide modi:
+
+- **Wie offline is, wordt overgeslagen.** Een telefoon die op slot gaat, verliest de verbinding. Tel alleen de tijd binnen iemands beurt: start een klok op het laatste van twee momenten, het begin van de beurt of het moment dat die speler offline ging. Sla de beurt na 30 seconden over, en stop de klok als de speler terugkomt.
+- **Het scherm blijft aan.** Vraag tijdens het spel `navigator.wakeLock.request('screen')` aan, opnieuw als de pagina weer zichtbaar wordt, en negeer fouten.
 
 ## Wat de ack wel en niet betekent
 

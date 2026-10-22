@@ -78,7 +78,7 @@ Dat kan ook met het websocketbericht `award` of met [`POST /api/v1/rooms/{code}/
 
 Een achievement die de speler al had, geeft gewoon een bevestiging.
 
-Speelt de maker mee (`host_mode: "playing"`, sinds 0.5.1 ook in eigen spellen), dan is die een speler zoals iedereen. De host mag een achievement toekennen aan de eigen plek van de maker, `host_player_id`, als de maker met een account speelt. Wat niet kan: een spelleider die alleen leidt en met hetzelfde account ook als speler meedoet, kan zichzelf niets geven.
+Speelt de maker mee (`host_mode: "playing"`, sinds 0.5.1 ook in eigen spellen), dan is die een speler zoals iedereen. De host mag een achievement toekennen aan de eigen plek van de maker, `host_player_id`, als de maker met een account speelt. Wat niet kan: een spelleider die alleen leidt en met hetzelfde account ook als speler meedoet, kan zichzelf niets geven. Bij `host_mode: "tv"` (sinds 0.5.2) kan het wel: de tv is een apparaat, dus wie op de tv is ingelogd, verdient op de eigen telefoon gewoon mee.
 
 Dit is een bewuste keuze over vertrouwen. Een spelleider kan de achievements van **dat ene spel** toekennen aan andere spelers in **zijn eigen kamer**. Omdat de spelcode in de browser van de host draait, kan de server niet controleren of iemand de achievement echt verdiende. Daarom bewaart de engine deze achievements apart, zie hieronder. Resultaten en statistieken blijven alleen voor serverspellen.
 

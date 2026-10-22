@@ -41,7 +41,7 @@ await client.waitForSnapshot();
 Elke snapshot is de volledige, actuele weergave voor jouw rol. Render altijd vanuit de nieuwste snapshot, ook na een herverbinding. Een paar dingen om op te letten:
 
 - Klaarstatus en aanwezigheid veranderen zonder nieuwe versie. Verwerk dus elke snapshot.
-- `you.role` blijft `host` voor de maker, ook als die meespeelt. Kijk naar `you.player_id` om te zien of iemand een spelersplek heeft. `host_player_id` (sinds 0.5.1) is voor iedere rol de plek van een meespelende maker, of `null`; gebruik het om de spelleider in de spelerslijst aan te wijzen.
+- `you.role` blijft `host` voor de maker, ook als die meespeelt. Kijk naar `you.player_id` om te zien of iemand een spelersplek heeft. `host_player_id` (sinds 0.5.1) is voor iedere rol de plek van een meespelende maker, of `null` bij TV of een spelleider; gebruik het om te zeggen wie het spel start. Bij een gezelschapsspel is de maker een speler zoals de rest: zet er geen *spelleider* bij. `config.host_mode` zegt welke modus de kamer heeft, zodat de hostpagina weet of ze de spelerspagina of het scherm moet tonen.
 - Toon de instellingen (`room.settings`) als gewone tekst, bijvoorbeeld *Regels: 5 rondes*. De maker koos ze bij het maken van de kamer; zet er geen knoppen bij om ze te wijzigen.
 - Een speler leest zijn eigen geheime deel als `private_state`. Het gedeelde scherm krijgt nooit privégegevens.
 - `client.room` bevat altijd de laatste snapshot; `client.connected` wordt pas `true` na de eerste snapshot.

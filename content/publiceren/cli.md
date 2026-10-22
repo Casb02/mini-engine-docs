@@ -77,7 +77,7 @@ me dev --set sets/filmavond.json --no-open
 
 - Pas je iets aan in de map, dan laden de stoelen opnieuw en blijft de kamer bestaan. Een fout in het manifest zie je in het overzicht en in de terminal.
 - Iedere speler telt als speler met een account, zodat je achievements kunt testen. Gekregen achievements verschijnen in de terminal.
-- Sinds CLI 0.5.1 controleert `me dev` ook het [icoon](../game-bouwen/package-en-manifest.md#icon) en volgt hij de regels voor een [meespelende maker](../concepten/spelleidermodi.md#meespelen-in-een-eigen-spel): diens plek staat klaar en de snapshot heeft `host_player_id`.
+- Sinds CLI 0.5.1 controleert `me dev` ook het [icoon](../game-bouwen/package-en-manifest.md#icon) en volgt hij de regels voor een [meespelende maker](../concepten/spelleidermodi.md#meespelen-in-een-eigen-spel): diens plek staat klaar en de snapshot heeft `host_player_id`. Sinds CLI 0.5.2 kent `me dev` ook [TV](../concepten/spelleidermodi.md#tv): de host zonder plek die het spel toont.
 - Alles staat alleen in het geheugen. Stoppen doe je met Ctrl+C.
 - De server luistert alleen op je eigen computer (`127.0.0.1`). Telefoons op je wifi kunnen er niet bij.
 

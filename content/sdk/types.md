@@ -33,7 +33,7 @@ De `jsconfig.json` van de scaffolder koppelt `/sdk/mini-engine.js` aan het decla
 ```ts
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 type Role = 'host' | 'player' | 'display';
-type HostMode = 'moderator' | 'playing' | 'hostless';
+type HostMode = 'moderator' | 'playing' | 'tv' | 'hostless';
 type Lifecycle = 'lobby' | 'running' | 'finished';
 type ConnectionStatus = 'connecting' | 'connected' | 'reconnecting' | 'disconnected';
 ```
@@ -147,7 +147,7 @@ interface SettingsProperty {
 }
 ```
 
-`icon` is het pad van een SVG-icoon in het package, sinds SDK 0.5.1 (engine 0.5.1). De regels staan bij [package en manifest](../game-bouwen/package-en-manifest.md#icon). Een manifest zonder `host_modes` geldt als `['moderator']`; een nieuw spel uit de scaffolder heeft `['playing', 'moderator']` met `default_host_mode: 'playing'`.
+`icon` is het pad van een SVG-icoon in het package, sinds SDK 0.5.1 (engine 0.5.1). De regels staan bij [package en manifest](../game-bouwen/package-en-manifest.md#icon). Een manifest zonder `host_modes` geldt als `['moderator']`; een nieuw spel uit de scaffolder heeft sinds 0.5.2 `['playing', 'tv']` met `default_host_mode: 'playing'`.
 
 ### Achievements en soorten sets
 

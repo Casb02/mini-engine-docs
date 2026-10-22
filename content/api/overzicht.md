@@ -175,15 +175,15 @@ Deze documentatie hoort bij deze versies:
 
 | Onderdeel | Versie |
 | --- | --- |
-| Mini Engine | 0.5.1 (`GET /api/health` geeft de gebouwde versie) |
-| Mini Engine SDK | 0.5.1 |
-| me-CLI | 0.5.1 |
+| Mini Engine | 0.5.2 (`GET /api/health` geeft de gebouwde versie) |
+| Mini Engine SDK | 0.5.2 |
+| me-CLI | 0.5.2 |
 | Documentatie | 0.5 |
-| API-referentie (pdf) | Editie 0.5, bijgewerkt voor 0.5.1; edities 0.4, 0.3 en 0.2 blijven te downloaden |
+| API-referentie (pdf) | Editie 0.5, bijgewerkt voor 0.5.2; edities 0.4, 0.3 en 0.2 blijven te downloaden |
 
 Nieuw in 0.5.1:
 
-- Een eigen spel kan de maker laten meespelen: `playing` in `host_modes` bij `runtime: "host"`. Dat is het gewone geval; `me game new` zet `["playing", "moderator"]` met `playing` als standaard. De plek van de maker staat altijd klaar, verdient achievements zoals elke speler, en het snapshotveld `host_player_id` wijst de maker aan. Een manifest zonder `host_modes` blijft `["moderator"]`. Zie [spelleidermodi](../concepten/spelleidermodi.md#meespelen-in-een-eigen-spel).
+- Een eigen spel kan de maker laten meespelen: `playing` in `host_modes` bij `runtime: "host"`. Dat is het gewone geval; `me game new` zet sinds 0.5.2 `["playing", "tv"]` met `playing` als standaard. Met `tv` is de maker een tv zonder spelersplek. De plek van de maker staat altijd klaar, verdient achievements zoals elke speler, en het snapshotveld `host_player_id` wijst de maker aan. Een manifest zonder `host_modes` blijft `["moderator"]`. Zie [spelleidermodi](../concepten/spelleidermodi.md#meespelen-in-een-eigen-spel).
 - Een spel kan een eigen icoon meenemen met het manifestveld `icon`; `GET /api/v1/games` geeft het mee. Zie [package en manifest](../game-bouwen/package-en-manifest.md#icon).
 - Je zet je eigen spellen aan of uit op de accountpagina, met `GET /api/v1/accounts/games` en `PUT /api/v1/accounts/games/{id}`. Zie [Mijn spellen](accounts.md#mijn-spellen).
 - De startpagina toont bij meer dan vier spellen drie willekeurige en een knop *Bekijk alle N spellen*, naar `/home/spellen`. Beschrijvingen in die lijsten stoppen na twee regels.
