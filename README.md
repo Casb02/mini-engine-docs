@@ -5,7 +5,7 @@
 
 # Mini Engine Docs
 
-De documentatiesite van Mini Engine en de Mini Engine SDK. Statische HTML, geen JavaScript-frameworks, bedoeld voor GitHub Pages op `https://casb02.github.io/mini-engine-docs/`.
+De documentatiesite van Mini Engine en de Mini Engine SDK. Statische HTML, geen JavaScript-frameworks, gehost op GitHub Pages onder `https://docs.miniengine.nl/`.
 
 De engine-repository is privé; deze repository, de SDK en de CLI zijn publiek. Zet hier dus geen sleutels, interne URL's of code uit die repositories die niet openbaar mag.
 
@@ -82,7 +82,7 @@ De site linkt naar `downloads/MiniEngine-API-v0.4.pdf` (`PDF` in `build.mjs`). Z
 
 3. Ga in de repository naar **Settings → Pages** en kies bij **Build and deployment → Source** voor **GitHub Actions**.
 4. De workflow `.github/workflows/pages.yml` bouwt bij elke push naar `main`, controleert de links en publiceert `site/`. Je kunt hem ook handmatig starten via **Actions → Pages → Run workflow**.
-5. De site staat daarna op `https://casb02.github.io/mini-engine-docs/`.
+5. De site staat daarna op `https://casb02.github.io/mini-engine-docs/`. Met een eigen domein (hier `docs.miniengine.nl`) zet je dat domein onder **Settings → Pages → Custom domain** en `DOCS_BASE: /` in `.github/workflows/pages.yml`.
 
 `site/` staat in `.gitignore`: GitHub bouwt de site zelf. De build schrijft `site/.nojekyll`, zodat Pages de bestanden ongewijzigd serveert.
 
