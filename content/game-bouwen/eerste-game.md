@@ -34,6 +34,16 @@ cargo run
 
 Open `/home`, kies **Mijn Spel** en maak een kamer. Doe mee vanaf een tweede browser of apparaat, zet je klaar, en start de stemronde op de spelleiderspagina.
 
+## Sneller testen met `me dev`
+
+Tijdens het bouwen gaat het sneller met `me dev` uit de [CLI](../publiceren/cli.md#me-dev), sinds CLI 0.5.0. Die bootst de engine na op je eigen computer en toont de spelleider, het gedeelde scherm en twee spelers naast elkaar in je browser. Vanuit de root van de engine-checkout:
+
+```sh
+me dev games/mijn-spel
+```
+
+Sla je een bestand op, dan laden de pagina's opnieuw en blijft de kamer bestaan. Speel je spel voor een avond met vrienden wel een keer op een echte engine. Zie [testen](testen.md#eerst-lokaal-met-me-dev).
+
 ## De slug
 
 De eerste parameter is de slug van je spel. Die wordt de id in het manifest en de naam van de map.
@@ -79,7 +89,7 @@ Het stemspel is een complete hostruntime-game: de spelleider controleert stemmen
 | Een andere weergave | `host.html`, `player.html`, `display.html` en `assets/style.css` |
 | Geheime speldata, zoals antwoorden | Een `data.json`, die alleen de host via een beveiligde route leest |
 
-Herstart de engine na elke wijziging aan het package.
+Herstart de engine na elke wijziging aan het package. Met `me dev` hoeft dat niet.
 
 ## Typecontrole in je editor
 

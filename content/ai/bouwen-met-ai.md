@@ -15,7 +15,7 @@ De skills staan in de map `skills/` van de SDK-repository en gaan mee in het pak
 
 | Skill | Waarvoor |
 | --- | --- |
-| `build-mini-engine-game` | De werkwijze van begin tot eind: scaffolden met `create-mini-game`, manifest en `settings_schema`, de spelleider en de rollen, state in de hostruntime (publiek, alleen host, geheim per speler), rondes, het gedeelde scherm, de engine draaien en controleren met meerdere apparaten. Met naslag over de SDK, manifestregels, recepten voor de hostruntime en probleemoplossing, plus `scripts/play.mjs`, dat met Playwright een echte kamer bespeelt. |
+| `build-mini-engine-game` | De werkwijze van begin tot eind: scaffolden met `create-mini-game`, manifest en `settings_schema`, de spelleider en de rollen, state in de hostruntime (publiek, alleen host, geheim per speler), rondes, het gedeelde scherm, snel testen met `me dev`, de engine draaien en controleren met meerdere apparaten. Met naslag over de SDK, manifestregels, recepten voor de hostruntime en probleemoplossing, plus `scripts/play.mjs`, dat met Playwright een echte kamer bespeelt. |
 | `design-mini-engine-game-ui` | De drie pagina's: speler (telefoon), scherm (tv aan de overkant van de kamer) en spelleider. Een eigen sfeer per spel, raakvlakken, leesbaarheid, zelf gehoste lettertypes, geen inline scripts onder de CSP van de engine, minder beweging als de gebruiker dat vraagt. |
 | `mini-engine-ui` | **MiniEngineUI**: de rustige stijl van de demospellen als kant-en-klare kit. Een stylesheet, Space Grotesk en DM Sans, en pagina's voor spelleider, speler en scherm die meteen op de scaffold passen. Vier sferen (`kalk`, `nacht`, `vilt`, `studio`) en ruimte voor één eigen blikvanger per spel. |
 
@@ -71,7 +71,7 @@ Je kunt hem ook bij naam aanroepen: `/build-mini-engine-game`.
 - **Agents zonder skills** wijs je direct naar het bestand: *Lees skills/build-mini-engine-game/SKILL.md in de Mini Engine SDK en volg het.*
 - Geef de agent ook `types/mini-engine.d.ts` uit de SDK. Daarin staan alle methoden en types exact.
 
-De skills gaan uit van een engine-checkout (om het spel te draaien en te testen) en een SDK-checkout (voor `create-mini-game`). Ontbreken die, dan wijst de agent je erop. De SDK is openbaar; voor de engine-repository heb je GitHub-toegang nodig. Wil je alleen publiceren naar een draaiende engine, dan heb je genoeg aan de CLI.
+De bouwskill test een spel eerst met [`me dev`](../publiceren/cli.md#me-dev) uit de CLI, een nagebootste engine op je eigen computer. Daarna speelt hij het op een echte engine: een engine-checkout, of een draaiende engine waar je met de CLI naar uploadt. Voor `create-mini-game` gaan de skills uit van een SDK-checkout. Ontbreekt iets, dan wijst de agent je erop. De SDK is openbaar; voor de engine-repository heb je GitHub-toegang nodig. Wil je alleen publiceren naar een draaiende engine, dan heb je genoeg aan de CLI.
 
 ## Wat je de agent meegeeft
 
@@ -96,4 +96,4 @@ Een agent schrijft overtuigende code die net naast het contract kan zitten. De b
 - **Geen inline scripts, geen `onclick`-attributen en geen CDN's.** De Content-Security-Policy van de engine blokkeert ze.
 - **Geen automatische retries.** Na een fout eerst de snapshot bekijken.
 
-Gebruik ook de [testchecklist](../game-bouwen/testen.md) en draai `npx -p typescript tsc -p jsconfig.json` in de spelmap voor de typecontrole.
+Speel het spel zelf terwijl de agent bouwt: `me dev` in de spelmap toont de spelleider, het scherm en de spelers naast elkaar en laadt opnieuw zodra de agent iets opslaat. Gebruik ook de [testchecklist](../game-bouwen/testen.md) en draai `npx -p typescript tsc -p jsconfig.json` in de spelmap voor de typecontrole. Probeer het spel voor een avond met vrienden ook een keer op een echte engine.

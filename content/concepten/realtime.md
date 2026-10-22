@@ -57,7 +57,7 @@ Een waarde is een live stand per afzender en sleutel, bijvoorbeeld `kart` of `cu
 
 ## Afzender en tijd
 
-De engine zet `from` en `ts` zelf op elk bericht. `from` zegt wie het stuurde, met rol en speler-id. `ts` is het moment waarop de server het bericht ontving, in milliseconden sinds de Unix-epoch. Zo meet je bij een buzzer alle drukken op één klok, niet op de klokken van verschillende telefoons.
+De engine zet `from` en `ts` zelf op elk bericht. `from` zegt wie het stuurde, met rol en speler-id. `ts` is het moment waarop de engine het bericht ontving, in milliseconden sinds de Unix-epoch. Niemand kan hem vervalsen, en je vergelijkt alle telefoons op één klok, niet op hun eigen klokken.
 
 Een client kan `from` en `ts` niet meesturen; een bericht dat het probeert, wordt geweigerd. De `data` en `value` zelf komen wel van de client en zijn net zo onbetrouwbaar als actiedata.
 
@@ -89,7 +89,7 @@ Komt een waarde boven de grens van 64 sleutels of 256 KiB, dan laat de engine ha
 
 ## Voorbeeld: een buzzer
 
-Jeopardy laat zien hoe realtime en acties samenwerken. De `buzz` blijft de actie die telt: de server beslist wie de vraag mag beantwoorden en slaat dat op. Tegelijk stuurt de speler een event `pressed`. Host en scherm tonen daarmee meteen wie er drukte, in volgorde en met het verschil in milliseconden, zoals *Sander +14 ms*.
+Jeopardy laat zien hoe realtime en acties samenwerken. De `buzz` blijft de actie die telt: de server beslist wie de vraag mag beantwoorden en slaat dat op. Tegelijk stuurt de speler een event `pressed`. Host en scherm tonen daarmee meteen wie er drukte, in volgorde en met het verschil in milliseconden, zoals *Sander +14 ms*. Dat is het verschil in aankomst bij de engine, niet in het moment van drukken: netwerkvertraging telt mee.
 
 Op de spelerspagina:
 

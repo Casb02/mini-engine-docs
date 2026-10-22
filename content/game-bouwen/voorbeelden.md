@@ -44,7 +44,7 @@ Vastgehouden indexen verwijzen naar de bestaande worp. Minstens één steen blij
 
 ## Jeopardy
 
-Een quizbord met teams. Meerdere telefoons per team, een buzzer die de server eerlijk afhandelt, scores, geheime antwoorden en een expliciete onthulling. De quizmaster kiest en beoordeelt; de server bewaakt spelregels en scores.
+Een quizbord met teams. Meerdere telefoons per team, een buzzer die de server afhandelt, scores, geheime antwoorden en een expliciete onthulling. De quizmaster kiest en beoordeelt; de server bewaakt spelregels en scores.
 
 ### Instellingen en rollen
 
