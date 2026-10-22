@@ -101,15 +101,15 @@ De database staat in het volume `mini-engine-data` (`/app/data`). Dat volume bli
 
 ## 5. Back-ups
 
-Maak in Coolify onder **Scheduled Tasks** een taak voor de service `engine`, bijvoorbeeld elke nacht om 03:00:
+Maak in Coolify onder **Scheduled Tasks** een taak voor de service `engine`, met als frequentie `0 3 * * *` (elke nacht om 03:00):
 
 ```sh
-mini-engine backup /app/data/backups/mini-engine-$(date +%F).sqlite
+mini-engine backup /app/data/backups/mini-engine-$(date +%F).sqlite && ls -1t /app/data/backups/mini-engine-*.sqlite | tail -n +4 | xargs -r rm -f
 ```
 
-`mini-engine backup <bestand>` maakt een consistente kopie van de database (`VACUUM INTO`), ook terwijl er gespeeld wordt. Het doelbestand mag nog niet bestaan; ontbrekende mappen maakt het commando zelf.
+`mini-engine backup <bestand>` maakt een consistente kopie van de database (`VACUUM INTO`), ook terwijl er gespeeld wordt. Het doelbestand mag nog niet bestaan; ontbrekende mappen maakt het commando zelf. Het tweede deel bewaart alleen de drie nieuwste kopieën, zodat de schijf niet volloopt. Het draait alleen als de nieuwe back-up gelukt is. Wil je er meer bewaren, verhoog dan de `4` in `tail -n +4` (aantal plus één).
 
-De back-up staat dan nog op dezelfde server. Haal de map `backups/` geregeld naar een andere plek, bijvoorbeeld met de S3-back-up van Coolify of met `rsync`, en ruim oude bestanden op.
+De back-ups staan dan nog op dezelfde server. Haal de map `backups/` geregeld naar een andere plek, bijvoorbeeld met `rsync` naar een andere machine.
 
 Terugzetten: stop de service, vervang `/app/data/mini-engine.sqlite` door een back-up, verwijder eventuele `-wal`- en `-shm`-bestanden ernaast en start de service opnieuw.
 
@@ -117,9 +117,9 @@ Terugzetten: stop de service, vervang `/app/data/mini-engine.sqlite` door een ba
 
 Zet in Coolify **Auto Deploy** aan, of deploy met de hand na een merge naar `main`. Tijdens het wisselen van container zijn de websockets even weg; de SDK verbindt zelf opnieuw en kamers lopen door. Kamers die een versie van een geüploade game spelen, houden die versie.
 
-## 7. Optioneel: docs op docs.miniengine.nl
+## 7. Docs op docs.miniengine.nl
 
-Deze documentatie draait op GitHub Pages. Wil je haar onder een eigen domein:
+Deze documentatie draait op GitHub Pages onder `https://docs.miniengine.nl/`. Zo is dat ingericht:
 
 1. Maak een DNS-record `CNAME` `docs` → `casb02.github.io`.
 2. Ga in `Casb02/mini-engine-docs` naar **Settings → Pages → Custom domain**, vul `docs.miniengine.nl` in en zet **Enforce HTTPS** aan zodra het certificaat er is.
