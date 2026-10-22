@@ -20,6 +20,15 @@ De skills staan in de map `skills/` van de SDK-repository en gaan mee in het pak
 
 De bouwskill roept de ontwerpskill zelf aan als hij aan de pagina's toekomt.
 
+## Installeren met de CLI
+
+Met de [me-CLI](../publiceren/cli.md) staan de skills er in één commando:
+
+```sh
+me skill install            # naar ~/.claude/skills
+me skill install --project  # naar ./.claude/skills
+```
+
 ## Claude Code
 
 Claude Code laadt skills uit twee plekken:

@@ -48,5 +48,5 @@ Mini Engine is gemaakt voor een vriendengroep die eigen spellen wil spelen en bo
   <li><a href="aan-de-slag/engine-draaien.md"><strong>De engine draaien</strong><span>Start Mini Engine op je computer en speel met telefoons op je wifi.</span></a></li>
   <li><a href="game-bouwen/eerste-game.md"><strong>Een game bouwen</strong><span>Maak met de scaffolder in vijf minuten een speelbaar stemspel en pas het aan.</span></a></li>
   <li><a href="concepten/kamers-en-rollen.md"><strong>De concepten</strong><span>Kamers, rollen, spelleidermodi, state en acties: hoe de onderdelen samenwerken.</span></a></li>
-  <li><a href="api/overzicht.md"><strong>De HTTP- en websocket-API</strong><span>Alle routes, berichten, foutcodes en limieten van versie 0.2.</span></a></li>
+  <li><a href="api/overzicht.md"><strong>De HTTP- en websocket-API</strong><span>Alle routes, berichten, foutcodes en limieten van versie 0.3.</span></a></li>
 </ul>

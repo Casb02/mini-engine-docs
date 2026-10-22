@@ -1,16 +1,16 @@
 ---
 title: HTTP API-overzicht
 nav_title: Overzicht
-description: De basis van de Mini Engine-API versie 0.2, met authenticatie, het foutformaat, alle foutcodes, origin-controle en een overzicht van alle routes.
+description: De basis van de Mini Engine-API versie 0.3, met authenticatie, het foutformaat, alle foutcodes, origin-controle en een overzicht van alle routes.
 section: HTTP API
 order: 1
 ---
 
 # HTTP API-overzicht
 
-Mini Engine 0.2 heeft een JSON-API onder `/api/v1` en een websocket per kamer. `v1` is de routeversie; de engine zelf heeft versie 0.2.
+Mini Engine 0.3 heeft een JSON-API onder `/api/v1` en een websocket per kamer. `v1` is de routeversie; de engine zelf heeft versie 0.3.
 
-[Download de API-referentie (pdf)]({{root}}downloads/MiniEngine-API-v0.2.pdf) voor een afdrukbare versie van deze pagina's.
+[Download de API-referentie (pdf)]({{root}}downloads/MiniEngine-API-v0.3.pdf) voor een afdrukbare versie van deze pagina's. De [editie voor 0.2]({{root}}downloads/MiniEngine-API-v0.2.pdf) blijft beschikbaar.
 
 ## Basis
 
@@ -22,12 +22,14 @@ Mini Engine 0.2 heeft een JSON-API onder `/api/v1` en een websocket per kamer. `
 
 ## Authenticatie
 
-Er zijn twee soorten sleutels, die je nooit door elkaar gebruikt:
+Er zijn vier soorten sleutels, die je nooit door elkaar gebruikt:
 
 | Sleutel | Krijg je van | Gebruik je voor |
 | --- | --- | --- |
 | Kamersleutel | Kamer maken (host), meedoen (speler), schermsleutel (display) | Alles binnen één kamer |
 | Accountsleutel | Registreren of inloggen | `/accounts/me`, `/accounts/stats`, `/accounts/logout`, en optioneel bij kamer maken en meedoen |
+| Dev-key (`med_…`) | De eigenaar van de server | Games uploaden en beheren onder [`/dev`](ontwikkelaars.md) |
+| Admintoken | Jezelf, als eigenaar (`MINI_ENGINE_ADMIN_TOKEN`) | Dev-keys en games beheren onder [`/admin`](beheer.md) |
 
 Stuur een sleutel als header:
 
@@ -131,5 +133,16 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | `GET /api/v1/accounts/me` | Account | Accountobject |
 | `POST /api/v1/accounts/logout` | Account | 204 |
 | `GET /api/v1/accounts/stats` | Account | Statistieken |
+| `GET /releases/{id}/{version}/{path}` | Openbaar | Assets van één versie van een geüploade game |
+| `GET /api/v1/dev/me` | Dev-key | Account en key |
+| `GET /api/v1/dev/games` | Dev-key | Jouw games |
+| `GET`, `PUT`, `DELETE /api/v1/dev/games/{id}` | Dev-key | Eén game bekijken, aan/uit zetten, verwijderen |
+| `POST /api/v1/dev/games/{id}/versions` | Dev-key | Nieuwe versie uploaden |
+| `POST /api/v1/dev/games/{id}/versions/{version}/activate` | Dev-key | Versie actief maken |
+| `DELETE /api/v1/dev/games/{id}/versions/{version}` | Dev-key | Versie verwijderen |
+| `POST`, `GET /api/v1/admin/dev-tokens` | Admintoken | Dev-key maken, keys bekijken |
+| `DELETE /api/v1/admin/dev-tokens/{id}` | Admintoken | Key intrekken |
+| `GET /api/v1/admin/games` | Admintoken | Alle geüploade games |
+| `PUT /api/v1/admin/games/{id}` | Admintoken | Game blokkeren of deblokkeren |
 
-Details per groep: [spellen](games.md), [kamers](kamers.md), [accounts](accounts.md), [websocket](websocket.md) en [limieten](limieten.md).
+Details per groep: [spellen](games.md), [kamers](kamers.md), [accounts](accounts.md), [ontwikkelaars](ontwikkelaars.md), [beheer](beheer.md), [websocket](websocket.md) en [limieten](limieten.md).

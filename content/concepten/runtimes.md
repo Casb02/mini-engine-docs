@@ -26,7 +26,7 @@ De twee ingebouwde spellen draaien hun regels in Rust. Hun browserpagina's rende
 
 Een geslaagde serveractie is opgeslagen voordat de nieuwe snapshot zichtbaar wordt. Lukt opslaan niet, dan blijft de oude spelstand staan.
 
-> Alleen een veld `"runtime": "server"` in een manifest installeert geen nieuwe serverregels. Versie 0.2 kent alleen de runtimes van Common Dice en Jeopardy. Een nieuw serverspel vraagt een wijziging in de engine, met tests.
+> Alleen een veld `"runtime": "server"` in een manifest installeert geen nieuwe serverregels. De engine kent alleen de runtimes van Common Dice en Jeopardy. Een nieuw serverspel vraagt een wijziging in de engine, met tests.
 
 ## Hostruntime
 
@@ -43,4 +43,4 @@ De hostruntime is gemaakt voor vertrouwde spellen binnen je vriendengroep. Hoe j
 
 ## Welke kies ik?
 
-Voor een eigen spel is de keuze in 0.2 gemaakt: `host`. De scaffolder genereert een werkend voorbeeld. Wil je dat de engine zelf de regels bewaakt, of dat resultaten in accountstatistieken komen, dan moet de regelverwerking als Rust-runtime in de engine komen.
+Voor een eigen spel is de keuze gemaakt: `host`, ook voor uploads. De scaffolder genereert een werkend voorbeeld. Wil je dat de engine zelf de regels bewaakt, of dat resultaten in accountstatistieken komen, dan moet de regelverwerking als Rust-runtime in de engine komen.

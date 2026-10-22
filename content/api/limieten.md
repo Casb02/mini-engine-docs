@@ -1,8 +1,8 @@
 ---
 title: Limieten
-description: Alle grenzen van Mini Engine 0.2 op één plek, van kamercodes en namen tot berichtgroottes, aanvraaglimieten en gamepackages.
+description: Alle grenzen van Mini Engine 0.3 op één plek, van kamercodes en namen tot berichtgroottes, aanvraaglimieten en gamepackages.
 section: HTTP API
-order: 6
+order: 8
 ---
 
 # Limieten
@@ -74,3 +74,16 @@ Daarboven volgt `429 rate_limit`.
 | `version` | 1 tot 100 bytes |
 | `max_players` | maximaal 100 |
 | Webmap van de engine | 2 MiB per bestand, 20 MiB totaal |
+
+## Uploads (vanaf 0.3)
+
+| Grens | Waarde |
+| --- | --- |
+| Uploadbody | 16 MiB (bestanden als base64) |
+| `version` van een upload | 1 tot 64 tekens `0-9 A-Z a-z . + _ -`, beginnend met een letter of cijfer |
+| Bestandspad | relatief, hoogstens 255 bytes en 32 niveaus |
+| Games per account | 10 |
+| Bewaarde versies per game | 10 |
+| Label van een dev-key | 1 tot 80 tekens |
+| Verlooptijd van een dev-key | 1 tot 3650 dagen, of geen |
+| Admintoken | minstens 32 tekens |

@@ -3,7 +3,7 @@ title: Websocketprotocol
 nav_title: Websocket
 description: Verbinden, authenticeren, alle client- en serverberichten, bevestigingen, heartbeats en sluitredenen van de websocket per kamer.
 section: HTTP API
-order: 5
+order: 7
 toc_depth: 3
 ---
 

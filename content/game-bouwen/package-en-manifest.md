@@ -138,4 +138,4 @@ Bij het maken van een kamer worden de meegegeven instellingen over `default_sett
 
 ## Vertrouwen
 
-Lokaal geïnstalleerde packages zijn vertrouwde code op dezelfde origin als de engine. Ze kunnen kamersleutels en de accountsleutel van de demo lezen. Uploads van onbekende makers bestaan in 0.2 niet. Bekijk een package voordat je het installeert.
+Lokaal geïnstalleerde packages zijn vertrouwde code op dezelfde origin als de engine. Ze kunnen kamersleutels en de accountsleutel van de demo lezen. Uploaden kan vanaf 0.3 alleen met een dev-key van de eigenaar; zie [je game publiceren](../publiceren/overzicht.md). Bekijk een package voordat je het installeert.

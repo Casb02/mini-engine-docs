@@ -8,7 +8,7 @@ order: 6
 
 # De ingebouwde spellen
 
-Mini Engine 0.2 heeft twee ingebouwde spellen met een serverruntime. Hun regels staan in Rust (`src/games/` in de engine); hun pagina's in `games/common-dice/` en `games/jeopardy/` renderen alleen snapshots en sturen acties. Ze zijn goede voorbeelden van rolprojecties en weergave, ook als je eigen spel in de browser draait.
+Mini Engine heeft twee ingebouwde spellen met een serverruntime. Hun regels staan in Rust (`src/games/` in de engine); hun pagina's in `games/common-dice/` en `games/jeopardy/` renderen alleen snapshots en sturen acties. Ze zijn goede voorbeelden van rolprojecties en weergave, ook als je eigen spel in de browser draait.
 
 ## Common Dice
 

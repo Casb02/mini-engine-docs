@@ -23,14 +23,15 @@ const SECTIONS = [
   'Snel aan de slag',
   'Concepten',
   'Een game bouwen',
+  'Publiceren',
   'SDK-referentie',
   'HTTP API',
   'Bouwen met AI',
   'Merk',
 ];
 
-const PDF = 'downloads/MiniEngine-API-v0.2.pdf';
-const VERSION = '0.2';
+const PDF = 'downloads/MiniEngine-API-v0.3.pdf';
+const VERSION = '0.3';
 
 // ---------- helpers ----------
 
