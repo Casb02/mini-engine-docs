@@ -165,7 +165,10 @@ interface ActionPayloads {
 ## Accounts
 
 ```ts
-interface Account { id: string; username: string; display_name: string; created_at: string | number }
+interface Account {
+  id: string; username: string; display_name: string; created_at: string | number;
+  email: string | null; email_verified: boolean;
+}
 interface AccountSession { account: Account; token: string }
 interface AccountStats {
   totals: { games_played: number; wins: number };
@@ -177,3 +180,5 @@ interface AccountStats {
   recent: Json[];
 }
 ```
+
+`email` en `email_verified` zijn er sinds SDK 0.3.1 (engine 0.4). `email` is `null` bij een account zonder adres.

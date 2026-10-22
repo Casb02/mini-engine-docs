@@ -116,8 +116,10 @@ Maakt een nieuwe schermsleutel; de vorige werkt daarna niet meer. Alleen voor de
 ### register(input)
 
 ```ts
-register(input: { username: string; password: string; display_name: string }): Promise<AccountSession>
+register(input: { username: string; password: string; display_name: string; email: string }): Promise<AccountSession>
 ```
+
+Sinds engine 0.4 is `email` verplicht. De engine stuurt een bevestigingsmail met een link naar `/demo/account?verify=<token>`.
 
 ### login(input)
 
@@ -131,6 +133,31 @@ Beide geven `{ account, token }` en bewaren niets. Zet de sleutel zelf:
 const { token } = await api.login({ username: 'hessel', password: 'jouw-wachtwoord' });
 api.accountToken = token;
 ```
+
+### verifyEmail(token)
+
+```ts
+verifyEmail(token: string): Promise<{ account: Account }>
+```
+
+Bevestigt het e-mailadres met het token uit de `?verify=`-link. Dat werkt alleen voor het account waarvoor de link is, dus zet eerst `api.accountToken` van dat account:
+
+```ts
+const token = new URL(location.href).searchParams.get('verify');
+api.accountToken = accountToken; // de sleutel van het ingelogde account
+const { account } = await api.verifyEmail(token);
+// account.email_verified === true
+```
+
+Een onbekende, verlopen, al gebruikte of andermans link geeft een `MiniEngineError` met code `invalid_token`.
+
+### setEmail(email)
+
+```ts
+setEmail(email: string): Promise<{ account: Account; verification_sent: boolean }>
+```
+
+Voegt een adres toe, wijzigt het (het is daarna weer onbevestigd) of stuurt de link opnieuw als het adres gelijk blijft. Gebruikt `api.accountToken`. Eén mail per account per minuut; daarboven volgt `rate_limit`. Is het adres al bevestigd, dan volgt `email_already_verified`; is het bevestigd door een ander account, dan `email_taken`.
 
 ### me()
 
@@ -160,7 +187,7 @@ Trekt de huidige sessie in en wist `api.accountToken` als de server dat bevestig
 | --- | --- |
 | `createRoom`, `joinRoom` | `accountToken`, als die er is |
 | `getRoom`, `gameData`, `displayToken` | De meegegeven kamersleutel |
-| `me`, `stats`, `logout` | `accountToken` |
+| `me`, `stats`, `logout`, `verifyEmail`, `setEmail` | `accountToken` |
 | `getGames`, `getGame`, `roomInfo`, `register`, `login` | Geen |
 
 ## Losse functies

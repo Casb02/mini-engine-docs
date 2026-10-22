@@ -1,6 +1,6 @@
 ---
 title: Limieten
-description: Alle grenzen van Mini Engine 0.3 op één plek, van kamercodes en namen tot berichtgroottes, aanvraaglimieten en gamepackages.
+description: Alle grenzen van Mini Engine 0.4 op één plek, van kamercodes en namen tot berichtgroottes, aanvraaglimieten en gamepackages.
 section: HTTP API
 order: 8
 ---
@@ -46,13 +46,16 @@ order: 8
 | Route | Limiet |
 | --- | --- |
 | `POST /api/v1/rooms` en `POST /api/v1/rooms/{code}/join` | 60 per minuut |
-| `POST /api/v1/accounts/register` en `POST /api/v1/accounts/login` | 10 per minuut |
+| `POST /api/v1/accounts/register`, `POST /api/v1/accounts/login` en `POST /api/v1/accounts/verify-email` | 10 per minuut |
+| Mails: `POST /api/v1/accounts/register` en `PUT /api/v1/accounts/email` (vanaf 0.4) | 5 per 10 minuten |
 | Alle routes onder `/api/v1/admin/` | 30 per minuut |
 | `POST`, `PUT` en `DELETE` onder `/api/v1/dev/` | 60 per minuut |
 | Uploads (`POST /api/v1/dev/games/{id}/versions`) | 20 per 10 minuten |
 | Verkeerde admin- of dev-sleutel (401 op `/admin` of `/dev`) | na 10 in 10 minuten wordt dat adres 10 minuten geweigerd, ook met de goede sleutel |
 
-Daarboven volgt `429 rate_limit`. De tellers zijn per IP-adres, en per /64-blok voor IPv6. Daarnaast wacht een gebruikersnaam een kwartier na tien mislukte inlogpogingen, van welk adres ook; een geslaagde login zet de teller terug. Achter een reverse proxy delen alle bezoekers het adres van de proxy.
+Daarboven volgt `429 rate_limit`. De tellers zijn per IP-adres, en per /64-blok voor IPv6. Registreren telt zowel mee voor de accountgrens als voor de mailgrens. Daarnaast wacht een gebruikersnaam een kwartier na tien mislukte inlogpogingen, van welk adres ook; een geslaagde login zet de teller terug.
+
+Achter een reverse proxy delen alle bezoekers het adres van de proxy, tenzij je `MINI_ENGINE_TRUST_PROXY` zet. Met `x-forwarded-for` telt de engine het laatste adres dat de proxy in die header zette; met een andere headernaam, zoals `cf-connecting-ip`, het adres uit die header. Zet dit alleen als de engine uitsluitend via die proxy bereikbaar is. Zie [hosten op Coolify](../aan-de-slag/coolify.md).
 
 ## Accounts
 
@@ -61,7 +64,10 @@ Daarboven volgt `429 rate_limit`. De tellers zijn per IP-adres, en per /64-blok 
 | Gebruikersnaam | 3 tot 24 ASCII-letters, cijfers of `_`, na trimmen en kleine letters |
 | Schermnaam | 1 tot 24 Unicode-tekens |
 | Wachtwoord | 10 tot 128 bytes UTF-8 |
+| E-mailadres | Hoogstens 254 tekens, na trimmen en kleine letters |
 | Sessie | 30 dagen |
+| Bevestigingslink | 48 uur geldig, één keer te gebruiken |
+| Bevestigingsmails | Eén per account per minuut |
 | Recente resultaten in stats | 20 |
 
 ## Gamepackages

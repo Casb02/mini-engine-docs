@@ -8,7 +8,7 @@ toc_depth: 3
 
 # Ontwikkelaars
 
-Deze routes staan onder `/api/v1/dev` en verwachten een dev-key: `Authorization: Bearer med_…`. Een ongeldige, verlopen of ingetrokken key geeft 401 `unauthorized`. De [me-CLI](../publiceren/cli.md) gebruikt precies deze routes.
+Deze routes staan onder `/api/v1/dev` en verwachten een dev-key: `Authorization: Bearer med_…`. Een ongeldige, verlopen of ingetrokken key geeft 401 `unauthorized`. De eigenaar maakt een key alleen voor een account met een bevestigd e-mailadres; zie [beheer](beheer.md#post-api-v1-admin-dev-tokens). De [me-CLI](../publiceren/cli.md) gebruikt precies deze routes.
 
 ## Objecten
 

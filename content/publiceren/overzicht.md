@@ -11,7 +11,7 @@ Vanaf Mini Engine 0.3 hoef je geen toegang tot de server te hebben om je spel te
 
 Zo gaat het:
 
-1. Je maakt een gewoon account op `/demo/account` van die server.
+1. Je maakt een gewoon account op `/demo/account` van die server en bevestigt je e-mailadres via de link in de mail.
 2. De eigenaar maakt een dev-key voor jouw gebruikersnaam en geeft hem aan je.
 3. Je installeert de [`me`-CLI](cli.md), plakt de key met `me auth` en uploadt je spel met `me game upload`.
 
@@ -20,6 +20,8 @@ me auth
 me game new mijn-spel
 me game upload ./mijn-spel
 ```
+
+Een dev-key kan alleen voor een account met een bevestigd e-mailadres. Krijg je de bevestigingsmail niet, vraag de eigenaar dan om je adres met de hand te bevestigen. De CLI praat standaard met `https://miniengine.nl`; voor een andere server gebruik je `me auth --server <adres>`.
 
 ## Wat er met je upload gebeurt
 

@@ -1,16 +1,16 @@
 ---
 title: HTTP API-overzicht
 nav_title: Overzicht
-description: De basis van de Mini Engine-API versie 0.3, met authenticatie, het foutformaat, alle foutcodes, origin-controle en een overzicht van alle routes.
+description: De basis van de Mini Engine-API versie 0.4, met authenticatie, het foutformaat, alle foutcodes, origin-controle en een overzicht van alle routes.
 section: HTTP API
 order: 1
 ---
 
 # HTTP API-overzicht
 
-Mini Engine 0.3 heeft een JSON-API onder `/api/v1` en een websocket per kamer. `v1` is de routeversie; de engine zelf heeft versie 0.3.
+Mini Engine 0.4 heeft een JSON-API onder `/api/v1` en een websocket per kamer. `v1` is de routeversie; de engine zelf heeft versie 0.4.
 
-[Download de API-referentie (pdf)]({{root}}downloads/MiniEngine-API-v0.3.pdf) voor een afdrukbare versie van deze pagina's. De [editie voor 0.2]({{root}}downloads/MiniEngine-API-v0.2.pdf) blijft beschikbaar.
+[Download de API-referentie (pdf)]({{root}}downloads/MiniEngine-API-v0.4.pdf) voor een afdrukbare versie van deze pagina's. Oudere edities blijven beschikbaar: [0.3]({{root}}downloads/MiniEngine-API-v0.3.pdf) en [0.2]({{root}}downloads/MiniEngine-API-v0.2.pdf).
 
 ## Basis
 
@@ -27,7 +27,7 @@ Er zijn vier soorten sleutels, die je nooit door elkaar gebruikt:
 | Sleutel | Krijg je van | Gebruik je voor |
 | --- | --- | --- |
 | Kamersleutel | Kamer maken (host), meedoen (speler), schermsleutel (display) | Alles binnen één kamer |
-| Accountsleutel | Registreren of inloggen | `/accounts/me`, `/accounts/stats`, `/accounts/logout`, en optioneel bij kamer maken en meedoen |
+| Accountsleutel | Registreren of inloggen | `/accounts/me`, `/accounts/stats`, `/accounts/logout`, `/accounts/verify-email`, `/accounts/email`, en optioneel bij kamer maken en meedoen |
 | Dev-key (`med_…`) | De eigenaar van de server | Games uploaden en beheren onder [`/dev`](ontwikkelaars.md) |
 | Admintoken | Jezelf, als eigenaar (`MINI_ENGINE_ADMIN_TOKEN`) | Dev-keys en games beheren onder [`/admin`](beheer.md) |
 
@@ -53,7 +53,8 @@ Elke fout heeft dezelfde vorm:
 
 | Status | Code | Betekenis |
 | --- | --- | --- |
-| 400 | `invalid_request` | Ongeldige invoer: naam, instellingen, config, actiedata, spelregel |
+| 400 | `invalid_request` | Ongeldige invoer: naam, e-mailadres, instellingen, config, actiedata, spelregel |
+| 400 | `invalid_token` | Bevestigingslink onbekend, verlopen, al gebruikt of voor een ander account |
 | 400, 413, 415, 422 | `invalid_json` | Geen geldige JSON, verkeerde velden, geen `Content-Type: application/json` of een te grote body |
 | 401 | `unauthorized` | Geen, een ongeldige of een verlopen sleutel; ook een mislukte login |
 | 401 | `auth_timeout` | Websocket: niet binnen vijf seconden geauthenticeerd |
@@ -76,13 +77,17 @@ Elke fout heeft dezelfde vorm:
 | 409 | `host_offline` | Eigen spel: de host is niet verbonden |
 | 409 | `session_replaced` | Websocket: deze verbinding is vervangen |
 | 409 | `username_taken` | Gebruikersnaam bestaat al |
+| 409 | `email_taken` | Dit e-mailadres is al bevestigd door een ander account |
+| 409 | `email_already_verified` | Dit adres is al bevestigd voor jouw account |
+| 409 | `email_not_verified` | Beheer: een dev-key kan alleen voor een account met een bevestigd adres |
+| 409 | `email_missing` | Beheer: het account heeft geen e-mailadres om te bevestigen |
 | 409 | `game_not_running` | Serverspel: start eerst het spel |
 | 409 | `buzzer_closed` | Jeopardy: de buzzer staat niet open voor jouw team |
 | 409 | `teams_required` | Jeopardy: niet iedere speler heeft een team |
 | 409 | `teams_locked` | Jeopardy: teams liggen vast |
 | 409 | `invalid_game_action` | Jeopardy: actie past niet in de huidige spelfase |
 | 413 | `state_too_large` | Gepubliceerde state groter dan 64 KiB |
-| 429 | `rate_limit` | Te veel verzoeken of berichten |
+| 429 | `rate_limit` | Te veel verzoeken, berichten of mails |
 | 500 | `internal_error` | Opslaan mislukt; de oude state blijft staan |
 | 503 | `room_limit` | De engine beheert al het maximale aantal kamers |
 | 503 | `connection_limit` | Te veel gelijktijdige websocketverbindingen |
@@ -128,11 +133,13 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | `DELETE /api/v1/rooms/{code}/players/{player_id}` | Host | 204, speler verwijderd |
 | `DELETE /api/v1/rooms/{code}` | Host | 204, kamer verwijderd |
 | `GET /api/v1/rooms/{code}/ws` | Kamersleutel in eerste bericht | Websocket |
-| `POST /api/v1/accounts/register` | Openbaar | 201 met account en sleutel |
+| `POST /api/v1/accounts/register` | Openbaar | 201 met account en sleutel; stuurt een bevestigingsmail |
 | `POST /api/v1/accounts/login` | Openbaar | 200 met account en sleutel |
 | `GET /api/v1/accounts/me` | Account | Accountobject |
 | `POST /api/v1/accounts/logout` | Account | 204 |
 | `GET /api/v1/accounts/stats` | Account | Statistieken |
+| `POST /api/v1/accounts/verify-email` | Account waarvoor de link is | E-mailadres bevestigen met het token uit de link |
+| `PUT /api/v1/accounts/email` | Account | E-mailadres toevoegen of wijzigen, of de link opnieuw sturen |
 | `GET /releases/{id}/{version}/{path}` | Openbaar | Assets van de actieve versie, of van een versie die een lopende kamer speelt |
 | `GET /api/v1/dev/me` | Dev-key | Account en key |
 | `GET /api/v1/dev/games` | Dev-key | Jouw games |
@@ -142,6 +149,7 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | `DELETE /api/v1/dev/games/{id}/versions/{version}` | Dev-key | Versie verwijderen |
 | `POST`, `GET /api/v1/admin/dev-tokens` | Admintoken | Dev-key maken, keys bekijken |
 | `DELETE /api/v1/admin/dev-tokens/{id}` | Admintoken | Key intrekken |
+| `POST /api/v1/admin/accounts/{username}/verify-email` | Admintoken | E-mailadres van een account met de hand bevestigen |
 | `GET /api/v1/admin/games` | Admintoken | Alle geüploade games |
 | `PUT /api/v1/admin/games/{id}` | Admintoken | Game blokkeren of deblokkeren |
 

@@ -25,7 +25,7 @@ De CLI is openbaar en valt onder de MIT-licentie.
 
 ### `me auth`
 
-Vraagt je dev-key (`med_…`) en controleert hem bij de server. Wat je plakt, wordt niet getoond. Met `--server https://jouw-server` kies je een andere engine dan `http://localhost:3000`; `--token` is er voor scripts.
+Vraagt je dev-key (`med_…`) en controleert hem bij de server. Wat je plakt, wordt niet getoond. Standaard is dat `https://miniengine.nl`; met `--server http://localhost:3000` of een ander adres kies je een andere engine. `--token` is er voor scripts.
 
 ### `me auth status` en `me auth logout`
 
@@ -70,6 +70,7 @@ Deze commando's gebruiken het admintoken van de server, niet een dev-key. Zie [b
 | `me admin token create <gebruiker> [--label TEKST] [--expires DAGEN]` | Maakt een dev-key; die zie je maar één keer |
 | `me admin token list` | Alle keys, zonder geheimen |
 | `me admin token revoke <id>` | Trekt een key direct in |
+| `me admin account verify <gebruikersnaam>` | Bevestigt het e-mailadres van een account met de hand; een dev-key kan alleen voor een bevestigd adres |
 | `me admin games` | Alle geüploade games met eigenaar |
 | `me admin game block <id>` / `unblock <id>` | Noodstop voor een game, of opheffen |
 
@@ -79,7 +80,7 @@ De CLI bewaart server en keys in `~/.config/miniengine/config.json` (alleen lees
 
 | Variabele | Betekenis |
 | --- | --- |
-| `MINIENGINE_SERVER` | Adres van de engine |
+| `MINIENGINE_SERVER` | Adres van de engine (standaard `https://miniengine.nl`) |
 | `MINIENGINE_TOKEN` | Dev-key |
 | `MINIENGINE_ADMIN_TOKEN` | Admintoken |
 

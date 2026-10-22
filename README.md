@@ -7,7 +7,7 @@
 
 De documentatiesite van Mini Engine en de Mini Engine SDK. Statische HTML, geen JavaScript-frameworks, bedoeld voor GitHub Pages op `https://casb02.github.io/mini-engine-docs/`.
 
-De engine- en SDK-repository zijn privé; deze repository is publiek. Zet hier dus geen sleutels, interne URL's of code uit die repositories die niet openbaar mag.
+De engine-repository is privé; deze repository, de SDK en de CLI zijn publiek. Zet hier dus geen sleutels, interne URL's of code uit die repositories die niet openbaar mag.
 
 ## Bouwen
 
@@ -66,7 +66,7 @@ Alle pagina's linken relatief, dus de site werkt onder elk pad, ook als losse be
 
 ## De API-referentie als pdf
 
-De site linkt naar `downloads/MiniEngine-API-v0.2.pdf`. Zet het bestand in `static/downloads/MiniEngine-API-v0.2.pdf`; de build kopieert het naar `site/downloads/`. Zolang het ontbreekt, meldt de build een waarschuwing en faalt de strikte linkcontrole.
+De site linkt naar `downloads/MiniEngine-API-v0.4.pdf` (`PDF` in `build.mjs`). Zet het bestand in `static/downloads/MiniEngine-API-v0.4.pdf`; oudere edities blijven ernaast staan. De build kopieert het naar `site/downloads/`. Zolang het ontbreekt, meldt de build een waarschuwing en faalt de strikte linkcontrole.
 
 ## Publiceren op GitHub Pages
 

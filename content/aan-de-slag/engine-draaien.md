@@ -48,6 +48,11 @@ Open op de telefoons `http://<LAN-IP>:3000/demo`, bijvoorbeeld `http://192.168.1
 | `MINI_ENGINE_GAMES` | `games` | Map met gamepackages |
 | `MINI_ENGINE_WEB` | `web` | Map met de demopagina en de SDK-bundle |
 | `MINI_ENGINE_ORIGINS` | leeg | Extra toegestane browser-origins, kommagescheiden, met schema en poort |
+| `MINI_ENGINE_ADMIN_TOKEN` | leeg | Zet [beheer](../publiceren/beheer.md) aan; minstens 32 tekens |
+| `MINI_ENGINE_PUBLIC_URL` | `http://localhost:3000` | Publiek adres voor links in bevestigingsmails, zonder `/` aan het eind |
+| `MINI_ENGINE_SMTP_URL` | leeg | SMTP-server voor bevestigingsmails, als URL (zie het voorbeeld hieronder). Zonder deze variabele komen de mails met de link alleen in de log. |
+| `MINI_ENGINE_MAIL_FROM` | `Mini Engine <noreply@localhost>` | Afzender van de mails |
+| `MINI_ENGINE_TRUST_PROXY` | leeg | Achter een reverse proxy: `x-forwarded-for`, of een headernaam zoals `cf-connecting-ip`. Alleen zetten als de engine uitsluitend via die proxy bereikbaar is. |
 
 Paden zijn relatief aan de werkmap. Buiten Docker Compose wordt `.env` niet automatisch ingelezen; exporteer de waarden zelf. De repository bevat een `.env.example` als voorbeeld:
 
@@ -57,7 +62,14 @@ MINI_ENGINE_DB=data/mini-engine.sqlite
 MINI_ENGINE_GAMES=games
 MINI_ENGINE_WEB=web
 # MINI_ENGINE_ORIGINS=http://localhost:3000,http://192.168.1.20:3000
+# MINI_ENGINE_ADMIN_TOKEN=
+# MINI_ENGINE_PUBLIC_URL=https://miniengine.nl
+# MINI_ENGINE_SMTP_URL=smtps://user:password@smtp.example.com:465
+# MINI_ENGINE_MAIL_FROM=Mini Engine <noreply@miniengine.nl>
+# MINI_ENGINE_TRUST_PROXY=x-forwarded-for
 ```
+
+Lokaal hoef je geen SMTP in te stellen. Registreer je een account, dan staat de bevestigingslink in de uitvoer van de engine; open die link in dezelfde browser waarin je bent ingelogd.
 
 ## Spellen toevoegen of wijzigen
 
@@ -69,8 +81,18 @@ De engine laadt gamepackages bij het opstarten. Na het toevoegen of wijzigen van
 curl http://localhost:3000/api/health
 ```
 
-Het antwoord is `{"status":"ok","version":"0.2.0"}`, met de versie uit `Cargo.toml`. De spellencatalogus staat op `/api/v1/games`.
+Het antwoord is `{"status":"ok","version":"0.4.0"}`, met de versie uit `Cargo.toml`. De spellencatalogus staat op `/api/v1/games`.
+
+In een container doet `mini-engine healthcheck` hetzelfde: het commando slaagt als `/api/health` een 200 geeft.
+
+## Back-ups
+
+```sh
+mini-engine backup backups/mini-engine.sqlite
+```
+
+Dit maakt een consistente kopie van de database uit `MINI_ENGINE_DB`, ook terwijl de engine draait. Het doelbestand mag nog niet bestaan. Draai je de engine met `cargo run`, gebruik dan `cargo run -- backup <bestand>`.
 
 ## Volgende stap
 
-Maak [je eerste kamer](eerste-kamer.md), of draai de engine [in Docker](docker.md) zodat kamers en accounts een herstart overleven.
+Maak [je eerste kamer](eerste-kamer.md), of draai de engine [in Docker](docker.md) zodat kamers en accounts een herstart overleven. Voor een publieke server met een eigen domein en bevestigingsmails, zie [hosten op Coolify](coolify.md).

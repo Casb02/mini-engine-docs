@@ -100,7 +100,7 @@ Wil je de SDK in een ander project gebruiken zonder de repository, maak dan een 
 npm pack
 
 # in je eigen project
-npm install /absoluut/pad/naar/mini-engine-sdk/casb02-mini-engine-sdk-0.2.0.tgz
+npm install /absoluut/pad/naar/mini-engine-sdk/casb02-mini-engine-sdk-0.3.1.tgz
 npx create-mini-game mijn-spel --directory /pad/naar/engine/games/mijn-spel
 ```
 

@@ -1,6 +1,6 @@
 ---
 title: Beheer
-description: De routes onder /api/v1/admin waarmee de eigenaar dev-keys maakt en intrekt en geüploade games blokkeert.
+description: De routes onder /api/v1/admin waarmee de eigenaar dev-keys maakt en intrekt, e-mailadressen bevestigt en geüploade games blokkeert.
 section: HTTP API
 order: 6
 toc_depth: 3
@@ -32,7 +32,12 @@ Deze routes staan onder `/api/v1/admin` en zijn alleen voor de eigenaar van de s
 }
 ```
 
-Het `token` staat alleen in dit antwoord; de server bewaart een SHA-256-hash. Onbekende gebruikersnaam: 404 `account_not_found`.
+Het `token` staat alleen in dit antwoord; de server bewaart een SHA-256-hash.
+
+| Fout | Wanneer |
+| --- | --- |
+| 404 `account_not_found` | Onbekende gebruikersnaam |
+| 409 `email_not_verified` | Het account heeft nog geen bevestigd e-mailadres (vanaf 0.4) |
 
 ### GET /api/v1/admin/dev-tokens
 
@@ -52,6 +57,23 @@ Nieuwste eerst, zonder geheimen.
 ### DELETE /api/v1/admin/dev-tokens/{id}
 
 Trekt de key in: 204. Hij werkt meteen niet meer. Al ingetrokken of onbekend: 404 `token_not_found`.
+
+## Accounts
+
+### POST /api/v1/admin/accounts/{username}/verify-email
+
+Bevestigt het e-mailadres van een account met de hand, voor wie de bevestigingsmail niet krijgt. Geen body. Antwoord 200:
+
+```json
+{ "username": "sander", "email": "sander@example.com", "email_verified": true }
+```
+
+Was het adres al bevestigd, dan blijft dat zo en volgt hetzelfde antwoord. De actie komt in `audit_log`.
+
+| Fout | Wanneer |
+| --- | --- |
+| 404 `account_not_found` | Onbekende gebruikersnaam |
+| 409 `email_missing` | Het account heeft geen e-mailadres |
 
 ## Games
 

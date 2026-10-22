@@ -13,7 +13,7 @@ Deze routes zijn openbaar en hebben geen sleutel nodig.
 ## GET /api/health
 
 ```json
-{ "status": "ok", "version": "0.2.0" }
+{ "status": "ok", "version": "0.4.0" }
 ```
 
 `version` is de gebouwde versie van de engine.

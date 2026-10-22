@@ -1,7 +1,7 @@
 ---
 title: Accounts
 nav_title: Accounts
-description: De accountroutes van de HTTP API voor registreren, inloggen, uitloggen, het eigen account en statistieken.
+description: De accountroutes van de HTTP API voor registreren, e-mailbevestiging, inloggen, uitloggen, het eigen account en statistieken.
 section: HTTP API
 order: 4
 toc_depth: 3
@@ -14,13 +14,28 @@ Accounts zijn optioneel. Ze gelden voor alle spellen op één engine. Achtergron
 ## POST /api/v1/accounts/register
 
 ```json
-{ "username": "hessel", "password": "minstens-tien-bytes", "display_name": "Hessel" }
+{
+  "username": "hessel",
+  "password": "minstens-tien-bytes",
+  "display_name": "Hessel",
+  "email": "hessel@example.com"
+}
 ```
 
 **Antwoord** `201`:
 
 ```json
-{ "account": { "id": "uuid", "username": "hessel", "display_name": "Hessel", "created_at": 1792656419 }, "token": "ACCOUNT_SECRET" }
+{
+  "account": {
+    "id": "uuid",
+    "username": "hessel",
+    "display_name": "Hessel",
+    "created_at": 1792656419,
+    "email": "hessel@example.com",
+    "email_verified": false
+  },
+  "token": "ACCOUNT_SECRET"
+}
 ```
 
 | Veld | Regel |
@@ -28,10 +43,11 @@ Accounts zijn optioneel. Ze gelden voor alle spellen op één engine. Achtergron
 | `username` | Getrimd en naar kleine letters; 3 tot 24 ASCII-letters, cijfers of `_` |
 | `password` | 10 tot 128 bytes UTF-8, exact bewaard zoals ingevoerd |
 | `display_name` | Getrimd; 1 tot 24 Unicode-tekens zonder controletekens |
+| `email` | Verplicht. Getrimd en naar kleine letters; een geldig adres van hoogstens 254 tekens |
 
-Extra velden, zoals een eigen `account_id`, worden geweigerd.
+Extra velden, zoals een eigen `account_id`, worden geweigerd. Na het aanmaken stuurt de engine een bevestigingsmail; zie [e-mailbevestiging](#e-mailbevestiging). Het account kan meteen inloggen en spelen.
 
-**Fouten:** `400 invalid_request`, `409 username_taken`, `429 rate_limit`.
+**Fouten:** `400 invalid_request`, `409 username_taken`, `409 email_taken` (het adres is al bevestigd door een ander account), `429 rate_limit`.
 
 ## POST /api/v1/accounts/login
 
@@ -48,8 +64,57 @@ Extra velden, zoals een eigen `account_id`, worden geweigerd.
 **Toegang:** accountsleutel. **Antwoord** `200`: het accountobject.
 
 ```json
-{ "id": "uuid", "username": "hessel", "display_name": "Hessel", "created_at": 1792656419 }
+{
+  "id": "uuid",
+  "username": "hessel",
+  "display_name": "Hessel",
+  "created_at": 1792656419,
+  "email": "hessel@example.com",
+  "email_verified": true
+}
 ```
+
+`email` is `null` bij een account zonder adres: een account van vóór 0.4, of een account waarvan een ander account hetzelfde adres eerder bevestigde.
+
+## E-mailbevestiging
+
+De bevestigingsmail bevat een link naar `MINI_ENGINE_PUBLIC_URL/demo/account?verify=<token>` en noemt het account (`@gebruikersnaam`) waarvoor hij is. De accountpagina van de demo laat je eerst inloggen en stuurt het token daarna naar de route hieronder. Een eigen app doet hetzelfde.
+
+- Een link werkt alleen voor het ingelogde account waarvoor hij is verstuurd. Wie zich met jouw adres registreert, krijgt het dus niet bevestigd doordat jij op de link klikt.
+- Een link verloopt na 48 uur, werkt één keer en vervalt zodra het adres van het account verandert.
+- Linktokens zijn willekeurig (256 bits); de engine bewaart alleen een SHA-256-hash.
+- Een onbevestigd adres reserveert niets. Het account dat als eerste bevestigt, houdt het adres; bij andere accounts met hetzelfde onbevestigde adres wordt `email` dan `null`.
+- Zonder `MINI_ENGINE_SMTP_URL` komt de mail met de link alleen in de log van de engine.
+
+### POST /api/v1/accounts/verify-email
+
+**Toegang:** accountsleutel van het account waarvoor de link is.
+
+```json
+{ "token": "TOKEN_UIT_DE_LINK" }
+```
+
+**Antwoord** `200`: `{ "account": Account }` met `email_verified: true`.
+
+**Fouten:** `400 invalid_token` (onbekend, verlopen, al gebruikt, voor een ander adres of voor een ander account), `401 unauthorized`, `409 email_taken` (een ander account heeft dit adres intussen bevestigd), `429 rate_limit`.
+
+### PUT /api/v1/accounts/email
+
+**Toegang:** accountsleutel.
+
+```json
+{ "email": "hessel@example.com" }
+```
+
+Voegt een adres toe, wijzigt het, of stuurt de link opnieuw als het adres gelijk blijft. Een nieuw adres is weer onbevestigd. Er gaat altijd een nieuwe bevestigingsmail uit.
+
+**Antwoord** `200`:
+
+```json
+{ "account": Account, "verification_sent": true }
+```
+
+**Fouten:** `400 invalid_request` (geen geldig adres), `401 unauthorized`, `409 email_already_verified` (dit adres is al bevestigd voor dit account), `409 email_taken` (bevestigd door een ander account), `429 rate_limit`: er is in de afgelopen minuut al een bevestigingsmail voor dit account verstuurd, of dit IP-adres heeft de mailgrens bereikt (zie [limieten](limieten.md#aanvragen-per-ip-adres)).
 
 ## POST /api/v1/accounts/logout
 
@@ -94,5 +159,5 @@ Resultaten komen alleen uit afgeronde rondes van serverspellen. Er is geen route
 ## Sessies
 
 - Een sessie verloopt na dertig dagen en overleeft een herstart van de engine.
-- Wachtwoorden: Argon2id. Sessiesleutels: alleen een SHA-256-hash in de database.
+- Wachtwoorden: Argon2id. Sessiesleutels en bevestigingslinks: alleen een SHA-256-hash in de database.
 - Er is geen wachtwoordherstel en geen route om een account te verwijderen.
