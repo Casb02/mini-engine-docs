@@ -1,11 +1,27 @@
 #!/usr/bin/env node
 // Bouwt de Mini Engine-documentatie: content/**/*.md + template.html → site/.
-// Geen runtime-JavaScript in de site; één afhankelijkheid (marked) voor Markdown.
+// Kleur in codeblokken komt tijdens de build (highlight.js); in de browser draait alleen static/site.js voor de kopieerknoppen.
 import { readFile, writeFile, mkdir, readdir, rm, cp, stat } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, dirname, relative, posix, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Marked } from 'marked';
+import hljs from 'highlight.js/lib/core';
+import bash from 'highlight.js/lib/languages/bash';
+import http from 'highlight.js/lib/languages/http';
+import javascript from 'highlight.js/lib/languages/javascript';
+import json from 'highlight.js/lib/languages/json';
+import typescript from 'highlight.js/lib/languages/typescript';
+import yaml from 'highlight.js/lib/languages/yaml';
+
+hljs.registerLanguage('bash', bash);
+hljs.registerAliases(['sh', 'shell'], { languageName: 'bash' });
+hljs.registerLanguage('http', http);
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('json', json);
+hljs.registerLanguage('typescript', typescript);
+hljs.registerLanguage('yaml', yaml);
+const CODE_LABELS = { sh: 'Shell', bash: 'Shell', shell: 'Shell', js: 'JavaScript', javascript: 'JavaScript', ts: 'TypeScript', typescript: 'TypeScript', json: 'JSON', http: 'HTTP', yaml: 'YAML' };
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const CONTENT = join(ROOT, 'content');
@@ -155,9 +171,13 @@ function renderMarkdown(page) {
         return `<h${depth} id="${id}">${html}${anchor}</h${depth}>\n`;
       },
       code({ text, lang }) {
-        const language = (lang || '').trim().split(/\s+/)[0];
-        const cls = language ? ` class="language-${escapeHtml(language)}"` : '';
-        return `<pre class="code" tabindex="0"><code${cls}>${escapeHtml(text)}</code></pre>\n`;
+        const language = (lang || '').trim().split(/\s+/)[0].toLowerCase();
+        const cls = language ? ` class="hljs language-${escapeHtml(language)}"` : ' class="hljs"';
+        const body = hljs.getLanguage(language)
+          ? hljs.highlight(text, { language, ignoreIllegals: true }).value
+          : escapeHtml(text);
+        const label = CODE_LABELS[language];
+        return `<div class="codeblock">${label ? `<span class="code-lang">${label}</span>` : ''}<button class="copy" type="button" hidden>Kopieer</button><pre class="code" tabindex="0"><code${cls}>${body}</code></pre></div>\n`;
       },
       link({ href, title, tokens }) {
         const text = this.parser.parseInline(tokens);
