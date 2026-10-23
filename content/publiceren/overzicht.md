@@ -17,10 +17,12 @@ Zo gaat het:
 
 ```sh
 me auth
-me game new mijn-spel
+me init mijn-spel
 cd mijn-spel
 me game upload
 ```
+
+Met `me doctor` zie je vooraf of alles klaarstaat: je dev-key, de server en het spel in de map.
 
 Een dev-key kan alleen voor een account met een bevestigd e-mailadres. Komt de bevestigingsmail niet aan, vraag dan om hulp bij wie de server beheert. De CLI praat standaard met `https://miniengine.nl`; voor een andere server gebruik je `me auth --server <adres>`.
 
@@ -31,7 +33,7 @@ Een dev-key kan alleen voor een account met een bevestigd e-mailadres. Komt de b
 - **Lopende kamers houden hun versie.** Wie al aan het spelen is, merkt niets van een nieuwe versie.
 - **Je game is van jou.** Niemand anders kan er versies aan toevoegen, hem uitzetten of verwijderen. Wie de server beheert, kan hem wel blokkeren.
 
-Na een upload van een actieve versie toont de CLI het adres om een kamer te maken: `<server>/home/new/<id>`.
+Na een upload van een actieve versie toont de CLI het adres om een kamer te maken: `<server>/home/new/<id>`. Bij de eerste versie van een nieuw spel zegt de CLI erbij dat die meteen live staat.
 
 ## Aan of uit vanaf de accountpagina
 

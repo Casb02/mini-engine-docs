@@ -22,13 +22,14 @@ me dev --players 3
 
 De kamer krijgt de `default_host_mode` uit je manifest. Wil je `tv` of `moderator` proberen, zet die dan even als standaard en kies **Nieuwe kamer**.
 
-`me dev` is er voor games met `runtime: "host"` en luistert alleen op je eigen computer; telefoons op je wifi kunnen er niet bij. Het blijft een nabootsing. Speel je spel daarom voor een avond met vrienden ook een keer als testversie op de server.
+`me dev` is er voor games met `runtime: "host"` en luistert standaard alleen op je eigen computer. Met `me dev --lan` doen ook telefoons op hetzelfde wifi mee: ze openen het adres dat `me dev` toont, of scannen de QR-code in het overzicht, en kiezen een naam. Gebruik dat alleen op een netwerk dat je vertrouwt. Het blijft een nabootsing. Speel je spel daarom voor een avond met vrienden ook een keer als testversie op de server.
 
 ## Daarna als testversie op de server
 
-Daarvoor heb je een dev-key nodig; zie [je game publiceren](../publiceren/overzicht.md). Log één keer in met `me auth` en upload vanuit de map van je spel:
+Daarvoor heb je een dev-key nodig; zie [je game publiceren](../publiceren/overzicht.md). Log één keer in met `me auth`. Kijk met `me doctor` of alles klaarstaat, en upload vanuit de map van je spel:
 
 ```sh
+me doctor
 me game upload
 ```
 

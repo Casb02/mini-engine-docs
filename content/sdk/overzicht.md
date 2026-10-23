@@ -14,14 +14,14 @@ De Mini Engine SDK is een getypeerde browser- en Node-client zonder runtime-afha
 | | |
 | --- | --- |
 | Pakketnaam | `@casb02/mini-engine-sdk` |
-| Versie | `0.5.2` |
+| Versie | `0.6.0` |
 | Repository | [Casb02/mini-engine-sdk](https://github.com/Casb02/mini-engine-sdk) (openbaar, MIT) |
 | Node.js | 22 of nieuwer |
 | npm | GitHub Packages, of rechtstreeks uit de repository |
 
 ## Versies
 
-Deze documentatie hoort bij SDK 0.5.2 en CLI 0.5.2. Ze werken met Mini Engine 0.5. Wat een nieuwere versie van Mini Engine vraagt, staat er steeds bij, zoals *sinds 0.5.1*:
+Deze documentatie hoort bij SDK 0.6.0 en CLI 0.6.0. Ze werken met Mini Engine 0.5 en nieuwer. Wat een nieuwere versie van Mini Engine vraagt, staat er steeds bij, zoals *sinds 0.5.1*:
 
 | Onderdeel | Vanaf Mini Engine |
 | --- | --- |
@@ -72,14 +72,14 @@ npm install @casb02/mini-engine-sdk
 Zonder token installeer je rechtstreeks uit de repository; npm bouwt het pakket dan zelf:
 
 ```sh
-npm install github:Casb02/mini-engine-sdk#v0.5.2
+npm install github:Casb02/mini-engine-sdk#v0.6.0
 ```
 
 ```ts
 import { ApiClient, MiniEngine, saveSession } from '@casb02/mini-engine-sdk';
 ```
 
-Het pakket bevat `dist/mini-engine.js`, de typedeclaraties in `types/mini-engine.d.ts`, de scaffolder in `bin/` en de skills voor AI-agents in `skills/`.
+Het pakket bevat `dist/mini-engine.js`, de typedeclaraties in `types/mini-engine.d.ts`, de scaffolder met vijf startsjablonen in `bin/` en de skills voor AI-agents in `skills/`. Sinds 0.6.0 kiest `create-mini-game --template` uit `stemmen`, `quiz`, `buzzer`, `beurten` en `leeg`; zie [je eerste game](../game-bouwen/eerste-game.md#kies-een-sjabloon). De CLI gebruikt dezelfde sjablonen voor `me init` en `me game new`.
 
 ## Van buiten een browser
 

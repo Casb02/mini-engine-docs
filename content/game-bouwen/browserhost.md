@@ -72,7 +72,7 @@ Krijg je toch een conflict, kijk dan opnieuw naar de actuele state. Speel een on
 
 ## Als de maker meespeelt
 
-Sinds 0.5.1 kan de maker meespelen in een eigen spel, als het manifest `playing` in [`host_modes`](package-en-manifest.md#host-modes) heeft. Een nieuw spel uit `me game new` doet dat standaard. De hostpagina is dan scheidsrechter én de spelerspagina van de maker. Je ziet het aan de snapshot: `client.room.you.player_id` is de spelersplek van de maker, en `client.room.host_player_id` is hetzelfde id voor iedere rol.
+Sinds 0.5.1 kan de maker meespelen in een eigen spel, als het manifest `playing` in [`host_modes`](package-en-manifest.md#host-modes) heeft. Een nieuw spel uit `me init` of `me game new` doet dat standaard. De hostpagina is dan scheidsrechter én de spelerspagina van de maker. Je ziet het aan de snapshot: `client.room.you.player_id` is de spelersplek van de maker, en `client.room.host_player_id` is hetzelfde id voor iedere rol.
 
 De hostverbinding kan geen `action` sturen; dat geeft `403 forbidden`. De hostpagina past de zet van de maker daarom zelf toe, in dezelfde wachtrij als de acties van spelers:
 
