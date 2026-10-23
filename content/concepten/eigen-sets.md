@@ -179,7 +179,9 @@ Op **Mijn sets** zie je je sets per spel. *Nieuw vragenbord* opent een raster: e
 
 Kom je via *Maak een eigen bord* op de pagina voor een nieuwe kamer, dan brengt opslaan je daar terug, met je nieuwe bord al gekozen. Een set verwijderen kan altijd; kamers die hem al gebruiken, spelen gewoon door.
 
-Andere soorten sets krijgen een eenvoudige JSON-editor, met de foutmeldingen van de engine.
+Andere soorten sets krijgen een formulier, als hun schema dat toelaat: alleen tekst, getallen, aan/uit, lijsten met teksten en lijsten van kleine items. Een lijst met teksten is een tekstvak met één item per regel, met eronder hoeveel regels er zijn en wat mag. Voor eigen kaarten van een spel als Punchline typ je dus gewoon één vraag per regel. Een lijst van kleine items, zoals vragen met een antwoord en punten, krijgt een blok per item met *Toevoegen* en *Weghalen*. Gaat er iets mis, dan noemt de editor de plek in gewone woorden, zoals *Vragen, regel 13* of *Vraag 2, antwoord*, en zet hij de cursor daar. Een schema met geneste objecten krijgt een eenvoudige JSON-editor, met de foutmeldingen van de engine. Het formulier is er sinds Mini Engine 0.5.3.
+
+Geef in je schema elk veld een `title` en een `description`: het formulier gebruikt ze als label en uitleg. Een `title` op `items` noemt één item ("Vraag" in een lijst "Vragen"). Verplichte velden staan bovenaan, in de volgorde van `required`.
 
 ## Wie kan erbij?
 
