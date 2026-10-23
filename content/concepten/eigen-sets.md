@@ -1,7 +1,8 @@
 ---
 title: Eigen sets
 description: Eigen inhoud voor een spel, zoals een eigen Jeopardy-bord. Wat een set is, set_kinds en het schemadialect, opslaan op je account, kiezen bij een nieuwe kamer, gameData en de boardeditor.
-section: Concepten
+section: SDK
+group: Concepten
 order: 10
 toc_depth: 3
 ---
@@ -37,11 +38,11 @@ Een kamer met een set speelt met die set in plaats van de `data.json` van het sp
 | `description` | 1 tot 160 tekens, niet leeg, geen controletekens |
 | `schema` | De vorm van een set, in het schemadialect hieronder |
 
-De engine controleert dit bij het opstarten en bij elke upload, net als de rest van het manifest.
+`me dev`, `me game upload` en de server controleren dit, net als de rest van het manifest.
 
 ## Het schemadialect
 
-Het schema van een set gebruikt een kleine, begrensde subset van JSON Schema. De engine controleert die met een eigen validator, zodat geen manifest of set de controle eindeloos kan laten duren. Dit dialect staat los van het [`settings_schema`](../game-bouwen/package-en-manifest.md#settings-schema), dat plat blijft.
+Het schema van een set gebruikt een kleine, begrensde subset van JSON Schema. Dit dialect staat los van het [`settings_schema`](../game-bouwen/package-en-manifest.md#settings-schema), dat plat blijft.
 
 Elk onderdeel van het schema heeft een `type`. Per type mogen alleen deze sleutels:
 
@@ -109,7 +110,7 @@ Past een set niet, dan noemt de fout het pad van het eerste probleem, bijvoorbee
 
 ## Opslaan op je account
 
-Je maakt en bewerkt sets op de pagina **Mijn sets** (`/home/sets`), of met de routes onder [`/api/v1/accounts/sets`](../api/accounts.md#sets). Bij elke keer opslaan controleert de engine:
+Spelers maken en bewerken sets op de pagina **Mijn sets** (`/home/sets`). Met de SDK kan dat ook, met [`createSet` en `updateSet`](../sdk/api-client.md#eigen-sets). Bij elke keer opslaan controleert de server:
 
 - dat de **actieve** versie van het spel deze soort set kent;
 - dat de inhoud aan het schema voldoet en hoogstens 64 KiB is;
@@ -130,7 +131,7 @@ Haalt een nieuwe versie van een spel een soort set weg, dan kun je bestaande set
 
 Op de pagina voor een nieuwe kamer (`/home/new/{id}`) staat een keuzelijst als het spel sets kent en je bent ingelogd. Bij Jeopardy heet die *Vragenbord*, met *Standaardbord* en je eigen borden, en een link *Maak een eigen bord*. Gasten zien een korte hint om in te loggen.
 
-Via de API stuur je `set_id` mee bij [`POST /api/v1/rooms`](../api/kamers.md#post-api-v1-rooms), met je accountsleutel. De engine controleert dat de set van jou is, bij dit spel hoort en dat zijn soort voorkomt in de versie die de kamer krijgt. Daarna controleert hij de inhoud opnieuw tegen die versie.
+Met de SDK geef je `set_id` mee aan [`api.createRoom()`](../sdk/api-client.md#createroom-options), met een accountsleutel. De server controleert dat de set van dat account is, bij dit spel hoort en dat zijn soort voorkomt in de versie die de kamer krijgt. Daarna controleert hij de inhoud opnieuw tegen die versie.
 
 - **De kamer krijgt een kopie.** Wijzig of verwijder je de set later, dan merkt een lopende kamer daar niets van. Net als de spelversie ligt de set vast voor de hele kamer. De kopie verdwijnt met de kamer.
 - **Iedereen ziet welke set het is.** De snapshot heeft een veld `set` met `id`, `kind` en `title`, voor alle rollen, ook het scherm. Zo kan de lobby *Bord: Dani's filmavond* tonen. De inhoud staat nooit in een snapshot.
@@ -138,7 +139,7 @@ Via de API stuur je `set_id` mee bij [`POST /api/v1/rooms`](../api/kamers.md#pos
 
 ## De set in het spel
 
-Bij een **serverspel** gebruikt de engine de set overal waar hij anders `data.json` zou gebruiken: bij het starten, bij nieuwe instellingen en bij elke actie. Jeopardy zet een bord om naar zijn eigen vorm. De vragen zijn per rij 100 tot 500 punten waard en krijgen id's als `c2-300`: kolom 2, 300 punten.
+Bij een **ingebouwd spel** gebruikt de server de set in plaats van `data.json`. Jeopardy maakt van een bord vragen van 100 tot 500 punten per rij, met id's als `c2-300`: kolom 2, 300 punten.
 
 Bij een **eigen spel** leest de host de set met dezelfde route als `data.json`:
 
@@ -153,7 +154,7 @@ if (client.room.set) {
 }
 ```
 
-Heeft de kamer een set, dan geeft [`game-data`](../api/kamers.md#get-api-v1-rooms-code-game-data) die set, precies zoals hij is opgeslagen. Anders geeft hij `data.json`. Ook hier mag alleen de host lezen.
+Heeft de kamer een set, dan geeft `gameData()` die set, precies zoals hij is opgeslagen. Anders geeft hij `data.json`. Alleen de host mag lezen. Geef je `data.json` dezelfde vorm als je soort set, dan werkt één stuk code voor allebei. Test het met `me dev --set bestand.json`.
 
 ## De Jeopardy-editor
 
@@ -173,15 +174,48 @@ Een Jeopardy-bord als set ziet er zo uit:
 }
 ```
 
-Eén tot zes categorieën, elk met precies vijf vragen. Waarden en id's zet je er niet in; die maakt de engine.
+Eén tot zes categorieën, elk met precies vijf vragen. Waarden en id's zet je er niet in; die komen erbij als de kamer start.
 
-Op **Mijn sets** zie je je sets per spel. *Nieuw vragenbord* opent een raster: een kolom per categorie, met vijf vakken van 100 tot 500 punten, elk met een vraag en een antwoord. Je voegt categorieën toe of haalt ze weg. Bij opslaan controleert de engine dezelfde regels als bij de API. Gaat er iets mis, dan noemt de editor de plek in gewone woorden, zoals *Categorie 2, vraag voor 300*, en zet hij de cursor in dat vak.
+Op **Mijn sets** zie je je sets per spel. *Nieuw vragenbord* opent een raster: een kolom per categorie, met vijf vakken van 100 tot 500 punten, elk met een vraag en een antwoord. Je voegt categorieën toe of haalt ze weg. Bij opslaan gelden dezelfde regels als bij de SDK. Gaat er iets mis, dan noemt de editor de plek in gewone woorden, zoals *Categorie 2, vraag voor 300*, en zet hij de cursor in dat vak.
 
 Kom je via *Maak een eigen bord* op de pagina voor een nieuwe kamer, dan brengt opslaan je daar terug, met je nieuwe bord al gekozen. Een set verwijderen kan altijd; kamers die hem al gebruiken, spelen gewoon door.
 
-Andere soorten sets krijgen een formulier, als hun schema dat toelaat: alleen tekst, getallen, aan/uit, lijsten met teksten en lijsten van kleine items. Een lijst met teksten is een tekstvak met één item per regel, met eronder hoeveel regels er zijn en wat mag. Voor eigen kaarten van een spel als Punchline typ je dus gewoon één vraag per regel. Een lijst van kleine items, zoals vragen met een antwoord en punten, krijgt een blok per item met *Toevoegen* en *Weghalen*. Gaat er iets mis, dan noemt de editor de plek in gewone woorden, zoals *Vragen, regel 13* of *Vraag 2, antwoord*, en zet hij de cursor daar. Een schema met geneste objecten krijgt een eenvoudige JSON-editor, met de foutmeldingen van de engine. Het formulier is er sinds Mini Engine 0.5.3.
+## Het formulier voor je eigen soort set
 
-Geef in je schema elk veld een `title` en een `description`: het formulier gebruikt ze als label en uitleg. Een `title` op `items` noemt één item ("Vraag" in een lijst "Vragen"). Verplichte velden staan bovenaan, in de volgorde van `required`.
+Andere soorten sets krijgen een formulier, als hun schema dat toelaat: alleen tekst, getallen, aan/uit, lijsten met teksten en lijsten van kleine items. Een lijst met teksten is een tekstvak met één item per regel, met eronder hoeveel regels er zijn en wat mag. Voor eigen kaarten van een spel als Punchline typ je dus gewoon één vraag per regel. Een lijst van kleine items, zoals vragen met een antwoord en punten, krijgt een blok per item met *Toevoegen* en *Weghalen*. Gaat er iets mis, dan noemt de editor de plek in gewone woorden, zoals *Vragen, regel 13* of *Vraag 2, antwoord*, en zet hij de cursor daar. Een schema met geneste objecten krijgt een eenvoudige JSON-editor, met de foutmeldingen van de server. Het formulier is er sinds Mini Engine 0.5.3.
+
+### Een schema dat in het formulier past
+
+- **Houd het plat.** Velden met tekst, getallen of aan/uit, een lijst met teksten, of een lijst van kleine objecten met zulke velden. Een object in een object, of een lijst in een lijst, valt terug op de JSON-editor.
+- **Geef elk veld een `title` en, waar dat helpt, een `description`.** Het formulier gebruikt ze als label en uitleg.
+- **Geef `items` een `title` in het enkelvoud**, zoals "Vraag" in een lijst "Vragen". Het formulier noemt er één item mee, ook in een foutmelding.
+- **Zet de velden in `required` in de volgorde waarin mensen ze invullen.** Verplichte velden staan bovenaan, in die volgorde.
+- **Kies grenzen die mensen begrijpen**, zoals `minItems` en `maxItems` voor het aantal regels en `maxLength` voor een tekst. Bij een lijst met teksten toont het formulier onder het tekstvak hoeveel regels er zijn en wat mag.
+
+Een soort set voor een lijst met eigen stellingen:
+
+```json
+{
+  "id": "stellingen",
+  "title": "Eigen stellingen",
+  "description": "Tien tot veertig stellingen om over te stemmen.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "stellingen": {
+        "type": "array",
+        "title": "Stellingen",
+        "description": "Eén stelling per regel.",
+        "minItems": 10,
+        "maxItems": 40,
+        "items": { "type": "string", "title": "Stelling", "minLength": 1, "maxLength": 120 }
+      }
+    },
+    "required": ["stellingen"],
+    "additionalProperties": false
+  }
+}
+```
 
 ## Wie kan erbij?
 

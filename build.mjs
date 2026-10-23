@@ -34,19 +34,30 @@ const OUT = join(ROOT, 'site');
 const BASE = process.env.DOCS_BASE ?? '/mini-engine-docs/';
 
 // Volgorde van de secties in de navigatie. De `section` uit de front matter moet hierin staan.
-const SECTIONS = [
-  'Start',
-  'Snel aan de slag',
-  'Concepten',
-  'Een game bouwen',
-  'Publiceren',
-  'SDK-referentie',
-  'HTTP API',
-  'Bouwen met AI',
-  'Branding',
-];
+const SECTIONS = ['Start', 'SDK', 'CLI', 'Branding'];
 
-const PDF = 'downloads/MiniEngine-API-v0.5.pdf';
+// Optionele groepen binnen een sectie, in menuvolgorde. Een sectie met groepen vraagt een `group` per pagina.
+const GROUPS = {
+  SDK: ['Aan de slag', 'Een game bouwen', 'Concepten', 'Referentie'],
+};
+
+// Downloads die altijd in static/ moeten staan. De build en de linkcontrole falen zonder.
+const DOWNLOADS = ['downloads/MiniEngine-Brandbook.pdf', 'downloads/MiniEngine-logos.zip'];
+
+// Oude adressen die naar een andere pagina zijn verhuisd. Elk krijgt een kleine doorverwijspagina.
+// Pagina's die zijn verdwenen (zoals het hosten van de engine) staan hier niet; die geven 404.
+const REDIRECTS = {
+  'start/een-avond.html': 'index.md',
+  'aan-de-slag/eerste-kamer.html': 'concepten/kamers-en-rollen.md#een-kamer-op-miniengine-nl',
+  'api/overzicht.html': 'sdk/events-en-fouten.md#foutcodes-van-de-server',
+  'api/games.html': 'sdk/api-client.md#spellen',
+  'api/kamers.html': 'sdk/api-client.md#kamers',
+  'api/accounts.html': 'sdk/api-client.md#accounts',
+  'api/ontwikkelaars.html': 'publiceren/cli.md',
+  'api/websocket.html': 'sdk/realtime-client.md',
+  'api/limieten.html': 'sdk/grenzen.md',
+};
+
 const VERSION = '0.5';
 
 // ---------- helpers ----------
@@ -125,6 +136,9 @@ for (const file of files) {
     if (!data[key]) throw new Error(`${src}: front matter mist '${key}'`);
   }
   if (!SECTIONS.includes(data.section)) throw new Error(`${src}: onbekende sectie '${data.section}'`);
+  const groups = GROUPS[data.section];
+  if (groups && !groups.includes(data.group)) throw new Error(`${src}: sectie '${data.section}' vraagt een group uit ${groups.join(', ')}`);
+  if (!groups && data.group) throw new Error(`${src}: sectie '${data.section}' heeft geen groepen`);
   pages.push({
     src,
     out: src.replace(/\.md$/, '.html'),
@@ -132,6 +146,7 @@ for (const file of files) {
     navTitle: data.nav_title || data.title,
     description: data.description,
     section: data.section,
+    group: data.group || null,
     order: Number(data.order ?? 100),
     layout: data.layout || 'doc',
     toc: data.toc !== false,
@@ -139,9 +154,11 @@ for (const file of files) {
     body,
   });
 }
+const groupIndex = (page) => (page.group ? GROUPS[page.section].indexOf(page.group) : 0);
 pages.sort(
   (a, b) =>
     SECTIONS.indexOf(a.section) - SECTIONS.indexOf(b.section) ||
+    groupIndex(a) - groupIndex(b) ||
     a.order - b.order ||
     a.src.localeCompare(b.src),
 );
@@ -214,17 +231,27 @@ function resolveHref(page, href) {
 const template = await readFile(join(ROOT, 'template.html'), 'utf8');
 
 function navHtml(current, root) {
-  let html = '';
-  for (const section of SECTIONS) {
-    const items = pages.filter((page) => page.section === section);
-    if (!items.length) continue;
-    const list = items
+  const list = (items) =>
+    `<ul>${items
       .map((page) => {
         const active = current && page.src === current.src;
         return `<li><a href="${root}${page.out}"${active ? ' aria-current="page"' : ''}>${escapeHtml(page.navTitle)}</a></li>`;
       })
-      .join('');
-    html += `<div class="nav-group"><p class="nav-heading">${escapeHtml(section)}</p><ul>${list}</ul></div>`;
+      .join('')}</ul>`;
+  let html = '';
+  for (const section of SECTIONS) {
+    const items = pages.filter((page) => page.section === section);
+    if (!items.length) continue;
+    let body = '';
+    if (GROUPS[section]) {
+      for (const group of GROUPS[section]) {
+        const inGroup = items.filter((page) => page.group === group);
+        if (inGroup.length) body += `<p class="nav-subheading">${escapeHtml(group)}</p>${list(inGroup)}`;
+      }
+    } else {
+      body = list(items);
+    }
+    html += `<div class="nav-group"><p class="nav-heading">${escapeHtml(section)}</p>${body}</div>`;
   }
   return html;
 }
@@ -284,7 +311,7 @@ function renderPage(page, { root, content, headings, isNotFound = false }) {
   const crumbs =
     page.layout === 'home' || isNotFound
       ? ''
-      : `<p class="crumb">${escapeHtml(page.section)}</p>`;
+      : `<p class="crumb">${escapeHtml(page.group ? `${page.section} · ${page.group}` : page.section)}</p>`;
   return fill({
     root,
     title: escapeHtml(page.layout === 'home' ? 'Mini Engine Docs' : `${page.title} – Mini Engine Docs`),
@@ -297,17 +324,49 @@ function renderPage(page, { root, content, headings, isNotFound = false }) {
     crumb: crumbs,
     content,
     pager: isNotFound ? '' : pagerHtml(page, root),
-    pdf: `${root}${PDF}`,
     version: VERSION,
   });
 }
 
+/** Een kleine doorverwijspagina voor een oud adres. Het doel is een .md-bron, zodat de build het controleert. */
+function redirectHtml(from, to) {
+  const [path, hash] = to.split('#');
+  const target = bySrc.get(path);
+  if (!target) throw new Error(`REDIRECTS: ${from} wijst naar onbekende pagina ${to}`);
+  if (bySrc.has(from.replace(/\.html$/, '.md'))) throw new Error(`REDIRECTS: ${from} bestaat nog als pagina`);
+  const rel = posix.relative(posix.dirname(from), target.out) + (hash ? `#${hash}` : '');
+  const href = escapeHtml(rel);
+  return `<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta http-equiv="refresh" content="0; url=${href}">
+  <title>Verplaatst – Mini Engine Docs</title>
+</head>
+<body>
+  <p>Deze pagina is verplaatst naar <a href="${href}">${escapeHtml(target.title)}</a>.</p>
+</body>
+</html>
+`;
+}
+
 // ---------- schrijven ----------
+
+const missing = DOWNLOADS.filter((file) => !existsSync(join(STATIC, file)));
+if (missing.length) throw new Error(`Ontbrekende downloads in static/: ${missing.join(', ')}`);
 
 await rm(OUT, { recursive: true, force: true });
 await mkdir(OUT, { recursive: true });
 if (existsSync(STATIC)) await cp(STATIC, OUT, { recursive: true });
 await writeFile(join(OUT, '.nojekyll'), '');
+
+for (const [from, to] of Object.entries(REDIRECTS)) {
+  const out = join(OUT, from);
+  await mkdir(dirname(out), { recursive: true });
+  await writeFile(out, redirectHtml(from, to));
+}
 
 for (const page of pages) {
   const { html, headings } = renderMarkdown(page);
@@ -331,9 +390,7 @@ const notFoundBody = `<h1 id="niet-gevonden">Deze pagina bestaat niet</h1>
 <p><a class="button" href="${BASE}index.html">Naar de startpagina</a></p>`;
 await writeFile(join(OUT, '404.html'), renderPage(notFound, { root: BASE, content: notFoundBody, headings: [], isNotFound: true }));
 
-const pdfPresent = existsSync(join(OUT, PDF));
 const size = (await stat(join(OUT, 'index.html'))).size;
 console.log(
-  `Gebouwd: ${pages.length} pagina's + 404.html naar ${toPosix(relative(process.cwd(), OUT)) || '.'}/ (index ${size} bytes).` +
-    (pdfPresent ? '' : `\nLet op: ${PDF} ontbreekt nog; zet de pdf in static/${PDF}.`),
+  `Gebouwd: ${pages.length} pagina's, ${Object.keys(REDIRECTS).length} doorverwijzingen en 404.html naar ${toPosix(relative(process.cwd(), OUT)) || '.'}/ (index ${size} bytes).`,
 );

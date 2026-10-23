@@ -1,48 +1,35 @@
 ---
 title: Je eerste game
-description: Maak met create-mini-game in vijf minuten een speelbaar stemspel en speel het met een tweede apparaat.
-section: Een game bouwen
-order: 1
+description: Maak met me game new in vijf minuten een speelbaar stemspel, speel het met me dev op je eigen computer en pas het aan.
+section: SDK
+group: Aan de slag
+order: 2
 ---
 
 # Je eerste game
 
-De Mini Engine SDK bevat een scaffolder, `create-mini-game`. Die maakt een compleet, speelbaar stemspel met een spelleiderspagina, een spelerspagina en een gedeeld scherm. Daarna pas je het aan tot je eigen spel.
+De Mini Engine SDK bevat een scaffolder die een compleet, speelbaar stemspel maakt, met een pagina voor de spelleider, een voor elke speler en een gedeeld scherm. De CLI levert dezelfde scaffolder mee als `me game new`, en speelt je spel met `me dev` meteen op je eigen computer. Daarna pas je het aan tot je eigen spel.
 
 ## Wat je nodig hebt
 
 - Node.js 22 of nieuwer.
-- Een checkout van de openbare SDK-repository [`Casb02/mini-engine-sdk`](https://github.com/Casb02/mini-engine-sdk), of `me game new` uit de [CLI](../publiceren/cli.md).
-- Een checkout van Mini Engine naast de SDK, bijvoorbeeld in `../mini-engine`.
+- De [me-CLI](../publiceren/cli.md).
+
+```sh
+npm install -g github:Casb02/mini-engine-cli
+```
 
 ## In vijf minuten
 
 ```sh
-git clone git@github.com:Casb02/mini-engine-sdk.git
-cd mini-engine-sdk
-npm ci
-npm run build
-node bin/create-mini-game.mjs mijn-spel --directory ../mini-engine/games/mijn-spel
+me game new mijn-spel
+cd mijn-spel
+me dev
 ```
 
-Herstart de engine vanuit de root van de engine-checkout:
+`me dev` opent een overzicht in je browser met de spelleider, het gedeelde scherm en twee spelers naast elkaar. Je speelt zelf mee: *Iedereen doet mee* (`playing`) is de standaardmodus van het voorbeeld, en je plek staat meteen klaar. Zet de twee spelers klaar, start de stemronde op de spelleiderspagina en stem op elke stoel. Sla je een bestand op, dan laden de stoelen opnieuw en blijft de kamer bestaan. Stoppen doe je met Ctrl+C.
 
-```sh
-cd ../mini-engine
-cargo run
-```
-
-Open `/home`, kies **Mijn Spel** en maak een kamer. Je speelt zelf mee: *Iedereen doet mee* (`playing`) is de standaardmodus van het voorbeeld, en je plek staat meteen klaar. Kies je *TV*, dan toont dit tabblad de stemming groot en stem je op de telefoon. Doe mee vanaf een tweede browser of apparaat, zet je daar klaar, en start de stemronde op de spelleiderspagina. Daar stem je zelf ook.
-
-## Sneller testen met `me dev`
-
-Tijdens het bouwen gaat het sneller met `me dev` uit de [CLI](../publiceren/cli.md#me-dev), sinds CLI 0.5.0. Die bootst de engine na op je eigen computer en toont de spelleider, het gedeelde scherm en twee spelers naast elkaar in je browser. Vanuit de root van de engine-checkout:
-
-```sh
-me dev games/mijn-spel
-```
-
-Sla je een bestand op, dan laden de pagina's opnieuw en blijft de kamer bestaan. Speel je spel voor een avond met vrienden wel een keer op een echte engine. Zie [testen](testen.md#eerst-lokaal-met-me-dev).
+Meer over `me dev`, en hoe je daarna op een echte server test, staat bij [testen](testen.md).
 
 ## De slug
 
@@ -50,21 +37,15 @@ De eerste parameter is de slug van je spel. Die wordt de id in het manifest en d
 
 - Maximaal 48 tekens: kleine letters, cijfers en losse streepjes.
 - Begint met een letter. Dus `mijn-spel` en `quiz2` mogen, `2quiz` en `mijn--spel` niet.
-- Als je `--directory` opgeeft, moet de laatste mapnaam gelijk zijn aan de slug. De engine laadt een package alleen als map en manifest-id overeenkomen.
-- De doelmap mag nog niet bestaan. De scaffolder overschrijft nooit iets.
+- De map mag nog niet bestaan. De scaffolder overschrijft nooit iets.
+- De titel wordt afgeleid van de slug: `mijn-spel` wordt *Mijn Spel*.
 
-```sh
-node bin/create-mini-game.mjs ander-spel
-node bin/create-mini-game.mjs ander-spel --directory /pad/naar/engine/games/ander-spel
-node bin/create-mini-game.mjs --help
-```
-
-De titel wordt afgeleid van de slug: `mijn-spel` wordt *Mijn Spel*.
+Met `me game new mijn-spel --dir spellen/mijn-spel` kies je een andere map.
 
 ## Wat je krijgt
 
 ```text
-games/mijn-spel/
+mijn-spel/
   manifest.json         id, titel, spelers, instellingen, runtime
   host.html             pagina voor de spelleider
   player.html           pagina voor elke speler
@@ -76,9 +57,10 @@ games/mijn-spel/
   types/
     mini-engine.d.ts    gebundelde typedeclaraties van de SDK
   README.md             uitleg bij dit spel
+  .meignore             wat me game upload overslaat
 ```
 
-Het stemspel is een complete hostruntime-game: de spelleider controleert stemmen, publiceert de stand, toont totalen aan alle rollen en ondersteunt meerdere rondes. Laat het spelleiderstabblad open tijdens het spelen.
+Het stemspel is een complete game met `runtime: "host"`: de spelleider controleert stemmen, publiceert de stand, toont totalen aan alle rollen en ondersteunt meerdere rondes. Laat het spelleiderstabblad open tijdens het spelen.
 
 ## Waar pas je wat aan?
 
@@ -87,37 +69,31 @@ Het stemspel is een complete hostruntime-game: de spelleider controleert stemmen
 | Een andere vraag of standaardinstellingen | `manifest.json`: `default_settings` en `settings_schema` |
 | Andere spelregels | `assets/app.js`: de host-reducer |
 | Een andere weergave | `host.html`, `player.html`, `display.html` en `assets/style.css` |
-| Geheime speldata, zoals antwoorden | Een `data.json`, die alleen de host via een beveiligde route leest |
-
-Herstart de engine na elke wijziging aan het package. Met `me dev` hoeft dat niet.
+| Geheime speldata, zoals antwoorden | Een `data.json`, die alleen de host leest met `gameData()` |
 
 ## Typecontrole in je editor
 
-`assets/app.js` is gewone JavaScript met JSDoc-types, dus de browser draait het zonder build. `jsconfig.json` koppelt de import `/sdk/mini-engine.js` aan de typedeclaraties van de SDK. Binnen een engine-checkout gebruikt het de kopie van de engine (`web/mini-engine.d.ts`), elders de gebundelde kopie in `types/`. VS Code en andere editors met TypeScript pakken dat vanzelf op. Vanuit een terminal:
+`assets/app.js` is gewone JavaScript met JSDoc-types, dus de browser draait het zonder build. `jsconfig.json` koppelt de import `/sdk/mini-engine.js` aan de typedeclaraties in `types/`. VS Code en andere editors met TypeScript pakken dat vanzelf op. Vanuit een terminal:
 
 ```sh
 npx -p typescript tsc -p jsconfig.json
 ```
 
-De engine serveert alleen bestanden onder `assets/`; `jsconfig.json` en `types/` negeert hij.
+Alleen bestanden onder `assets/` zijn publiek. `jsconfig.json` en `types/` staan in `.meignore`, dus `me game upload` laat ze thuis.
 
-## Installeren vanuit een tarball
+## Zonder de CLI
 
-Wil je de SDK in een ander project gebruiken zonder de repository, maak dan een lokaal pakket:
+De scaffolder zit ook in het SDK-pakket, als `create-mini-game`. Die maakt hetzelfde spel, zonder `.meignore`:
 
 ```sh
-# in de SDK-checkout
-npm pack
-
-# in je eigen project
-npm install /absoluut/pad/naar/mini-engine-sdk/casb02-mini-engine-sdk-0.5.1.tgz
-npx create-mini-game mijn-spel --directory /pad/naar/engine/games/mijn-spel
+npx -p @casb02/mini-engine-sdk create-mini-game mijn-spel
+npx -p @casb02/mini-engine-sdk create-mini-game --help
 ```
 
-`npx` gebruikt hier de lokaal geïnstalleerde CLI. Je kunt het pakket ook uit GitHub Packages installeren; zie [het SDK-overzicht](../sdk/overzicht.md#in-een-eigen-project).
+Het pakket staat in GitHub Packages; zie [het SDK-overzicht](../sdk/overzicht.md#in-een-eigen-project) voor de eenmalige instelling. Met `--directory pad/naar/mijn-spel` kies je een andere map; de laatste mapnaam moet dan gelijk zijn aan de slug.
 
-> Open gegenereerde HTML niet via `file://` of een losse static server. De engine levert de API, de kamersessies, de websockets en de assetroutes.
+> Open gegenereerde HTML niet via `file://` of een losse static server. De pagina's hebben kamers, sessies, websockets en de SDK op `/sdk/mini-engine.js` nodig. `me dev` levert die op je eigen computer, net als Mini Engine online.
 
 ## Volgende stap
 
-Lees hoe [een package en manifest](package-en-manifest.md) in elkaar zitten, of ga meteen naar [de browserhost schrijven](browserhost.md).
+Lees hoe je [test](testen.md), hoe [een package en manifest](package-en-manifest.md) in elkaar zitten, of ga meteen naar [de browserhost schrijven](browserhost.md). Klaar om te spelen met vrienden? Zie [je game publiceren](../publiceren/overzicht.md).

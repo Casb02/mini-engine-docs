@@ -2,8 +2,9 @@
 title: De websocketclient
 nav_title: Websocketclient
 description: MiniEngine, de websocketclient van de SDK, met verbinden, snapshots, acties, klaarzetten, instellingen, state publiceren, achievements toekennen, realtime en herverbinden.
-section: SDK-referentie
-order: 3
+section: SDK
+group: Referentie
+order: 2
 toc_depth: 3
 ---
 
@@ -83,7 +84,7 @@ await client.waitForSnapshot((room) => room.status === 'running');
 
 ## Opdrachten
 
-Alle opdrachten geven een `Promise<Ack>`. Bij een mutatie komt de nieuwe snapshot binnen vóór de bevestiging.
+Alle opdrachten geven een `Promise<Ack>`. Bij een mutatie komt de nieuwe snapshot binnen vóór de bevestiging. Snapshots komen ook zonder eigen opdracht binnen: als iemand meedoet, zich klaarzet, verbindt of wegvalt.
 
 ### action(name, data?, options?)
 
@@ -131,7 +132,7 @@ Alleen de host, alleen in de lobby. De spelleidermodus kies je bij het maken van
 setState(state: { expected_version: number; public_state: P; host_state?: Json; player_states?: Record<string, Json> }): Promise<Ack>
 ```
 
-Alleen de host van een spel met `runtime: "host"`. Vervangt de volledige spelstand. Een serverspel weigert dit.
+Alleen de host van een spel met `runtime: "host"`. Vervangt de volledige spelstand; zie [state en versies](../concepten/state-en-versies.md). Een ingebouwd spel weigert dit.
 
 ### award(playerId, achievementId)
 
@@ -187,7 +188,7 @@ Luistert naar één kanaal, of naar alle kanalen met `'*'`. `from` is `{ role, p
 set(key: string, value: Json): void
 ```
 
-Zet jouw waarde voor een sleutel; `null` wist hem. De laatste waarde wint. De SDK voegt snelle wijzigingen per sleutel samen en verstuurt hoogstens elke `realtime.setInterval` milliseconden (standaard 33) de laatste stand. Je eigen waarde staat direct in `value()`, want de engine stuurt je eigen waarden niet terug. Niet verbonden: de aanroep doet niets.
+Zet jouw waarde voor een sleutel; `null` wist hem. De laatste waarde wint. De SDK voegt snelle wijzigingen per sleutel samen en verstuurt hoogstens elke `realtime.setInterval` milliseconden (standaard 33) de laatste stand. Je eigen waarde staat direct in `value()`, want de server stuurt je eigen waarden niet terug. Niet verbonden: de aanroep doet niets.
 
 ### value(from, key)
 
@@ -215,10 +216,18 @@ Alleen de host. Wist alle waarden in de kamer; iedereen krijgt per gewiste sleut
 
 ### Verbinding en realtime
 
-- Na een herverbinding bouwt de client alle waarden opnieuw op uit de lijst die de engine bij het verbinden stuurt. Handlers van `onValue` horen dan wat er veranderde.
+- Na een herverbinding bouwt de client alle waarden opnieuw op uit de lijst die de server bij het verbinden stuurt. Handlers van `onValue` horen dan wat er veranderde.
 - Waarden die nog niet verstuurd waren toen de verbinding wegviel, stuurt de client niet meer.
 - Na `close()` zijn alle waarden in de client weg.
 - Valt er iets weg omdat je te veel stuurt, dan krijg je het event [`throttled`](events-en-fouten.md#events).
+
+## De verbinding
+
+- De client stuurt de kamersleutel in het eerste bericht. Lukt dat niet binnen vijf seconden, dan sluit de server met `auth_timeout`.
+- De server stuurt elke vijftien seconden een ping. Hoort hij 45 seconden niets, dan sluit hij met `heartbeat_timeout` en verbindt de client opnieuw.
+- Per seconde mag de host 240 opdrachten sturen en een speler of scherm 60. Daarboven sluit de server met `rate_limit`. Realtime heeft een eigen budget; zie [grenzen](grenzen.md).
+- Loopt een speler of scherm achter, dan krijgt die een verse snapshot. Loopt de host achter, dan sluit de server diens verbinding met `host_lagged`; de client verbindt opnieuw en krijgt de actuele stand.
+- Eén bericht is hoogstens 96 KiB.
 
 ## Herverbinden
 

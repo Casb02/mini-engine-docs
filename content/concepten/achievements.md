@@ -1,7 +1,8 @@
 ---
 title: Achievements
 description: Mijlpalen die een spel declareert en die spelers met een account verdienen. Het manifest, wie ze mag toekennen, het verschil tussen server en spel, en waar je ze terugziet.
-section: Concepten
+section: SDK
+group: Concepten
 order: 9
 toc_depth: 3
 ---
@@ -28,23 +29,23 @@ Een spel noemt zijn achievements in `manifest.json`:
 | `title` | 1 tot 60 tekens, niet leeg, geen controletekens |
 | `description` | 1 tot 160 tekens, niet leeg, geen controletekens |
 
-De engine controleert dit bij het opstarten en bij elke upload. De definities zijn openbaar via [`GET /api/v1/games`](../api/games.md#get-api-v1-games). Een kamer gebruikt de achievements van de versie van het spel waarmee hij is gemaakt.
+`me dev`, `me game upload` en de server controleren dit. De definities zijn openbaar: `api.getGames()` geeft ze mee. Een kamer gebruikt de achievements van de versie van het spel waarmee hij is gemaakt.
 
 ## Wie kan er een verdienen?
 
-Alleen spelers met een spelersplek én een account. Het account komt uit de spelersplek die de engine zelf bijhoudt: het account waarmee iemand de kamer maakte of meedeed. Een client kan nooit zelf een account opgeven.
+Alleen spelers met een spelersplek én een account. Het account komt uit de spelersplek die de server zelf bijhoudt: het account waarmee iemand de kamer maakte of meedeed. Een client kan nooit zelf een account opgeven.
 
 - Gasten, een aparte spelleider zonder spelersplek en het gedeelde scherm krijgen nooit een achievement. Een meespelende maker heeft wel een spelersplek en kan ze dus verdienen.
 - Elke achievement verdien je één keer per spel. Nog een keer verdienen verandert niets.
-- De engine bewaart titel en beschrijving zoals ze waren op het moment van verdienen. Ze blijven staan als het spel later verandert, wordt uitgezet of verdwijnt.
+- Titel en beschrijving blijven bewaard zoals ze waren op het moment van verdienen. Ze blijven staan als het spel later verandert, wordt uitgezet of verdwijnt.
 
 ## Wie kent ze toe?
 
 Dat hangt af van de [runtime](runtimes.md) van het spel.
 
-### Serverspellen
+### Ingebouwde spellen
 
-Bij Common Dice en Jeopardy beslist de engine zelf, in Rust, aan het eind van een ronde: bij de overgang van `running` naar `finished`. De achievements worden opgeslagen in dezelfde transactie als de resultaten en de afgeronde kamer. Lukt opslaan niet, dan is er niets toegekend.
+Bij Common Dice en Jeopardy beslist de server zelf, aan het eind van een ronde: bij de overgang van `running` naar `finished`.
 
 | Spel | Id | Titel | Wanneer |
 | --- | --- | --- | --- |
@@ -63,11 +64,11 @@ Bij een eigen spel met `runtime: "host"` draaien de spelregels in de browser van
 await client.award(playerId, 'winnaar');
 ```
 
-Dat kan ook met het websocketbericht `award` of met [`POST /api/v1/rooms/{code}/achievements`](../api/kamers.md#post-api-v1-rooms-code-achievements) en de hostsleutel. De engine controleert:
+De server controleert elke toekenning:
 
 | Regel | Anders |
 | --- | --- |
-| Het spel heeft `runtime: "host"` | `403 forbidden`: bij een serverspel kent de server toe |
+| Het spel heeft `runtime: "host"` | `403 forbidden`: bij een ingebouwd spel kent de server toe |
 | De kamer is bezig of afgerond | `409 game_not_running` |
 | De speler zit in de kamer | `404 player_not_found` |
 | De speler heeft een account | `403 not_eligible` |
@@ -80,7 +81,7 @@ Een achievement die de speler al had, geeft gewoon een bevestiging.
 
 Speelt de maker mee (`host_mode: "playing"`, sinds 0.5.1 ook in eigen spellen), dan is die een speler zoals iedereen. De host mag een achievement toekennen aan de eigen plek van de maker, `host_player_id`, als de maker met een account speelt. Wat niet kan: een spelleider die alleen leidt en met hetzelfde account ook als speler meedoet, kan zichzelf niets geven. Bij `host_mode: "tv"` (sinds 0.5.2) kan het wel: de tv is een apparaat, dus wie op de tv is ingelogd, verdient op de eigen telefoon gewoon mee.
 
-Dit is een bewuste keuze over vertrouwen. Een spelleider kan de achievements van **dat ene spel** toekennen aan andere spelers in **zijn eigen kamer**. Omdat de spelcode in de browser van de host draait, kan de server niet controleren of iemand de achievement echt verdiende. Daarom bewaart de engine deze achievements apart, zie hieronder. Resultaten en statistieken blijven alleen voor serverspellen.
+Dit is een bewuste keuze over vertrouwen. Een spelleider kan de achievements van **dat ene spel** toekennen aan andere spelers in **zijn eigen kamer**. Omdat de spelcode in de browser van de host draait, kan de server niet controleren of iemand de achievement echt verdiende. Daarom staan deze achievements apart op het account, zie hieronder. Resultaten en statistieken blijven alleen voor de ingebouwde spellen.
 
 Een host die een ronde afsluit, kan zo de winnaar belonen:
 
@@ -101,19 +102,19 @@ Elke verdiende achievement heeft een `source`:
 
 | `source` | Toegekend door | Gecontroleerd door de server |
 | --- | --- | --- |
-| `server` | De engine, bij een serverspel | Ja |
+| `server` | De server, bij een ingebouwd spel | Ja |
 | `game` | De host van een eigen spel | Nee |
 
 De accountpagina op `/home/account` toont ze in twee groepen. Onder **Achievements** staan die van de server, per spel. Onder **Toegekend door eigen spellen** staan die van eigen spellen, met de uitleg dat het spel ze zelf gaf en de server ze niet heeft gecontroleerd. Die tweede groep verschijnt alleen als er iets in staat.
 
-Lees ze zelf met [`GET /api/v1/accounts/achievements`](../api/accounts.md#get-api-v1-accounts-achievements), of met `api.achievements()` in de SDK.
+Lees ze met [`api.achievements()`](../sdk/api-client.md#achievements-accounttoken) in de SDK.
 
 ## Vieren in het spel
 
-Verdient een speler een achievement voor het eerst, dan stuurt de engine de hele kamer een bericht:
+Verdient een speler een achievement voor het eerst, dan krijgt iedereen in de kamer het event `achievement`:
 
-```json
-{ "type": "achievement", "player_id": "…", "achievement": { "id": "winnaar", "title": "Winnaar", "description": "Win een show met je team." } }
+```js
+{ player_id: '…', achievement: { id: 'winnaar', title: 'Winnaar', description: 'Win een show met je team.' } }
 ```
 
 Het hoort niet bij de spelstand: het heeft geen versie en staat niet in de snapshot. Het komt niet als iemand de achievement al had. Wie op dat moment niet verbonden is, mist het bericht, maar de achievement staat gewoon op het account.

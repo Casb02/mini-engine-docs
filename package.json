@@ -2,7 +2,7 @@
   "name": "mini-engine-docs",
   "private": true,
   "type": "module",
-  "description": "Statische documentatiesite voor Mini Engine en de Mini Engine SDK",
+  "description": "Statische documentatiesite voor de Mini Engine SDK, de CLI en het merk",
   "scripts": {
     "build": "node build.mjs",
     "serve": "node scripts/serve.mjs",

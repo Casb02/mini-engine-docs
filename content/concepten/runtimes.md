@@ -1,51 +1,45 @@
 ---
 title: Runtimes
-description: Het verschil tussen spellen waarvan de regels in Rust op de server draaien en spellen waarvan de regels in de browser van de spelleider draaien.
-section: Concepten
+description: Waarom de regels van een eigen spel in het tabblad van de spelleider draaien, hoe een actie daar aankomt, en wat er anders is bij de ingebouwde spellen.
+section: SDK
+group: Concepten
 order: 3
 ---
 
 # Runtimes
 
-Waar de spelregels draaien, bepaalt het manifestveld `runtime`. Er zijn twee soorten.
+Waar de spelregels draaien, bepaalt het manifestveld `runtime`. Een eigen spel gebruikt altijd `"host"`: de regels draaien in het browsertabblad van wie de kamer maakte. Ook uploads moeten `"host"` zijn.
 
-| | `server` | `host` |
-| --- | --- | --- |
-| Spelregels | In Rust, in de engine | In het browsertabblad van de spelleider |
-| Spellen | Common Dice en Jeopardy | Elk eigen spel, zoals de scaffolder ze maakt |
-| Tabblad van de maker | Mag dicht (Common Dice zonder spelleider) | Moet open blijven |
-| `set_state` | Geweigerd, ook voor de host | Zo publiceert de host de nieuwe spelstand |
-| Acties | Verwerkt en opgeslagen door de server | Doorgestuurd naar de host |
-| Deduplicatie met `action_id` | Ja, begrensd | Nee |
-| Accountresultaten | Ja, bij afronden van de ronde | Nee |
-| [Achievements](achievements.md) | De server kent ze toe bij afronden van de ronde | De host kent ze toe; ze staan apart, als niet gecontroleerd |
-| [Eigen sets](eigen-sets.md) | De engine gebruikt de set in plaats van `data.json` | De host leest de set met `gameData()` |
-| [Realtime](realtime.md) | Ja | Ja |
-| Spelleidermodi | Zoals het spel aangeeft | `moderator`, sinds 0.5.1 `playing` en sinds 0.5.2 `tv`; nooit `hostless` |
+`"server"` is er alleen voor de twee ingebouwde spellen, Common Dice en Jeopardy. Hun regels draaien op de server. Een manifest kan die runtime niet toevoegen.
 
-## Serverruntime
+## Hoe een eigen spel werkt
 
-De twee ingebouwde spellen draaien hun regels in Rust. Hun browserpagina's renderen snapshots en sturen acties; ze bepalen niets. Common Dice kiest de worp op de server, Jeopardy verwerkt buzzers, antwoorden en scores op de server. Elk apparaat ziet daardoor dezelfde uitkomst.
-
-Een geslaagde serveractie is opgeslagen voordat de nieuwe snapshot zichtbaar wordt. Lukt opslaan niet, dan blijft de oude spelstand staan.
-
-> Alleen een veld `"runtime": "server"` in een manifest installeert geen nieuwe serverregels. De engine kent alleen de runtimes van Common Dice en Jeopardy. Een nieuw serverspel vraagt een wijziging in de engine, met tests.
-
-## Hostruntime
-
-Bij een eigen spel is het tabblad van de spelleider de scheidsrechter. De flow:
+Bij een eigen spel is het tabblad van de spelleider de scheidsrechter:
 
 1. Een speler stuurt een actie, bijvoorbeeld `vote` met `{ "yes": true }`.
-2. De engine stuurt die actie door naar de verbonden host, met de echte `player_id` van de afzender.
-3. De host controleert de actie en publiceert de volledige nieuwe spelstand met `set_state`.
-4. De engine slaat de state op en stuurt elke rol zijn projectie.
+2. Mini Engine stuurt die actie door naar de verbonden host, met de echte `player_id` van de afzender.
+3. De host controleert de actie en publiceert de volledige nieuwe spelstand met `setState`.
+4. Mini Engine slaat de state op en stuurt elke rol zijn projectie.
 
-Speelt de maker mee (`host_mode: "playing"`), dan stuurt de hostpagina geen actie voor de eigen zetten: de hostverbinding mag geen `action` sturen. De hostpagina past die zetten zelf toe en publiceert de nieuwe spelstand met `set_state`, net als bij stap 3. Zie [spelleidermodi](spelleidermodi.md#meespelen-in-een-eigen-spel).
+Speelt de maker mee (`host_mode: "playing"`), dan stuurt de hostpagina geen actie voor de eigen zetten: de hostverbinding mag geen `action` sturen. De hostpagina past die zetten zelf toe en publiceert de nieuwe spelstand met `setState`, net als bij stap 3. Zie [spelleidermodi](spelleidermodi.md#meespelen-in-een-eigen-spel).
 
 Dit vraagt een verbonden host. Is de host offline, dan geeft een speleractie `409 host_offline`. Een bevestiging (ack) van zo'n actie betekent alleen dat de actie in de wachtrij van de host staat, niet dat de host haar verwerkt heeft. Acties kunnen bij uitval verloren gaan.
 
-De hostruntime is gemaakt voor vertrouwde spellen binnen je vriendengroep. Hoe je zo'n host schrijft, staat bij [de browserhost schrijven](../game-bouwen/browserhost.md).
+Hoe je zo'n host schrijft, staat bij [de browserhost schrijven](../game-bouwen/browserhost.md).
 
-## Welke kies ik?
+## Wat dat betekent
 
-Voor een eigen spel is de keuze gemaakt: `host`, ook voor uploads. De scaffolder genereert een werkend voorbeeld. Wil je dat de engine zelf de regels bewaakt, of dat resultaten in accountstatistieken komen, dan moet de regelverwerking als Rust-runtime in de engine komen. Achievements kan een eigen spel wel toekennen, maar die toont de accountpagina apart, omdat de server ze niet kan controleren.
+| | Eigen spel (`host`) | Ingebouwd spel (`server`) |
+| --- | --- | --- |
+| Spelregels | In het tabblad van de spelleider | Op de server |
+| Tabblad van de maker | Moet open blijven | Mag dicht bij `hostless` |
+| `setState` | Zo publiceert de host de nieuwe spelstand | Geweigerd, ook voor de host |
+| Acties | Doorgestuurd naar de host | Verwerkt door de server |
+| Ontdubbelen met `action_id` | Nee; de host krijgt elke actie | Ja, begrensd |
+| Accountresultaten | Nee | Ja, bij afronden van de ronde |
+| [Achievements](achievements.md) | De host kent ze toe; ze staan apart, als niet gecontroleerd | De server kent ze toe |
+| [Eigen sets](eigen-sets.md) | De host leest de set met `gameData()` | De server gebruikt de set |
+| [Realtime](realtime.md) | Ja | Ja |
+| [Spelleidermodi](spelleidermodi.md) | `playing`, `tv` en `moderator`; nooit `hostless` | Zoals het spel aangeeft |
+
+De hostruntime is gemaakt voor spellen binnen je vriendengroep. De server controleert wie een actie stuurde, maar niet of de host de regels eerlijk toepast. Daarom tellen scores uit eigen spellen niet mee in de accountstatistieken, en staan hun achievements apart op het account.

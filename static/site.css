@@ -194,18 +194,6 @@ body {
   align-self: center;
 }
 
-.header-pdf {
-  font-size: 0.9375rem;
-  color: var(--text);
-  text-decoration: none;
-  padding: 6px 12px;
-  border: 1px solid var(--line);
-  border-radius: var(--me-r-klein);
-  white-space: nowrap;
-}
-.header-pdf:hover {
-  border-color: var(--muted);
-}
 
 .shell {
   display: grid;
@@ -248,6 +236,15 @@ body {
   font-size: 0.9375rem;
   letter-spacing: -0.01em;
   color: var(--text);
+}
+.nav-subheading {
+  margin: var(--me-s4) 0 var(--me-s1);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.nav-heading + .nav-subheading {
+  margin-top: 0;
 }
 .nav ul {
   list-style: none;
@@ -923,10 +920,6 @@ blockquote > :last-child {
   }
   .sidebar {
     display: none;
-  }
-  .header-pdf {
-    font-size: 0.875rem;
-    padding: 5px 10px;
   }
   .menu {
     display: block;

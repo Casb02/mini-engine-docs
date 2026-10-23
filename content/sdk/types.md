@@ -1,14 +1,15 @@
 ---
 title: Types
 description: De belangrijkste TypeScript-types van de SDK, zoals Snapshot met host_player_id, Manifest met icon, RoomCredentials, ActionPayloads, de realtimetypes, achievements en sets, en waar het volledige declaratiebestand staat.
-section: SDK-referentie
-order: 6
+section: SDK
+group: Referentie
+order: 5
 toc_depth: 3
 ---
 
 # Types
 
-De SDK is in TypeScript geschreven. Alle declaraties staan in één bestand: [`types/mini-engine.d.ts`](https://github.com/Casb02/mini-engine-sdk/blob/main/types/mini-engine.d.ts) in de SDK-repository. Het wordt bij `npm run build` uit `src/` gegenereerd. De engine heeft een kopie in `web/mini-engine.d.ts`, en de scaffolder zet er een in `types/` van elk nieuw spel.
+De SDK is in TypeScript geschreven. Alle declaraties staan in één bestand: [`types/mini-engine.d.ts`](https://github.com/Casb02/mini-engine-sdk/blob/main/types/mini-engine.d.ts) in de SDK-repository. Het wordt bij `npm run build` uit `src/` gegenereerd. De scaffolder zet een kopie in `types/` van elk nieuw spel, en Mini Engine en `me dev` serveren het op `/sdk/mini-engine.d.ts`.
 
 ## Gebruik in gewone JavaScript
 
@@ -65,7 +66,7 @@ interface Snapshot<PublicState = Json, Settings = Record<string, Json>, PrivateS
 }
 ```
 
-`host_player_id` is optioneel in het type, omdat een engine van vóór 0.5.1 het veld niet stuurt. Een engine van 0.5.1 stuurt het altijd, aan iedere rol: de `player_id` van de maker als die meespeelt, anders `null`. Zie [spelleidermodi](../concepten/spelleidermodi.md#meespelen-in-een-eigen-spel).
+`host_player_id` is optioneel in het type, omdat Mini Engine het vóór 0.5.1 niet stuurde. Sinds 0.5.1 komt het altijd mee, aan iedere rol: de `player_id` van de maker als die meespeelt, anders `null`. Zie [spelleidermodi](../concepten/spelleidermodi.md#meespelen-in-een-eigen-spel).
 
 ### Player
 
@@ -147,11 +148,11 @@ interface SettingsProperty {
 }
 ```
 
-`icon` is het pad van een SVG-icoon in het package, sinds SDK 0.5.1 (engine 0.5.1). De regels staan bij [package en manifest](../game-bouwen/package-en-manifest.md#icon). Een manifest zonder `host_modes` geldt als `['moderator']`; een nieuw spel uit de scaffolder heeft sinds 0.5.2 `['playing', 'tv']` met `default_host_mode: 'playing'`.
+`icon` is het pad van een SVG-icoon in het package, sinds SDK 0.5.1 (Mini Engine 0.5.1). De regels staan bij [package en manifest](../game-bouwen/package-en-manifest.md#icon). Een manifest zonder `host_modes` geldt als `['moderator']`; een nieuw spel uit de scaffolder heeft sinds 0.5.2 `['playing', 'tv']` met `default_host_mode: 'playing'`.
 
 ### Achievements en soorten sets
 
-Sinds SDK 0.5.0 (engine 0.5).
+Sinds SDK 0.5.0 (Mini Engine 0.5).
 
 ```ts
 interface AchievementDefinition {
@@ -198,7 +199,7 @@ De waarde van het event `achievement`.
 
 ### Realtime
 
-Sinds SDK 0.5.0 (engine 0.5).
+Sinds SDK 0.5.0 (Mini Engine 0.5).
 
 ```ts
 interface RealtimeFrom { role: Role; player_id: string | null }
@@ -260,18 +261,18 @@ interface AccountStats {
 }
 ```
 
-`email` en `email_verified` zijn er sinds SDK 0.3.1 (engine 0.4). `email` is `null` bij een account zonder adres.
+`email` en `email_verified` zijn er sinds SDK 0.3.1 (Mini Engine 0.4). `email` is `null` bij een account zonder adres.
 
 ### Achievements van een account
 
-Sinds SDK 0.5.0 (engine 0.5).
+Sinds SDK 0.5.0 (Mini Engine 0.5).
 
 ```ts
 type AchievementSource = 'server' | 'game';
 
 interface AccountAchievement {
   game_id: string;
-  game_title: string | null; // huidige titel, of null als de engine het spel niet meer kent
+  game_title: string | null; // huidige titel, of null als de server het spel niet meer kent
   id: string;
   title: string;
   description: string;
@@ -282,7 +283,7 @@ interface AccountAchievement {
 
 ### Sets
 
-Sinds SDK 0.5.0 (engine 0.5).
+Sinds SDK 0.5.0 (Mini Engine 0.5).
 
 ```ts
 interface SetSummary {

@@ -1,8 +1,9 @@
 ---
 title: Pagina's per rol
 description: Hoe de kamerinterface host.html, player.html en display.html laadt, hoe een pagina verbindt en hoe je snapshots rendert.
-section: Een game bouwen
-order: 3
+section: SDK
+group: Een game bouwen
+order: 2
 ---
 
 # Pagina's per rol
@@ -11,7 +12,7 @@ Elk spel heeft een pagina per rol: `host.html`, `player.html` en, als het spel e
 
 ## Hoe een pagina laadt
 
-1. De pagina's onder `/home` bewaren de kamersleutel in `sessionStorage` en openen `/room/CODE/ROL`.
+1. De pagina's onder `/home` van Mini Engine bewaren de kamersleutel in `sessionStorage` en openen `/room/CODE/ROL`. `me dev` doet hetzelfde voor elke stoel.
 2. De kamerinterface op die URL vraagt de openbare kamerinfo op en laadt de spelpagina in een iframe: `/api/v1/games/{id}/{rol}?room=CODE`.
 3. Je spelpagina leest de code uit `?room=` en haalt de sleutel uit de sessie.
 

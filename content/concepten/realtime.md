@@ -1,7 +1,8 @@
 ---
 title: Realtime
 description: Snelle events en live waarden in een kamer, naast de opgeslagen spelstand. Wat het is, events tegenover waarden, de grenzen, verlies en volgorde, met een buzzer en kartposities als voorbeeld.
-section: Concepten
+section: SDK
+group: Concepten
 order: 6
 toc_depth: 3
 ---
@@ -10,17 +11,17 @@ toc_depth: 3
 
 Sinds 0.5 heeft een kamer naast de opgeslagen spelstand een tweede kanaal: realtime. Daarover gaan kleine berichten die snel moeten zijn en niet bewaard hoeven te worden. Wie als eerste drukte, een emoji, de positie van een kart dertig keer per seconde.
 
-Realtime loopt over dezelfde websocket als de snapshots, maar staat los van de spelstand. De engine bewaart realtime alleen in het geheugen, verhoogt er de versie niet mee en bevestigt niets.
+Realtime loopt over dezelfde websocket als de snapshots, maar staat los van de spelstand. Mini Engine slaat realtime niet op, verhoogt er de versie niet mee en bevestigt niets.
 
 ## Spelstand of realtime?
 
 | | Spelstand (state) | Realtime |
 | --- | --- | --- |
-| Opgeslagen | In SQLite; overleeft een herstart | Alleen in het geheugen van de engine |
+| Opgeslagen | Ja; overleeft een herstart van de server | Nee; alleen zolang de server draait |
 | Versie | Elke wijziging verhoogt `version` | Raakt `version` niet |
 | Bevestiging | Een `ack` nadat het is opgeslagen | Geen `ack` |
 | Verlies | Na een `ack` gaat niets verloren | Berichten kunnen wegvallen |
-| Wie schrijft | De host of de server, volgens de spelregels | Iedere rol: host, spelers en scherm |
+| Wie schrijft | De host, volgens de spelregels | Iedere rol: host, spelers en scherm |
 | Waarvoor | Spelregels, beurten, scores, de uitslag | Buzzers, reacties, cursors, posities, geluidjes |
 
 Vuistregel: alles wat telt voor de uitslag, hoort in de spelstand. Realtime is voor wat je ziet en hoort terwijl het gebeurt.
@@ -49,15 +50,15 @@ De afzender krijgt zijn eigen event niet terug, tenzij hij `echo` aanzet.
 
 Een waarde is een live stand per afzender en sleutel, bijvoorbeeld `kart` of `cursor`. De laatste waarde wint. Wie later binnenkomt, krijgt meteen alle huidige waarden. Gebruik waarden voor posities, cursors en "is aan het typen".
 
-- De engine bewaart waarden per afzender: `host`, `display` of een speler-id. Een meespelende host schrijft als `host`. Niemand kan de waarden van een ander overschrijven.
+- Waarden staan per afzender: `host`, `display` of een speler-id. Een meespelende host schrijft als `host`. Niemand kan de waarden van een ander overschrijven.
 - `null` als waarde wist de sleutel.
 - Een speler die even wegvalt, houdt zijn waarden. Ze verdwijnen als hij de kamer verlaat of wordt verwijderd; iedereen krijgt dan per sleutel de waarde `null`.
 - De host kan alle waarden in de kamer in één keer wissen.
-- Alle waarden verdwijnen als de kamer sluit of verloopt, en bij een herstart van de engine.
+- Alle waarden verdwijnen als de kamer sluit of verloopt, en bij een herstart van de server.
 
 ## Afzender en tijd
 
-De engine zet `from` en `ts` zelf op elk bericht. `from` zegt wie het stuurde, met rol en speler-id. `ts` is het moment waarop de engine het bericht ontving, in milliseconden sinds de Unix-epoch. Niemand kan hem vervalsen, en je vergelijkt alle telefoons op één klok, niet op hun eigen klokken.
+De server zet `from` en `ts` zelf op elk bericht. `from` zegt wie het stuurde, met rol en speler-id. `ts` is het moment waarop de server het bericht ontving, in milliseconden sinds de Unix-epoch. Niemand kan hem vervalsen, en je vergelijkt alle telefoons op één klok, niet op hun eigen klokken.
 
 Een client kan `from` en `ts` niet meesturen; een bericht dat het probeert, wordt geweigerd. De `data` en `value` zelf komen wel van de client en zijn net zo onbetrouwbaar als actiedata.
 
@@ -66,10 +67,10 @@ Een client kan `from` en `ts` niet meesturen; een bericht dat het probeert, word
 Realtime ruilt zekerheid in voor snelheid. Dat is het contract:
 
 - **Geen bevestiging, geen herhaling.** Een event dat niet aankomt, komt niet meer. De SDK zet realtime nooit in een wachtrij en stuurt na een herverbinding niets opnieuw.
-- **Berichten kunnen wegvallen.** Stuurt een verbinding meer dan zijn budget, dan laat de engine de rest stilletjes vallen en meldt dat met `rt.throttled`. De verbinding blijft open.
+- **Berichten kunnen wegvallen.** Stuurt een verbinding meer dan zijn budget, dan laat de server de rest stilletjes vallen en meldt dat met het event `throttled`. De verbinding blijft open.
 - **Een trage ontvanger mist berichten.** Loopt een apparaat te ver achter, dan slaat het realtimeberichten over. Zijn snapshots komen gewoon binnen en zijn verbinding blijft staan.
 - **Geen volgorde ten opzichte van snapshots.** Een event kan vóór of na de snapshot van een bijbehorende actie aankomen. Reken daar niet op.
-- **Waarden herstellen zich.** Omdat de laatste waarde wint, maakt een gemiste tussenstand niet uit. Na een herverbinding bouwt de SDK alle waarden opnieuw op uit de lijst die de engine bij het verbinden stuurt.
+- **Waarden herstellen zich.** Omdat de laatste waarde wint, maakt een gemiste tussenstand niet uit. Na een herverbinding bouwt de SDK alle waarden opnieuw op uit de lijst die de server bij het verbinden stuurt.
 
 Realtime werkt in elke fase van de kamer: lobby, `running` en `finished`.
 
@@ -83,13 +84,13 @@ Realtime werkt in elke fase van de kamer: lobby, `running` en `finished`.
 | Berichten per verbinding | 60 per seconde, met pieken tot 120. Dit budget staat los van dat voor opdrachten. |
 | Sleutels per afzender | 64 |
 | Waarden per kamer | 256 KiB samen |
-| Melding `rt.throttled` | Hoogstens eens per 5 seconden per verbinding |
+| Event `throttled` | Hoogstens eens per 5 seconden per verbinding |
 
-Komt een waarde boven de grens van 64 sleutels of 256 KiB, dan laat de engine haar vallen en telt ze mee in `rt.throttled`. Een ongeldig bericht, zoals een verkeerde kanaalnaam, te veel data of een onbekende ontvanger, geeft een `error` met `invalid_request`. Alleen de host mag alle waarden wissen; anderen krijgen `forbidden`.
+Komt een waarde boven de grens van 64 sleutels of 256 KiB, dan valt ze weg en telt ze mee in `throttled`. Een ongeldig bericht, zoals een verkeerde kanaalnaam, te veel data of een onbekende ontvanger, geeft het event `error` met `invalid_request`. Alleen de host mag alle waarden wissen; anderen krijgen `forbidden`.
 
 ## Voorbeeld: een buzzer
 
-Jeopardy laat zien hoe realtime en acties samenwerken. De `buzz` blijft de actie die telt: de server beslist wie de vraag mag beantwoorden en slaat dat op. Tegelijk stuurt de speler een event `pressed`. Host en scherm tonen daarmee meteen wie er drukte, in volgorde en met het verschil in milliseconden, zoals *Sander +14 ms*. Dat is het verschil in aankomst bij de engine, niet in het moment van drukken: netwerkvertraging telt mee.
+Jeopardy laat zien hoe realtime en acties samenwerken. De `buzz` blijft de actie die telt: daarmee wordt beslist wie de vraag mag beantwoorden, en dat komt in de spelstand. Tegelijk stuurt de speler een event `pressed`. Host en scherm tonen daarmee meteen wie er drukte, in volgorde en met het verschil in milliseconden, zoals *Sander +14 ms*. Dat is het verschil in aankomst bij de server, niet in het moment van drukken: netwerkvertraging telt mee.
 
 Op de spelerspagina:
 
@@ -158,5 +159,4 @@ Wie als eerste over de streep komt, telt voor de uitslag. Leg dat vast met een a
 ## Verder lezen
 
 - De methoden staan bij [de websocketclient](../sdk/realtime-client.md#realtime): `client.realtime.emit`, `on`, `set`, `value`, `onValue` en `reset`.
-- Wat er precies over de lijn gaat, staat bij [het websocketprotocol](../api/websocket.md#realtime).
 - Waarom realtime los staat van versies en bevestigingen: [state en versies](state-en-versies.md#realtime-staat-erbuiten).

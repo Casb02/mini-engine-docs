@@ -1,31 +1,34 @@
 ---
 title: Package en manifest
-description: De mapstructuur van een gamepackage, alle velden van manifest.json met icon, host_modes, achievements en set_kinds, het settings_schema en de grenzen die de engine controleert.
-section: Een game bouwen
-order: 2
+description: De mapstructuur van een gamepackage, alle velden van manifest.json met icon, host_modes, achievements en set_kinds, het settings_schema en de grenzen die gecontroleerd worden.
+section: SDK
+group: Een game bouwen
+order: 1
 toc_depth: 3
 ---
 
 # Package en manifest
 
-Een spel is een map in `games/` van de engine (of de map uit `MINI_ENGINE_GAMES`). De engine laadt alle packages bij het opstarten en weigert te starten als er een ongeldig package tussen zit.
+Een spel is een map met een `manifest.json`, de pagina's per rol en een map `assets/`. `me dev` en `me game upload` controleren het package met dezelfde regels als de server, zodat je een fout al op je eigen computer ziet.
 
 ## Mapstructuur
 
 ```text
-games/mijn-spel/
+mijn-spel/
   manifest.json      verplicht
   host.html          verplicht
   player.html        verplicht
   display.html       verplicht bij has_display: true
   assets/            publieke bestanden: scripts, stijl, beelden, geluid, icoon
   data.json          optioneel: geheime speldata voor de host
+  tests/             optioneel: je eigen tests, niet geüpload
 ```
 
-- De mapnaam is gelijk aan de `id` in het manifest: 1 tot 48 kleine ASCII-letters, cijfers of streepjes.
+- De `id` in het manifest heeft 1 tot 48 kleine ASCII-letters, cijfers of streepjes. Een nieuw spel uit de scaffolder gebruikt de slug als id en als mapnaam.
 - Alleen bestanden onder `assets/` zijn publiek, op `/games/{id}/assets/…`.
-- `data.json` leest alleen de host, via `GET /api/v1/rooms/{code}/game-data`. Zet antwoorden daar, nooit in `assets/` of in de HTML. Speelt een kamer met een [eigen set](../concepten/eigen-sets.md), dan geeft die route de set in plaats van `data.json`.
+- `data.json` leest alleen de host, met `gameData()`. Zet antwoorden daar, nooit in `assets/` of in de HTML. Speelt een kamer met een [eigen set](../concepten/eigen-sets.md), dan geeft `gameData()` de set in plaats van `data.json`.
 - Symlinks zijn niet toegestaan, net als bestanden die buiten de map wijzen.
+- `me game upload` slaat verborgen bestanden, `node_modules/`, `tests/` en de patronen uit `.meignore` over; zie [de me-CLI](../publiceren/cli.md#wat-me-game-upload-meestuurt).
 
 ### Grenzen van een package
 
@@ -69,7 +72,7 @@ Het manifest van het stemspel uit de scaffolder:
 
 | Veld | Type | Regel |
 | --- | --- | --- |
-| `id` | string | Gelijk aan de mapnaam |
+| `id` | string | 1 tot 48 kleine letters, cijfers of streepjes; uniek op de server |
 | `title` | string | Niet leeg, maximaal 200 bytes |
 | `description` | string | Maximaal 4000 bytes |
 | `version` | string | Niet leeg, maximaal 100 bytes |
@@ -86,9 +89,9 @@ Het manifest van het stemspel uit de scaffolder:
 | `achievements` | lijst | Optioneel, sinds 0.5. Hoogstens 50; zie [achievements](#achievements) |
 | `set_kinds` | lijst | Optioneel, sinds 0.5. Hoogstens 4 soorten eigen sets; zie [set_kinds](#set-kinds) |
 
-Kies `supports_late_join` voor een nieuw spel bewust. De kamer zet later aansluiten pas aan met `allow_late_join: true`, en de engine weigert dat als het spel het niet ondersteunt.
+Kies `supports_late_join` voor een nieuw spel bewust. De kamer zet later aansluiten pas aan met `allow_late_join: true`, en dat wordt geweigerd als het spel het niet ondersteunt.
 
-`runtime: "server"` kan alleen voor de ingebouwde spellen `common-dice` en `jeopardy`. Een manifest alleen installeert geen serverregels.
+`runtime: "server"` is er alleen voor de ingebouwde spellen Common Dice en Jeopardy. Een eigen spel gebruikt altijd `"host"`; zie [runtimes](../concepten/runtimes.md).
 
 ### host_modes
 
@@ -99,7 +102,7 @@ Kies `supports_late_join` voor een nieuw spel bewust. De kamer zet later aanslui
 | `"host"` | `"playing"`, `"tv"` en `"moderator"`, in elke combinatie. `playing` sinds 0.5.1, `tv` sinds 0.5.2; daarvoor alleen `["moderator"]` |
 | `"server"` | `"moderator"`, `"playing"` en `"hostless"`, zoals het ingebouwde spel aangeeft |
 
-`hostless` kan niet bij `runtime: "host"`: zonder een verbonden hosttabblad is er geen scheidsrechter. Een lege lijst, `hostless` bij een eigen spel of een `default_host_mode` die niet in de lijst staat, weigert de engine met *Invalid runtime or unsupported host modes.*
+`hostless` kan niet bij `runtime: "host"`: zonder een verbonden hosttabblad is er geen scheidsrechter. Een lege lijst, `hostless` bij een eigen spel of een `default_host_mode` die niet in de lijst staat, weigeren `me dev`, `me game upload` en de server.
 
 Een gezelschapsspel (bord, kaart, dobbel, tekenen) biedt `["playing", "tv"]` met `playing` als standaard, zoals in het voorbeeld hierboven: *Iedereen doet mee* of *TV*. Zo zet `me game new` het sinds 0.5.2 ook. Gebruik `moderator` alleen als de maker echt alleen leidt, zoals een quizmaster die de antwoorden kent:
 
@@ -118,7 +121,7 @@ Sinds 0.5.1 kan een spel een eigen icoon meenemen. De startpagina, de lijst met 
 "icon": "assets/icon.svg"
 ```
 
-De engine controleert het icoon bij het opstarten en bij elke upload, en `me game upload` en `me dev` doen dat al op je eigen computer:
+De server controleert het icoon bij elke upload, en `me game upload` en `me dev` doen dat al op je eigen computer:
 
 | Regel | Waarde |
 | --- | --- |
@@ -128,9 +131,9 @@ De engine controleert het icoon bij het opstarten en bij elke upload, en `me gam
 | Inhoud | Geldige UTF-8 en bevat `<svg` |
 | Niet toegestaan | `<script`, `<foreignObject`, `javascript:` en event-attributen zoals `onload=`, ongeacht hoofdletters |
 
-Een fout geeft *Invalid icon: …* met de reden.
+Klopt het icoon niet, dan noemen `me dev` en `me game upload` de reden (*manifest.json: icon …*); de server weigert een upload met *Invalid icon: …*.
 
-De pagina's van de engine laden het icoon als `<img alt="">`, vanaf het gewone assetadres van de actieve versie: `/games/{id}/{icon}?v={version}`. In een `<img>` voert de browser geen scripts uit een SVG uit.
+De pagina's van Mini Engine laden het icoon als `<img alt="">`, vanaf het gewone assetadres van de actieve versie: `/games/{id}/{icon}?v={version}`. In een `<img>` voert de browser geen scripts uit een SVG uit.
 
 Zo ontwerp je een icoon dat in de lijst past:
 
@@ -148,7 +151,7 @@ Zo ontwerp je een icoon dat in de lijst past:
 
 ## settings_schema
 
-Het instellingenschema is een kleine, strikte subset van JSON Schema. De engine controleert het schema en de standaardwaarden bij het opstarten, en elke instellingenwijziging daarna.
+Het instellingenschema is een kleine, strikte subset van JSON Schema. Het schema en de standaardwaarden worden gecontroleerd bij `me dev` en bij elke upload, en de instellingen van elke kamer daarna.
 
 Op het hoogste niveau:
 
@@ -171,7 +174,7 @@ Per instelling:
 | `title`, `description` | Tekst |
 | `default` | Moet zelf geldig zijn |
 
-Lijsten, geneste objecten, `$ref` en andere JSON Schema-onderdelen worden bij het opstarten afgewezen met *Unsupported settings schema feature*.
+Lijsten, geneste objecten, `$ref` en andere JSON Schema-onderdelen worden afgewezen met *Unsupported settings schema feature*.
 
 Een voorbeeld met grenzen en een keuzelijst:
 
@@ -193,7 +196,7 @@ Bij het maken van een kamer worden de meegegeven instellingen over `default_sett
 
 De maker kiest de instellingen in het formulier voor een nieuwe kamer. Daarna liggen ze in de praktijk vast. Toon ze in je spel als gewone tekst, bijvoorbeeld een korte regel *Regels: 5 rondes, 30 seconden per vraag*, en zet er geen knoppen of velden bij om ze te wijzigen.
 
-`setSettings` en `PUT /api/v1/rooms/{code}/settings` bestaan nog voor een spel dat het echt nodig heeft. Maar regels die veranderen terwijl mensen spelen, maken een spel oneerlijk. En een formulier dat bij elke snapshot opnieuw rendert, verliest makkelijk een klik.
+`setSettings` bestaat nog voor een spel dat het echt nodig heeft. Maar regels die veranderen terwijl mensen spelen, maken een spel oneerlijk. En een formulier dat bij elke snapshot opnieuw rendert, verliest makkelijk een klik.
 
 ## achievements
 
@@ -212,7 +215,7 @@ Sinds 0.5 kan een spel [achievements](../concepten/achievements.md) declareren:
 | `title` | 1 tot 60 tekens, niet leeg, geen controletekens |
 | `description` | 1 tot 160 tekens, niet leeg, geen controletekens |
 
-In een eigen spel kent de host ze toe met `client.award(playerId, achievementId)`. De engine bewaart ze apart van die van serverspellen, omdat de server ze niet kan controleren.
+In een eigen spel kent de host ze toe met `client.award(playerId, achievementId)`. Ze staan op het account apart van die van de ingebouwde spellen, omdat de server ze niet kan controleren.
 
 ## set_kinds
 
@@ -247,14 +250,18 @@ De host leest de gekozen set met `gameData()`, en de snapshot noemt hem in `room
 
 ## Controle
 
-De engine controleert het hele manifest, ook `icon`, `achievements` en `set_kinds`, bij het opstarten en bij elke upload. Een fout in een lokaal package laat de engine niet starten; een fout in een upload geeft `400 invalid_request` met de reden.
+Het hele manifest, ook `icon`, `achievements` en `set_kinds`, wordt op drie plekken met dezelfde regels gecontroleerd:
+
+- `me dev` toont een fout in het overzicht en in de terminal, en laadt opnieuw zodra je hem hebt opgelost.
+- `me game upload` controleert het package voordat er iets wordt verstuurd.
+- De server controleert elke upload nog eens en weigert een ongeldig package met `400 invalid_request` en de reden.
 
 ## HTML en assets
 
-- Verwijs naar assets en de SDK met absolute paden: `/games/mijn-spel/assets/app.js` en `/sdk/mini-engine.js`.
-- De engine stuurt een strikte Content-Security-Policy mee: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'`. Inline `<script>`-blokken en scripts, lettertypes of beelden van een CDN werken dus niet. Zet alles in `assets/`.
+- Verwijs naar assets en de SDK met absolute paden: `/games/mijn-spel/assets/app.js` en `/sdk/mini-engine.js`. Imports tussen je eigen modules schrijf je relatief; zie [versies en kamers](../publiceren/versies.md).
+- Mini Engine stuurt een strikte Content-Security-Policy mee: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'`. Inline `<script>`-blokken en scripts, lettertypes of beelden van een CDN werken dus niet. Zet alles in `assets/`. `me dev` stuurt dezelfde policy mee.
 - Inline stijlen en `data:`-beelden mogen wel.
 
 ## Vertrouwen
 
-Lokaal geïnstalleerde packages zijn vertrouwde code op dezelfde origin als de engine. Ze kunnen kamersleutels en de accountsleutel uit de browser lezen. Uploaden kan vanaf 0.3 alleen met een dev-key van de eigenaar; zie [je game publiceren](../publiceren/overzicht.md). Bekijk een package voordat je het installeert.
+Een spel draait op dezelfde origin als de pagina's van Mini Engine. Het kan de kamersleutel van dat tabblad en een eventuele accountsessie uit de browser lezen. Daarom kan alleen publiceren wie een dev-key heeft; zie [je game publiceren](../publiceren/overzicht.md). Gebruik in je spel alleen code die je zelf begrijpt.

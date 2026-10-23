@@ -1,7 +1,7 @@
 ---
 title: Versies en kamers
 description: Hoe versies werken, waarom een kamer zijn versie houdt en hoe je terugrolt of opruimt.
-section: Publiceren
+section: CLI
 order: 3
 ---
 
@@ -11,12 +11,12 @@ Elke upload is een **release**: een vaste kopie van je pakket onder het `version
 
 ## Een kamer houdt zijn versie
 
-Bij het maken van een kamer onthoudt de engine de actieve versie als `game_version`. Activeer je daarna een nieuwe versie, dan:
+Bij het maken van een kamer onthoudt Mini Engine de actieve versie als `game_version`. Activeer je daarna een nieuwe versie, dan:
 
 - krijgen **nieuwe** kamers de nieuwe versie;
 - spelen **lopende** kamers door met hun eigen versie, ook als iemand de pagina ververst of later aansluit.
 
-De engine regelt dat zelf. Hij serveert de HTML van de kamer uit de juiste release en verwijst `/games/<id>/assets/…` naar `/releases/<id>/<versie>/assets/…`. Schrijf imports tussen je eigen modules daarom **relatief**:
+Mini Engine regelt dat zelf. De pagina's van een kamer komen uit de juiste versie, en de verwijzingen naar `/games/<id>/assets/…` in je HTML wijzen dan naar de bestanden van die versie. In je JavaScript gebeurt dat niet. Schrijf imports tussen je eigen modules daarom **relatief**:
 
 ```js
 import { score } from './logic.js';      // goed: komt uit dezelfde versie
@@ -54,6 +54,6 @@ me game prune mijn-spel --keep 3     # houdt de actieve, de nieuwste 3 en versie
 
 ## Aan en uit
 
-`me game disable mijn-spel` haalt de game van `/home` en uit `GET /api/v1/games`. Nieuwe kamers kunnen dan niet meer, lopende kamers spelen door met hun eigen versie. `me game enable` zet hem terug. Sinds 0.5.1 kan dat ook op de accountpagina, onder **Mijn spellen**; zie [aan of uit vanaf de accountpagina](overzicht.md#aan-of-uit-vanaf-de-accountpagina).
+`me game disable mijn-spel` haalt de game van `/home` en uit de spellenlijst van `api.getGames()`. Nieuwe kamers kunnen dan niet meer, lopende kamers spelen door met hun eigen versie. `me game enable` zet hem terug. Sinds 0.5.1 kan dat ook op de accountpagina, onder **Mijn spellen**; zie [aan of uit vanaf de accountpagina](overzicht.md#aan-of-uit-vanaf-de-accountpagina).
 
-Blokkeert de eigenaar je game, dan is dat een noodstop: de engine serveert er niets meer van, ook niet aan lopende kamers, en je kunt hem niet zelf weer aanzetten.
+Blokkeert wie de server beheert je game, dan is dat een noodstop: er wordt niets meer van geserveerd, ook niet aan lopende kamers, en je kunt hem niet zelf weer aanzetten (`game_blocked`).
