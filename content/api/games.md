@@ -76,6 +76,9 @@ Ontbrekende manifestvelden krijgen hier hun standaardwaarde: `runtime: "host"`, 
 { "id": "vier-pionnen", "title": "Vier pionnen", "version": "0.2.0", "icon": "assets/icon.svg", "…": "…" }
 ```
 
+Sinds 0.6.1 heeft een geüpload spel ook `author`: de weergavenaam van het account dat het uploadde. De server zet dat veld, en een `author` in het manifest wordt genegeerd. De ingebouwde spellen hebben het veld niet. De site toont het als "door …" op de spelkaart.
+
+
 `achievements` en `set_kinds` zijn er sinds 0.5. Ze komen uit de actieve versie van het spel. Een kamer die een oudere versie speelt, gebruikt de achievements en soorten sets van die versie.
 
 ## GET /api/v1/games/{id}
