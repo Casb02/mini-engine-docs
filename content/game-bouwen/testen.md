@@ -1,33 +1,42 @@
 ---
-title: Testen op meerdere apparaten
-description: Een eigen spel testen, eerst snel lokaal met me dev en dan op een echte engine met spelleider, twee spelers en een gedeeld scherm, plus de geautomatiseerde controles van de SDK.
-section: Een game bouwen
-order: 5
+title: Testen
+description: Een eigen spel testen, eerst op je eigen computer met me dev en daarna als testversie op de server met telefoons, plus een checklist en geautomatiseerde controles.
+section: SDK
+group: Aan de slag
+order: 3
 ---
 
-# Testen op meerdere apparaten
+# Testen
 
-Een spel voor een hele tafel test je met een hele tafel. Je hebt minimaal een spelleider, twee spelers en een gedeeld scherm nodig. Dat kan in één browser met losse vensters, maar test ook een paar keer op echte telefoons.
+Een spel voor een hele tafel test je met een hele tafel: minimaal een spelleider, twee spelers en een gedeeld scherm. Begin op je eigen computer met `me dev`. Speel het daarna als testversie op de server, met echte telefoons.
 
-## Eerst lokaal met `me dev`
+## Eerst met `me dev`
 
-De snelste manier om te testen is `me dev` uit de [CLI](../publiceren/cli.md#me-dev), sinds CLI 0.5.0. Je hebt er geen engine voor nodig:
+`me dev` uit de [CLI](../publiceren/cli.md#me-dev) bootst Mini Engine na op je eigen computer. Vanuit de map van je spel:
 
 ```sh
-cd mijn-spel
 me dev --players 3
 ```
 
-`me dev` controleert eerst je `manifest.json` en opent dan één overzicht met de spelleider, het gedeelde scherm en de spelers naast elkaar. Elke stoel draait op een eigen poort en heeft dus een eigen sessie, net als een eigen telefoon. Sla je een bestand op, dan laden de stoelen opnieuw en blijft de kamer bestaan; herstarten hoeft niet. Hij bootst kamers, klaar zijn, state met versies, acties, realtime, achievements en game-data na. Met `--set` krijgt de game een [eigen set](../concepten/eigen-sets.md) in plaats van `data.json`.
+`me dev` controleert eerst je `manifest.json` zoals `me game upload` dat doet, en opent dan één overzicht met de spelleider, het gedeelde scherm en de spelers naast elkaar. Elke stoel draait op een eigen poort en heeft dus een eigen sessie, net als een eigen telefoon. Sla je een bestand op, dan laden de stoelen opnieuw en blijft de kamer bestaan. Kamers, klaar zijn, state met versies, acties, realtime, achievements en game-data werken zoals online. Met `--set` krijgt de game een [eigen set](../concepten/eigen-sets.md) in plaats van `data.json`.
 
-`me dev` is er voor games met `runtime: "host"`, luistert alleen op je eigen computer en blijft een nabootsing van de engine. Speel je spel daarom voor een avond met vrienden ook een keer op een echte server: op een engine op je eigen netwerk, zoals hieronder, of als testversie via `me game upload`.
+De kamer krijgt de `default_host_mode` uit je manifest. Wil je `tv` of `moderator` proberen, zet die dan even als standaard en kies **Nieuwe kamer**.
 
-## Op een echte engine
+`me dev` is er voor games met `runtime: "host"` en luistert alleen op je eigen computer; telefoons op je wifi kunnen er niet bij. Het blijft een nabootsing. Speel je spel daarom voor een avond met vrienden ook een keer als testversie op de server.
 
-1. Start de engine op je netwerk: `MINI_ENGINE_BIND=0.0.0.0:3000 cargo run`.
-2. Open `http://<LAN-IP>:3000/home` op je computer en maak een kamer.
-3. Doe mee met twee telefoons, of met twee privévensters. Kamersleutels staan in `sessionStorage` per tabblad, dus elk tabblad is een eigen deelnemer.
-4. Open het gedeelde scherm vanuit de spelleiderspagina.
+## Daarna als testversie op de server
+
+Daarvoor heb je een dev-key nodig; zie [je game publiceren](../publiceren/overzicht.md). Log één keer in met `me auth` en upload vanuit de map van je spel:
+
+```sh
+me game upload
+```
+
+- **De eerste upload van een nieuw spel is meteen live.** Het staat dan voor iedereen op de startpagina van die server.
+- **Latere versies worden pas actief met `--activate`**, of later met `me game activate`. Verhoog eerst `version` in `manifest.json`; een versie overschrijven kan niet. Nieuwe kamers krijgen de actieve versie, lopende kamers houden de hunne. Ging er iets mis, activeer dan de vorige versie. Zie [versies en kamers](../publiceren/versies.md).
+- Wil je testen zonder dat je echte spel verandert, upload dan een kopie met een eigen `id` in `manifest.json`, zoals `mijn-spel-test`. Ook die is meteen live. Zet hem na het testen uit met `me game disable mijn-spel-test`, of verwijder hem met `me game delete mijn-spel-test`.
+
+Na de upload toont de CLI het adres om een kamer te maken, zoals `https://miniengine.nl/home/new/mijn-spel`. Maak daar een kamer en laat anderen meedoen met de code of de QR-code. Wie de kamer maakte, opent het gedeelde scherm via **Kamer** → **Open het gedeelde scherm**. Heb je geen telefoons bij de hand: kamersleutels staan per browsertabblad, dus elk privévenster is een eigen deelnemer. Een gedupliceerd tabblad is dezelfde deelnemer. Meer over de pagina's van een kamer staat bij [kamers en rollen](../concepten/kamers-en-rollen.md#een-kamer-op-miniengine-nl).
 
 ## Checklist
 
@@ -50,8 +59,8 @@ me dev --players 3
 
 - Ververs een spelerspagina midden in een ronde: de stand is er meteen weer.
 - Zet een telefoon even op slot en open hem weer.
-- Sluit het spelleiderstabblad en open het opnieuw. Bij een eigen spel wachten spelers zolang; acties geven `host_offline`.
-- Herstart de engine. Opgeslagen state en sleutels blijven, aanwezigheid begint offline en apparaten verbinden opnieuw.
+- Sluit het spelleiderstabblad en open het opnieuw. Spelers wachten zolang; acties geven `host_offline`.
+- Laat een speler midden in een ronde vertrekken. De volgende `setState` mag daar niet op mislukken.
 
 **Conflicten**
 
@@ -66,7 +75,6 @@ me dev --players 3
 **Ongeldige invoer**
 
 - Stuur een actie met verkeerde data vanuit de browserconsole. De host moet haar negeren of weigeren.
-- Probeer instellingen buiten het schema. De engine weigert ze met `400`.
 
 **Telefoonschermen**
 
@@ -78,26 +86,22 @@ me dev --players 3
 
 ## Geautomatiseerde controles
 
-In de SDK-checkout:
+In de map van je spel:
 
 ```sh
-npm run check         # typecontrole, build, strikte TypeScript-consumer, tests
-npm run test:package  # tarball maken, installeren, CLI draaien
+npx -p typescript tsc -p jsconfig.json   # typecontrole van je spelcode
+node --test tests/*.test.mjs             # spelregels, als pure functies in assets/logic.js
 ```
 
-Een optionele test speelt het gegenereerde stemspel tegen een echte engine. Bouw eerst de engine met `cargo build`, dan:
+Zet je tests in `tests/`: `me game upload` laat die map thuis.
+
+Een hele kamer bespeel je met `scripts/play.mjs` uit de skill `build-mini-engine-game` in de SDK (zie [bouwen met AI](../ai/bouwen-met-ai.md)). Het script maakt een kamer, laat spelleider, spelers en scherm elk in een eigen browsercontext meedoen via Playwright, en maakt schermafbeeldingen in telefoon- en tv-formaat. Kopieer het naar `tests/play.mjs`, vervang het stuk dat bij het stemspel hoort door de stappen van jouw spel, en:
 
 ```sh
-MINI_ENGINE_CHECKOUT=/absoluut/pad/naar/mini-engine npm run test:engine
+npm install --no-save playwright         # eenmalig; me dev en me game upload slaan node_modules over
+npx playwright install chromium          # eenmalig
+me dev --no-open                         # in een tweede terminal
+node tests/play.mjs                      # standaard tegen me dev op http://127.0.0.1:3170
 ```
 
-Die test start een geïsoleerde engine met een tijdelijke database, laadt het gegenereerde package via de echte catalogus en draait alle drie de rolscripts in een DOM-harnas met echte websockets. Hij controleert klaarzetten, starten, gelijktijdige stemmen, gedeelde totalen en een nieuwe ronde. Opmaak en WebGL test je daarmee niet; daarvoor blijft een echte browser nodig.
-
-De engine zelf heeft een Playwright-suite die met echte HTTP en websockets meerdere rollen, telefoons en het tv-scherm test:
-
-```sh
-npm ci
-npm run build:server
-npx playwright install chromium
-npm run test:browser
-```
+De schermafbeeldingen komen in `tests/`. Tegen de server werkt hetzelfde script, zodra je spel daar actief is: `node tests/play.mjs https://miniengine.nl`. Het maakt dan een echte kamer. Opmaak en WebGL beoordeel je met de schermafbeeldingen of in een echte browser.

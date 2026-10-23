@@ -1,22 +1,17 @@
 ---
 title: Acties en action-id's
 description: Hoe spelers en spelleiders acties sturen, wat een action_id doet, waarom de SDK nooit automatisch opnieuw probeert, en hoe acties en realtime samengaan.
-section: Concepten
+section: SDK
+group: Concepten
 order: 5
 ---
 
 # Acties en action-id's
 
-Een actie is iets wat een deelnemer in het spel doet: gooien, buzzen, stemmen. Je stuurt een naam en een JSON-object met data.
-
-```json
-{ "name": "roll", "data": { "held": [0, 2] }, "action_id": "3d6c1b0e-…" }
-```
-
-Via de SDK:
+Een actie is iets wat een speler in het spel doet: gooien, buzzen, stemmen. Je stuurt een naam en JSON-data:
 
 ```js
-await client.action('roll', { held: [0, 2] });
+await client.action('vote', { yes: true });
 ```
 
 ## Regels voor een actie
@@ -24,16 +19,32 @@ await client.action('roll', { held: [0, 2] });
 | Veld | Regel |
 | --- | --- |
 | `name` | 1 tot 64 tekens: letters, cijfers, `_`, `.` of `-` |
-| `data` | JSON, maximaal 8 KiB. Serverspellen vragen een object. |
+| `data` | JSON, maximaal 8 KiB. De ingebouwde spellen vragen een object. |
 | `action_id` | Optioneel, 1 tot 64 tekens zonder controletekens |
 
-Wie een actie mag sturen, hangt van de runtime af. Bij een serverspel beslissen de spelregels in Rust; het gedeelde scherm mag nooit acties sturen. Bij een eigen browserspel sturen alleen spelers acties en verwerkt de host ze. Speelt de maker mee, dan stuurt die geen actie: de hostpagina past de eigen zetten direct toe met `setState`.
+Bij een eigen spel sturen alleen spelers acties, en verwerkt de host ze. Speelt de maker mee, dan stuurt die geen actie (`403 forbidden`): de hostpagina past de eigen zetten direct toe met `setState`. Het gedeelde scherm stuurt nooit acties.
 
-## Wat een action-id doet
+## Bij een eigen spel
 
-Bij serverspellen onthoudt de engine de laatste 256 verwerkte action-id's, gekoppeld aan de afzender en de huidige ronde. Komt dezelfde id binnen dat venster nog eens binnen, dan slaagt de actie zonder tweede effect en zonder nieuwe versie. Een herhaalde worp levert dus geen tweede worp op, en een herhaald goed antwoord geen dubbele score.
+Bij een eigen spel met `runtime: "host"` krijgt de host elke actie als event:
 
-De SDK geeft elke actie standaard een nieuwe, unieke id (`crypto.randomUUID()`). Wil je een actie bewust opnieuw proberen, hergebruik dan dezelfde id:
+```js
+client.on('action', (action) => {
+  // { type: 'action', player_id: '…', name: 'vote', data: { yes: true }, request_id: '7' }
+});
+```
+
+De `player_id` komt van de server en is betrouwbaar. De `data` komt van de speler en is dat niet: controleer altijd de vorm, de spelfase en de spelregels voordat je de state wijzigt. De bevestiging aan de speler betekent alleen dat de actie in de wachtrij van de host staat. Pas de snapshot die daarna komt, laat zien wat de host ermee deed.
+
+## Nooit automatisch opnieuw
+
+De SDK herhaalt opdrachten nooit vanzelf, ook niet na een time-out of een herverbinding. Open opdrachten worden bij uitval afgewezen. Na een onzeker resultaat kijk je eerst naar de nieuwste snapshot en beslis je dan.
+
+Een actie die een speler toch twee keer stuurt, krijgt de host ook twee keer: bij een eigen spel ontdubbelt de server niets. Schrijf je regels zo dat een herhaling geen kwaad doet, bijvoorbeeld door een stem te overschrijven in plaats van op te tellen, en door een actie te negeren die niet bij de huidige fase past.
+
+## Action-id's bij de ingebouwde spellen
+
+De SDK geeft elke actie een nieuwe, unieke id (`crypto.randomUUID()`). De ingebouwde spellen gebruiken die: de server onthoudt de laatste 256 action-id's per afzender en ronde, en een id die nog eens binnenkomt, heeft geen tweede effect. Een herhaalde worp levert dus geen tweede worp op, en een herhaald goed antwoord geen dubbele score. Wil je zo'n actie bewust opnieuw proberen, hergebruik dan dezelfde id:
 
 ```js
 const actionId = crypto.randomUUID();
@@ -45,49 +56,17 @@ try {
 }
 ```
 
-Een nieuwe lobbyronde begint een nieuw deduplicatievenster.
-
-## Nooit automatisch opnieuw
-
-De SDK herhaalt opdrachten nooit vanzelf, ook niet na een time-out of een herverbinding. Open opdrachten worden bij uitval afgewezen. Na een onzeker resultaat kijk je eerst naar de nieuwste snapshot en beslis je dan.
-
-## Bij eigen browserspellen
-
-Een eigen spel met `runtime: "host"` kent geen deduplicatie in de engine. De engine stuurt de actie door naar de host als:
-
-```json
-{ "type": "action", "player_id": "…", "name": "vote", "data": { "yes": true }, "request_id": "7" }
-```
-
-De `player_id` komt van de engine en is betrouwbaar. De `data` komt van de speler en is dat niet: controleer altijd de vorm, de spelfase en de spelregels voordat je de state wijzigt. De bevestiging aan de speler betekent alleen dat de actie in de wachtrij van de host staat.
-
 ## Acties en realtime
 
 Een [realtime-event](realtime.md) lijkt op een actie, maar is het niet:
 
 | | Actie | Realtime-event |
 | --- | --- | --- |
-| Verwerkt door | De spelregels: de server of de host | Niemand; het gaat rechtstreeks naar de ontvangers |
-| Opgeslagen | Ja, als onderdeel van de spelstand | Nee |
-| Bevestiging | `ack` | Geen |
-| `action_id` en deduplicatie | Ja, bij serverspellen | Nee |
-| Kan wegvallen | Nee, na een `ack` | Ja |
+| Verwerkt door | De spelregels in de host | Niemand; het gaat rechtstreeks naar de ontvangers |
+| Opgeslagen | De uitkomst, zodra de host die met `setState` publiceert | Nee |
+| Bevestiging | `ack`: de actie staat in de wachtrij van de host | Geen |
+| Kan wegvallen | Alleen als de host wegvalt voordat hij de actie verwerkt | Ja, onder drukte |
 
 Gebruik een actie voor alles wat telt. Gebruik realtime voor wat je meteen wilt laten zien. Ze gaan goed samen: in Jeopardy stuurt een speler bij het drukken een event `pressed` én de actie `buzz`. Host en scherm tonen het event direct, met het verschil in milliseconden; de actie beslist wie de vraag krijgt.
 
-## De acties van de ingebouwde spellen
-
-| Spel | Actie | Wie | Wat |
-| --- | --- | --- | --- |
-| Common Dice | `roll {held?}` | Deelnemers, of alleen de host bij `roll_permission: "owner"` | Gooit de vrije stenen; minstens één steen blijft vrij |
-| Common Dice | `clear_history {}` | Host | Wist de zichtbare worpgeschiedenis |
-| Beide | `start {}` / `finish {}` | Iedere deelnemer in `hostless`, anders de host | Start of sluit de ronde |
-| Jeopardy | `choose_team {team_id}` | Speler, in de lobby | Kiest een team |
-| Jeopardy | `buzz {}` | Speler, bij een open vraag | De eerste geldige buzz wint |
-| Jeopardy | `select_clue {clue_id}` | Host | Opent een vraag |
-| Jeopardy | `judge {correct}` | Host | Beoordeelt de buzz: plus of min de waarde van de vraag. Na een fout antwoord is dat team geblokkeerd en mogen de andere teams drukken. |
-| Jeopardy | `reveal {}` | Host | Zet het antwoord in de publieke state |
-| Jeopardy | `reopen {}` | Host | Verbergt het antwoord weer en opent de vraag voor alle teams |
-| Jeopardy | `close_clue {}` | Host | Sluit de vraag, nadat het antwoord onthuld is |
-
-Meer over beide spellen staat bij [voorbeelden](../game-bouwen/voorbeelden.md).
+De acties van Common Dice en Jeopardy staan bij [de ingebouwde spellen](../game-bouwen/voorbeelden.md#de-acties).

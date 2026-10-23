@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Controleert alle interne links en ankers in site/. Externe links worden overgeslagen.
-// Gebruik: node scripts/check-links.mjs [--allow-missing-pdf]
+// Controleert alle interne links en ankers in site/, en dat de vaste downloads er staan. Externe links worden overgeslagen.
+// Gebruik: node scripts/check-links.mjs
 import { readFile, readdir } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import { join, dirname, relative, resolve, sep } from 'node:path';
@@ -9,8 +9,9 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = join(ROOT, 'site');
 const BASE = process.env.DOCS_BASE ?? '/mini-engine-docs/';
-const PDF = (await readFile(join(ROOT, 'build.mjs'), 'utf8')).match(/^const PDF = '([^']+)';$/m)[1];
-const allowMissingPdf = process.argv.includes('--allow-missing-pdf');
+const DOWNLOADS = JSON.parse(
+  (await readFile(join(ROOT, 'build.mjs'), 'utf8')).match(/^const DOWNLOADS = (\[[^\]]*\]);$/m)[1].replace(/'/g, '"'),
+);
 
 if (!existsSync(SITE)) {
   console.error('site/ bestaat niet. Draai eerst: node build.mjs');
@@ -38,8 +39,11 @@ async function idsOf(file) {
 }
 
 const problems = [];
-const warnings = [];
 let checked = 0;
+
+for (const file of DOWNLOADS) {
+  if (!existsSync(join(SITE, file))) problems.push(`vaste download ontbreekt: ${file}`);
+}
 
 for (const page of pages) {
   const html = await readFile(page, 'utf8');
@@ -66,8 +70,7 @@ for (const page of pages) {
     }
     if (existsSync(target) && statSync(target).isDirectory()) target = join(target, 'index.html');
     if (!existsSync(target)) {
-      const isPdf = relative(SITE, target).split(sep).join('/') === PDF;
-      (isPdf && allowMissingPdf ? warnings : problems).push(`${rel}: ontbrekend doel: ${raw}`);
+      problems.push(`${rel}: ontbrekend doel: ${raw}`);
       continue;
     }
     if (hash && target.endsWith('.html')) {
@@ -78,10 +81,9 @@ for (const page of pages) {
 }
 
 const unique = (list) => [...new Set(list)];
-if (warnings.length) console.warn(`waarschuwing  ${PDF} ontbreekt nog (${warnings.length} verwijzingen). Zet de pdf in static/${PDF} en bouw opnieuw.`);
 if (problems.length) {
   for (const problem of unique(problems)) console.error(`fout  ${problem}`);
-  console.error(`\n${unique(problems).length} kapotte interne link(s) in ${pages.length} pagina's.`);
+  console.error(`\n${unique(problems).length} probleem/problemen in ${pages.length} pagina's.`);
   process.exit(1);
 }
-console.log(`Geen kapotte interne links: ${checked} links en ankers in ${pages.length} pagina's gecontroleerd.`);
+console.log(`Geen kapotte interne links: ${checked} links en ankers in ${pages.length} pagina's gecontroleerd, ${DOWNLOADS.length} vaste downloads aanwezig.`);

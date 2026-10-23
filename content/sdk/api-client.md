@@ -1,14 +1,15 @@
 ---
 title: ApiClient
 description: De HTTP-client van de SDK met alle methoden voor spellen, kamers, schermsleutels, accounts, achievements en eigen sets, plus de losse http-helpers.
-section: SDK-referentie
-order: 2
+section: SDK
+group: Referentie
+order: 1
 toc_depth: 3
 ---
 
 # ApiClient
 
-`ApiClient` praat met de HTTP-API van de engine. Hij bewaart zelf geen kamersleutels en logt geen tokens.
+`ApiClient` praat over HTTP met Mini Engine. Hij bewaart zelf geen kamersleutels en logt geen tokens.
 
 ```ts
 import { ApiClient } from '/sdk/mini-engine.js';
@@ -36,7 +37,7 @@ const api = new ApiClient({
 getGames(): Promise<{ games: Manifest[] }>
 ```
 
-Alle geïnstalleerde spellen met hun metadata en instellingenschema.
+Alle spellen die aanstaan, met hun metadata, instellingenschema, icoon, achievements en soorten sets, uit de actieve versie van elk spel. Ontbrekende manifestvelden krijgen hier hun standaardwaarde: `runtime: "host"`, `host_modes: ["moderator"]`, `default_host_mode: "moderator"`, `supports_late_join: true`, en lege lijsten voor `achievements` en `set_kinds`. `icon` ontbreekt als het spel er geen heeft.
 
 ### getGame(id)
 
@@ -54,18 +55,31 @@ De metadata van één spel. Onbekend: `404 game_not_found`.
 createRoom(options: CreateRoomOptions): Promise<RoomCredentials>
 ```
 
-Maakt een kamer en geeft de hostsleutel terug. Met een `accountToken` koppelt de engine het account aan de spelersplek van de maker en onthoudt hij het als account van de host.
+Maakt een kamer en geeft de hostsleutel terug. Met een `accountToken` koppelt Mini Engine het account aan de spelersplek van de maker en onthoudt het als account van de host. Dat laatste is nodig om in een eigen spel [achievements](../concepten/achievements.md#eigen-spellen) toe te kennen.
 
 ```ts
 const credentials = await api.createRoom({
-  game_id: 'common-dice',
+  game_id: 'mijn-spel',
   name: 'Hessel',
   max_players: 12,
-  settings: { dice_count: 5, sides: 6 },
-  config: { host_mode: 'hostless', display_enabled: true, allow_late_join: false },
+  settings: { prompt: 'Nog een ronde?', allow_change: true },
+  config: { host_mode: 'playing', display_enabled: true, allow_late_join: false },
 });
 // { code: 'HWKRTZ', token: '…', role: 'host', player_id: '…', display_token: '…' }
 ```
+
+| Veld | Verplicht | Regel |
+| --- | --- | --- |
+| `game_id` | ja | Een spel dat aanstaat |
+| `name` | nee | Naam van een meespelende maker, 1 tot 24 tekens; standaard `Spelleider`. Niet gebruikt bij `tv` en `moderator` |
+| `max_players` | nee | Binnen `min_players` en `max_players` van het spel; standaard het maximum van het spel, met 24 als bovengrens. Een meespelende maker telt mee |
+| `settings` | nee | Wordt over `default_settings` gelegd en daarna tegen het `settings_schema` gecontroleerd |
+| `config` | nee | Weggelaten velden: de standaardmodus van het spel, `display_enabled` gelijk aan `has_display`, `allow_late_join: false` |
+| `set_id` | nee | Sinds 0.5. Een [eigen set](../concepten/eigen-sets.md) van het ingelogde account voor dit spel; vraagt een `accountToken` |
+
+Bij `host_mode: "moderator"` en `"tv"` is `player_id` `null`. Staat het scherm uit, dan ontbreekt `display_token`. Bij `playing` is de sleutel van de maker tegelijk host en speler, en staat diens plek meteen klaar.
+
+**Fouten:** `invalid_request` (onbekende modus, een modus die het spel niet aanbiedt, capaciteit, instellingen, config, of een set die niet past), `unauthorized` (ongeldige accountsleutel, of `set_id` zonder accountsleutel), `game_not_found`, `set_not_found`, `release_changed` (het spel kreeg net een nieuwe versie; probeer het opnieuw), `rate_limit`, `room_limit` (de server heeft het maximale aantal kamers).
 
 Met `set_id` speelt de kamer met een [eigen set](../concepten/eigen-sets.md) van het ingelogde account. Dat vraagt een `accountToken`:
 
@@ -81,7 +95,9 @@ const room = await api.createRoom({ game_id: 'jeopardy', set_id: sets[0].id });
 joinRoom(code: string, name: string): Promise<RoomCredentials>
 ```
 
-Doet mee als speler. Geeft `{ code, token, role: 'player', player_id }`.
+Doet mee als speler, met een `accountToken` als die er is. Geeft `{ code, token, role: 'player', player_id }`. Namen zijn 1 tot 24 tekens zonder controletekens en uniek binnen de kamer, ongeacht hoofdletters.
+
+**Fouten:** `invalid_request` (naam), `unauthorized`, `room_not_found`, `room_started` (het spel loopt en later aansluiten staat uit), `room_full`, `name_taken`, `already_joined` (dit account heeft al een plek), `rate_limit`.
 
 ### getRoom(code, token)
 
@@ -89,7 +105,7 @@ Doet mee als speler. Geeft `{ code, token, role: 'player', player_id }`.
 getRoom<P = Json>(code: string, token: string): Promise<Snapshot<P>>
 ```
 
-De snapshot voor de rol van de meegegeven kamersleutel.
+De snapshot voor de rol van de meegegeven kamersleutel. Onbekende kamer: `room_not_found`.
 
 ### roomInfo(code)
 
@@ -127,7 +143,7 @@ Maakt een nieuwe schermsleutel; de vorige werkt daarna niet meer. Alleen voor de
 register(input: { username: string; password: string; display_name: string; email: string }): Promise<AccountSession>
 ```
 
-Sinds engine 0.4 is `email` verplicht. De engine stuurt een bevestigingsmail met een link naar `/home/account?verify=<token>`.
+`email` is verplicht. Mini Engine stuurt een bevestigingsmail met een link naar `/home/account?verify=<token>`. Fouten: `invalid_request`, `username_taken`, `email_taken` (het adres is al bevestigd door een ander account), `rate_limit`.
 
 ### login(input)
 
@@ -199,7 +215,7 @@ Trekt de huidige sessie in en wist `api.accountToken` als de server dat bevestig
 
 ## Eigen sets
 
-Sinds SDK 0.5.0. Alle methoden gebruiken `api.accountToken`. Zie [eigen sets](../concepten/eigen-sets.md) en de [routes](../api/accounts.md#sets).
+Sinds SDK 0.5.0. Alle methoden gebruiken `api.accountToken`; een bevestigd e-mailadres is niet nodig. Zie [eigen sets](../concepten/eigen-sets.md). Een set van een ander account bestaat voor jou niet: `set_not_found`. Aanmaken, wijzigen en verwijderen samen mag 30 keer per minuut.
 
 ### listSets(filter?)
 
@@ -248,6 +264,25 @@ Vervangt titel en inhoud. Kamers die de set al gebruiken, houden hun kopie.
 deleteSet(id: string): Promise<null>
 ```
 
+## Spelers en kamers beheren
+
+Voor verlaten, verwijderen en sluiten heeft `ApiClient` geen eigen methode. Gebruik daarvoor [`http`](#losse-functies), met de kamersleutel als `token`:
+
+| Verzoek | Sleutel | Wat er gebeurt |
+| --- | --- | --- |
+| `POST /api/v1/rooms/CODE/leave` | Speler | De speler verlaat de kamer en verliest zijn sleutel |
+| `DELETE /api/v1/rooms/CODE/players/PLAYER_ID` | Host | Verwijdert een speler en trekt diens sleutel in |
+| `DELETE /api/v1/rooms/CODE` | Host | Sluit de kamer; alle verbindingen sluiten met `room_deleted` |
+
+```js
+import { http, removeSession } from '/sdk/mini-engine.js';
+
+await http(`/api/v1/rooms/${code}/leave`, { method: 'POST', token: session.token }); // null bij 204
+removeSession(code, 'player');
+```
+
+De maker kan zijn eigen plek niet verwijderen en de kamer niet verlaten. Een speler verwijderen geeft `player_not_found` als die er niet (meer) is.
+
 ## Welke sleutel gaat waarheen?
 
 | Methode | Sleutel |
@@ -275,5 +310,3 @@ joinRoom(code: string, name: string): Promise<RoomCredentials>
 const info = await http('/api/v1/rooms/HWKRTZ/info');
 const room = await http('/api/v1/rooms/HWKRTZ', { token: credentials.token });
 ```
-
-De bijbehorende HTTP-routes staan in de [HTTP API](../api/kamers.md).

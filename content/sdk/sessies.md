@@ -1,8 +1,9 @@
 ---
 title: Sessiehelpers
 description: Kamersleutels bewaren en teruglezen in sessionStorage met sessionKey, saveSession, loadSession en removeSession.
-section: SDK-referentie
-order: 5
+section: SDK
+group: Referentie
+order: 4
 ---
 
 # Sessiehelpers

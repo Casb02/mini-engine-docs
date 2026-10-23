@@ -1,8 +1,9 @@
 ---
 title: De browserhost schrijven
 description: Acties ontvangen, controleren en de nieuwe spelstand publiceren in een eigen spel met runtime host, met een wachtrij en versiecontrole.
-section: Een game bouwen
-order: 4
+section: SDK
+group: Een game bouwen
+order: 3
 ---
 
 # De browserhost schrijven
@@ -25,7 +26,7 @@ client.on('action', (action) => {
 });
 ```
 
-`player_id` komt van de engine en klopt altijd. `data` komt van de speler: controleer de vorm, de spelfase en de spelregels. Clientdata mag nooit zelf een identiteit of een score voorschrijven.
+`player_id` komt van de server en klopt altijd. `data` komt van de speler: controleer de vorm, de spelfase en de spelregels. Clientdata mag nooit zelf een identiteit of een score voorschrijven.
 
 ## De host publiceert de nieuwe state
 
@@ -118,7 +119,7 @@ Twee dingen helpen bij een spel met beurten, in beide modi:
 
 Voor een speler betekent de bevestiging van een actie in een hostspel alleen: *de actie staat in de wachtrij van de host*. Niet: *de host heeft haar verwerkt*. Valt de host weg, dan kan de actie verloren gaan. Is de host offline op het moment dat een speler een actie stuurt, dan krijgt de speler `409 host_offline`.
 
-Een `setState` van de host wordt wel opgeslagen voordat de engine de nieuwe snapshot verspreidt.
+Een `setState` van de host wordt wel opgeslagen voordat de nieuwe snapshot naar de andere apparaten gaat.
 
 ## Geheime speldata
 
@@ -155,7 +156,7 @@ Voor wat snel moet en niet hoeft te tellen, zoals wie als eerste drukte of waar 
 ## Grenzen van de hostruntime
 
 - Het hosttabblad moet verbonden blijven tijdens het spelen.
-- Er is geen deduplicatie van action-id's in de engine.
+- De server ontdubbelt geen action-id's: een actie die twee keer binnenkomt, krijgt de host twee keer.
 - Scores uit hostspellen tellen niet mee in accountstatistieken. Achievements kun je wel toekennen; die staan apart.
 - Er is geen hostoverdracht: de hostsleutel leeft in het browsertabblad waarmee de kamer is gemaakt.
 

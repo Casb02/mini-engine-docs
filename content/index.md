@@ -1,16 +1,18 @@
 ---
 title: Mini Engine
 nav_title: Welkom
-description: Mini Engine is een kleine Rust-engine voor gezelschapsspellen met vrienden. Eén kamer, iedereen op zijn eigen telefoon, optioneel een gedeeld tv-scherm.
+description: Bouw je eigen gezelschapsspel voor Mini Engine met de SDK, zet het online met de CLI en gebruik het merk. Mini Engine is de plek om met vrienden te spelen, op miniengine.nl.
 section: Start
 order: 1
 layout: home
 toc: false
 ---
 
-# Spelavonden met je eigen spellen
+# Bouw je eigen spel voor Mini Engine
 
-Mini Engine is een kleine Rust-engine voor gezelschapsspellen met vrienden. Eén kamer, iedereen op zijn eigen telefoon, en als je wilt een gedeeld tv-scherm. De engine regelt kamers, apparaten, verbindingen en opgeslagen spelstand. Jij bouwt het spel.
+Mini Engine is de plek om gezelschapsspellen te spelen met vrienden, op [miniengine.nl](https://miniengine.nl). Eén kamer, iedereen op zijn eigen telefoon, en als je wilt een gedeeld tv-scherm.
+
+Deze documentatie is voor wie er zelf een spel voor maakt. Je bouwt het spel met de **SDK**, test het op je eigen computer en zet het online met de **CLI**. Onder **Branding** staan het logo, de kleuren en de lettertypes.
 
 <div class="tv" role="img" aria-label="Voorbeeld van het gedeelde tv-scherm: kamercode HWKRTZ, vier spelers aan tafel, drie staan klaar.">
   <div class="tv-top">
@@ -31,22 +33,24 @@ Mini Engine is een kleine Rust-engine voor gezelschapsspellen met vrienden. Eén
 ## Zo werkt een avond
 
 <ol class="steps">
-  <li><div><strong>Iemand maakt een kamer</strong>Op een laptop of telefoon kies je een spel en stel je de kamer in. Je krijgt een code van zes letters.</div></li>
-  <li><div><strong>De rest doet mee op de eigen telefoon</strong>Iedereen opent de startpagina, vult de code en een naam in en krijgt een eigen plek aan tafel. De tv toont het gedeelde scherm.</div></li>
+  <li><div><strong>Iemand maakt een kamer</strong>Op miniengine.nl kies je een spel en stel je de kamer in. Je krijgt een code van zes letters.</div></li>
+  <li><div><strong>De rest doet mee op de eigen telefoon</strong>Iedereen vult de code en een naam in, of scant de QR-code, en krijgt een eigen plek aan tafel. De tv toont het gedeelde scherm.</div></li>
   <li><div><strong>Iedereen zet zich klaar, het spel begint</strong>Als alle spelers klaarstaan, start de ronde. Elke telefoon ziet direct dezelfde worp, vraag of score.</div></li>
 </ol>
 
-Spelen kan zonder account. Wie er wel een maakt, ziet resultaten en achievements terug in een profiel dat voor alle spellen op dezelfde engine geldt, en kan eigen inhoud bewaren, zoals een eigen Jeopardy-bord.
+Spelen kan zonder account. Wie er wel een maakt, ziet resultaten en achievements terug in een profiel dat voor alle spellen geldt, en kan eigen inhoud bewaren, zoals een eigen Jeopardy-bord.
 
-## Voor wie is dit?
+## Wat je bouwt
 
-Mini Engine is gemaakt voor een vriendengroep die eigen spellen wil spelen en bouwen. Je hebt een computer nodig die de engine draait, en telefoons op hetzelfde netwerk. Er zitten twee spellen in: **Common Dice**, gedeelde 3D-dobbelstenen, en **Jeopardy**, een quiz met teams en een buzzer. Een eigen spel is een map met HTML, JavaScript en een `manifest.json`.
+Een spel is een map met een `manifest.json`, een pagina voor de spelleider, een voor de spelers en eventueel een voor het gedeelde scherm, plus je eigen JavaScript en CSS. Mini Engine regelt de kamers, de telefoons, de verbindingen en de opgeslagen spelstand. Jouw spel bepaalt de regels: die draaien in het tabblad van wie de kamer maakte.
+
+Je hebt Node.js 22 of nieuwer nodig. Om je spel online te zetten heb je daarnaast een dev-key nodig van wie de Mini Engine-server beheert waar je naar publiceert.
 
 ## Waar wil je beginnen?
 
 <ul class="routes">
-  <li><a href="aan-de-slag/engine-draaien.md"><strong>De engine draaien</strong><span>Start Mini Engine op je computer en speel met telefoons op je wifi.</span></a></li>
-  <li><a href="game-bouwen/eerste-game.md"><strong>Een game bouwen</strong><span>Maak met de scaffolder in vijf minuten een speelbaar stemspel en pas het aan.</span></a></li>
+  <li><a href="game-bouwen/eerste-game.md"><strong>Je eerste game</strong><span>Maak in vijf minuten een speelbaar stemspel en speel het meteen op je eigen computer.</span></a></li>
   <li><a href="concepten/kamers-en-rollen.md"><strong>De concepten</strong><span>Kamers, rollen, state, acties, realtime, achievements en eigen sets: hoe de onderdelen samenwerken.</span></a></li>
-  <li><a href="api/overzicht.md"><strong>De HTTP- en websocket-API</strong><span>Alle routes, berichten, foutcodes en limieten van versie 0.5.</span></a></li>
+  <li><a href="publiceren/overzicht.md"><strong>Publiceren met de CLI</strong><span>Zet je spel online met een dev-key en het commando me, met versies en terugrollen.</span></a></li>
+  <li><a href="branding.md"><strong>Branding</strong><span>Het brandbook en de logobestanden, met naam, kleuren en lettertypes.</span></a></li>
 </ul>

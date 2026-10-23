@@ -1,8 +1,9 @@
 ---
 title: Bouwen met AI
 description: Gebruik de skills uit de Mini Engine SDK met Claude Code of een andere AI-codeeragent om spellen te bouwen die zich aan het contract houden.
-section: Bouwen met AI
-order: 1
+section: SDK
+group: Aan de slag
+order: 4
 ---
 
 # Bouwen met AI
@@ -11,12 +12,12 @@ Een AI-codeeragent kan een Mini Engine-spel prima opzetten, zolang hij de regels
 
 ## De skills
 
-De skills staan in de map `skills/` van de SDK-repository en gaan mee in het pakket. Na `npm install` van de tarball vind je ze ook in `node_modules/@casb02/mini-engine-sdk/skills/`.
+De skills staan in de map `skills/` van de SDK-repository en gaan mee in het pakket. Na `npm install @casb02/mini-engine-sdk` vind je ze ook in `node_modules/@casb02/mini-engine-sdk/skills/`. De CLI heeft dezelfde skills aan boord.
 
 | Skill | Waarvoor |
 | --- | --- |
-| `build-mini-engine-game` | De werkwijze van begin tot eind: scaffolden met `create-mini-game`, manifest en `settings_schema`, de spelleider en de rollen, state in de hostruntime (publiek, alleen host, geheim per speler), rondes, het gedeelde scherm, snel testen met `me dev`, de engine draaien en controleren met meerdere apparaten. Met naslag over de SDK, manifestregels, recepten voor de hostruntime en probleemoplossing, plus `scripts/play.mjs`, dat met Playwright een echte kamer bespeelt. |
-| `design-mini-engine-game-ui` | De drie pagina's: speler (telefoon), scherm (tv aan de overkant van de kamer) en spelleider. Een eigen sfeer per spel, raakvlakken, leesbaarheid, zelf gehoste lettertypes, geen inline scripts onder de CSP van de engine, minder beweging als de gebruiker dat vraagt. Instellingen als gewone tekst, een kopieerbare kamercode en een QR-code om mee te doen. |
+| `build-mini-engine-game` | De werkwijze van begin tot eind: scaffolden met `me game new` of `create-mini-game`, manifest en `settings_schema`, de spelleider en de rollen, state in de hostruntime (publiek, alleen host, geheim per speler), rondes, het gedeelde scherm, testen met `me dev` en daarna als testversie op de server. Met naslag over de SDK, manifestregels, recepten voor de hostruntime en probleemoplossing, plus `scripts/play.mjs`, dat met Playwright een hele kamer bespeelt. |
+| `design-mini-engine-game-ui` | De drie pagina's: speler (telefoon), scherm (tv aan de overkant van de kamer) en spelleider. Een eigen sfeer per spel, raakvlakken, leesbaarheid, zelf gehoste lettertypes, geen inline scripts onder de Content-Security-Policy van Mini Engine, minder beweging als de gebruiker dat vraagt. Instellingen als gewone tekst, een kopieerbare kamercode en een QR-code om mee te doen. |
 | `mini-engine-ui` | **MiniEngineUI**: de rustige stijl van de demospellen als kant-en-klare kit. Een stylesheet, Space Grotesk en DM Sans, en pagina's voor spelleider, speler en scherm die meteen op de scaffold passen. Vier sferen (`kalk`, `nacht`, `vilt`, `studio`) en ruimte voor één eigen blikvanger per spel. |
 
 De bouwskill roept de ontwerpskill zelf aan als hij aan de pagina's toekomt.
@@ -27,10 +28,10 @@ Heb je alleen een idee en geen ontwerp in je hoofd, kies dan MiniEngineUI. De bo
 
 Sinds SDK 0.5.1 regelt de kit ook het uitnodigen:
 
-- **De kamercode is een knop.** Op de pagina's van spelleider en spelers kopieert een klik op de code (`me-code`) de uitnodigingslink, `/home/join?room=CODE` op het adres van de engine, en toont even *Gekopieerd*. Op het gedeelde scherm is de code gewone tekst.
+- **De kamercode is een knop.** Op de pagina's van spelleider en spelers kopieert een klik op de code (`me-code`) de uitnodigingslink, `/home/join?room=CODE` op het adres van de server, en toont even *Gekopieerd*. Op het gedeelde scherm is de code gewone tekst.
 - **Een QR-code op het scherm.** In de lobby toont het gedeelde scherm naast de grote code een QR-code met dezelfde link, groot genoeg om vanaf de bank te scannen. Zodra het spel loopt, verdwijnt de QR; de code blijft in de balk.
 - **Toon QR.** Waar geen vaste QR past, op de pagina's van spelleider en spelers, staat een rustige knop *Toon QR* naast de code. Die opent een venster met een grote QR, de code en *Sluiten*. Zo kan ook een speler een vriend laten scannen.
-- **Een korte uitnodiging.** Het scherm noemt alleen het adres, zonder `/home`: *Ga naar miniengine.nl en vul de code in*. Het adres komt uit `location.host`; de root van de engine stuurt zelf door naar de startpagina.
+- **Een korte uitnodiging.** Het scherm noemt alleen het adres, zonder `/home`: *Ga naar miniengine.nl en vul de code in*. Het adres komt uit `location.host`; dat adres stuurt zelf door naar de startpagina.
 
 De QR-code komt uit `kit/ui/qr.js` (de bibliotheek uqr, MIT, met de licentie ernaast) en `kit/ui/invite.js`, dat `joinUrl(code)`, `qrSvg(text)`, `bindCopyCode(button, code)` en `bindQrDialog(button, code)` levert. De stijl staat in de componenten `me-qr` en `me-dialog`.
 
@@ -54,18 +55,13 @@ Claude Code laadt skills uit twee plekken:
 | Plek | Geldt voor |
 | --- | --- |
 | `~/.claude/skills/` | Al jouw projecten |
-| `.claude/skills/` in een project | Alleen dat project, bijvoorbeeld je engine-checkout |
+| `.claude/skills/` in een project | Alleen dat project, bijvoorbeeld de map met je spellen |
 
-Vanuit de root van de SDK-checkout:
+`me skill install` zet ze op de eerste plek, `me skill install --project` op de tweede. Zonder CLI kopieer je ze uit het geïnstalleerde pakket:
 
 ```sh
-# voor al je projecten; symlinks volgen een git pull
 mkdir -p ~/.claude/skills
-ln -s "$PWD"/skills/* ~/.claude/skills/
-
-# of alleen voor de engine-checkout; een kopie, dus opnieuw kopiëren na updates
-mkdir -p ../mini-engine/.claude/skills
-cp -R skills/* ../mini-engine/.claude/skills/
+cp -R node_modules/@casb02/mini-engine-sdk/skills/* ~/.claude/skills/
 ```
 
 Start daarna een nieuwe sessie. De skill start vanzelf bij een passende vraag, bijvoorbeeld:
@@ -80,7 +76,7 @@ Je kunt hem ook bij naam aanroepen: `/build-mini-engine-game`.
 - **Agents zonder skills** wijs je direct naar het bestand: *Lees skills/build-mini-engine-game/SKILL.md in de Mini Engine SDK en volg het.*
 - Geef de agent ook `types/mini-engine.d.ts` uit de SDK. Daarin staan alle methoden en types exact.
 
-De bouwskill test een spel eerst met [`me dev`](../publiceren/cli.md#me-dev) uit de CLI, een nagebootste engine op je eigen computer. Daarna speelt hij het op een echte engine: een engine-checkout, of een draaiende engine waar je met de CLI naar uploadt. Een nieuw spel maakt de agent met `npx -p @casb02/mini-engine-sdk create-mini-game` of `me game new`; een SDK-checkout is daarvoor niet nodig. Ontbreekt iets, dan wijst de agent je erop. De SDK is openbaar; voor de engine-repository heb je GitHub-toegang nodig. Wil je alleen publiceren naar een draaiende engine, dan heb je genoeg aan de CLI.
+De bouwskill maakt een nieuw spel met `me game new` of `npx -p @casb02/mini-engine-sdk create-mini-game`, en test het eerst met [`me dev`](../publiceren/cli.md#me-dev) op je eigen computer. Daarna zet hij het als testversie op de server met `me game upload`; daarvoor heb je een dev-key nodig. Ontbreekt iets, dan wijst de agent je erop. Zie ook [testen](../game-bouwen/testen.md).
 
 ## Wat je de agent meegeeft
 
@@ -97,13 +93,13 @@ De rest mag de agent aannemen, mits hij zijn aannames aan het eind opsomt.
 
 Een agent schrijft overtuigende code die net naast het contract kan zitten. De bouwskill heeft een eigen afvinklijst; let in elk geval op:
 
-- **De host is de scheidsrechter.** Spelersdata is onbetrouwbaar; `player_id` komt van de engine. Hostknoppen roepen SDK-methoden aan, geen `action()`. Speelt de maker mee, dan past de hostpagina diens zetten zelf toe met `setState`.
+- **De host is de scheidsrechter.** Spelersdata is onbetrouwbaar; `player_id` komt van de server. Hostknoppen roepen SDK-methoden aan, geen `action()`. Speelt de maker mee, dan past de hostpagina diens zetten zelf toe met `setState`.
 - **Instellingen als tekst.** De maker kiest ze in het formulier voor een nieuwe kamer; het spel toont ze daarna als een korte regel, zonder knoppen om ze te wijzigen.
 - **Eén wachtrij voor mutaties**, met `expected_version` uit de laatste snapshot.
 - **Rondes met een doorlopende score spelen binnen één `running`-fase.** Terug naar de lobby wist de state.
 - **Geheimen niet in `assets/` of `public_state`**, maar in `data.json`, `host_state` of `player_states`.
 - **`player_states` alleen voor huidige spelers.** Een vertrokken speler in die map laat `setState` mislukken.
-- **Geen inline scripts, geen `onclick`-attributen en geen CDN's.** De Content-Security-Policy van de engine blokkeert ze.
+- **Geen inline scripts, geen `onclick`-attributen en geen CDN's.** De Content-Security-Policy van Mini Engine blokkeert ze.
 - **Geen automatische retries.** Na een fout eerst de snapshot bekijken.
 
-Speel het spel zelf terwijl de agent bouwt: `me dev` in de spelmap toont de spelleider, het scherm en de spelers naast elkaar en laadt opnieuw zodra de agent iets opslaat. Gebruik ook de [testchecklist](../game-bouwen/testen.md) en draai `npx -p typescript tsc -p jsconfig.json` in de spelmap voor de typecontrole. Probeer het spel voor een avond met vrienden ook een keer op een echte engine.
+Speel het spel zelf terwijl de agent bouwt: `me dev` in de spelmap toont de spelleider, het scherm en de spelers naast elkaar en laadt opnieuw zodra de agent iets opslaat. Gebruik ook de [testchecklist](../game-bouwen/testen.md) en draai `npx -p typescript tsc -p jsconfig.json` in de spelmap voor de typecontrole. Probeer het spel voor een avond met vrienden ook een keer als testversie op de server, met echte telefoons.
