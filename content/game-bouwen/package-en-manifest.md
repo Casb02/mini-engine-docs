@@ -104,7 +104,7 @@ Kies `supports_late_join` voor een nieuw spel bewust. De kamer zet later aanslui
 
 `hostless` kan niet bij `runtime: "host"`: zonder een verbonden hosttabblad is er geen scheidsrechter. Een lege lijst, `hostless` bij een eigen spel of een `default_host_mode` die niet in de lijst staat, weigeren `me dev`, `me game upload` en de server.
 
-Een gezelschapsspel (bord, kaart, dobbel, tekenen) biedt `["playing", "tv"]` met `playing` als standaard, zoals in het voorbeeld hierboven: *Iedereen doet mee* of *TV*. Zo zet `me game new` het sinds 0.5.2 ook. Gebruik `moderator` alleen als de maker echt alleen leidt, zoals een quizmaster die de antwoorden kent:
+Een gezelschapsspel (bord, kaart, dobbel, tekenen) biedt `["playing", "tv"]` met `playing` als standaard, zoals in het voorbeeld hierboven: *Iedereen doet mee* of *TV*. Zo zetten `me init` en `me game new` het ook. Gebruik `moderator` alleen als de maker echt alleen leidt, zoals een quizmaster die de antwoorden kent:
 
 ```json
 "host_modes": ["moderator"],

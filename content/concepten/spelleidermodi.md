@@ -28,10 +28,10 @@ Een spel geeft in zijn manifest aan welke modi het kent (`host_modes`) en welke 
 | Common Dice | `moderator`, `playing`, `hostless` | `hostless` |
 | Jeopardy | `moderator` | `moderator` |
 | Vier pionnen, Wormenwerpen | `playing`, `tv` | `playing` |
-| Nieuw eigen spel uit `me game new` (sinds 0.5.2) | `playing`, `tv` | `playing` |
+| Nieuw eigen spel uit `me init` of `me game new` (sinds 0.5.2) | `playing`, `tv` | `playing` |
 | Eigen spel zonder `host_modes` in het manifest | `moderator` | `moderator` |
 
-**Een gezelschapsspel** (bord, kaart, dobbel, tekenen) biedt `["playing", "tv"]` met `playing` als standaard. *Iedereen doet mee*: de maker is een gewone speler, met hetzelfde scherm als iedereen. *TV*: een tv toont het spel en iedereen speelt op de telefoon. Een spelleider die alleen leidt, zoals een quizmaster, is de uitzondering (`moderator`). Daarom maakt `me game new` sinds 0.5.2 een manifest met `"host_modes": ["playing", "tv"]` en `"default_host_mode": "playing"`.
+**Een gezelschapsspel** (bord, kaart, dobbel, tekenen) biedt `["playing", "tv"]` met `playing` als standaard. *Iedereen doet mee*: de maker is een gewone speler, met hetzelfde scherm als iedereen. *TV*: een tv toont het spel en iedereen speelt op de telefoon. Een spelleider die alleen leidt, zoals een quizmaster, is de uitzondering (`moderator`). Daarom maken `me init` en `me game new` een manifest met `"host_modes": ["playing", "tv"]` en `"default_host_mode": "playing"`.
 
 Een eigen browserspel draait zijn spelregels in het tabblad van de maker. Dat tabblad is de scheidsrechter en moet tijdens het spelen verbonden blijven. Daarom kent een eigen spel geen `hostless`; die modus blijft voor de ingebouwde spellen. Een manifest met `hostless` bij `runtime: "host"` weigeren `me dev`, `me game upload` en de server.
 
