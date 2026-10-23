@@ -159,4 +159,5 @@ Wie als eerste over de streep komt, telt voor de uitslag. Leg dat vast met een a
 ## Verder lezen
 
 - De methoden staan bij [de websocketclient](../sdk/realtime-client.md#realtime): `client.realtime.emit`, `on`, `set`, `value`, `onValue` en `reset`.
+- Wat er precies over de lijn gaat, staat bij [het websocketprotocol](../api/websocket.md#realtime).
 - Waarom realtime los staat van versies en bevestigingen: [state en versies](state-en-versies.md#realtime-staat-erbuiten).

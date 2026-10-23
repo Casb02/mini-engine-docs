@@ -9,9 +9,12 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = join(ROOT, 'site');
 const BASE = process.env.DOCS_BASE ?? '/mini-engine-docs/';
-const DOWNLOADS = JSON.parse(
-  (await readFile(join(ROOT, 'build.mjs'), 'utf8')).match(/^const DOWNLOADS = (\[[^\]]*\]);$/m)[1].replace(/'/g, '"'),
-);
+const BUILD = await readFile(join(ROOT, 'build.mjs'), 'utf8');
+const PDF = BUILD.match(/^const PDF = '([^']+)';$/m)[1];
+const DOWNLOADS = BUILD.match(/^const DOWNLOADS = \[([^\]]*)\];$/m)[1]
+  .split(',')
+  .map((item) => item.trim())
+  .map((item) => (item === 'PDF' ? PDF : item.replace(/^'|'$/g, '')));
 
 if (!existsSync(SITE)) {
   console.error('site/ bestaat niet. Draai eerst: node build.mjs');

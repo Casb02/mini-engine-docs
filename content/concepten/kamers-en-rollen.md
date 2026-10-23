@@ -31,7 +31,7 @@ De pagina's onder `/home` zijn de speelomgeving van Mini Engine. Als je je spel 
 | Pagina | Wat je er doet |
 | --- | --- |
 | `/home` | Een kamercode invullen, of een spel kiezen om zelf te beginnen |
-| `/home/spellen` | Alle spellen, als het er meer dan vier zijn |
+| `/home/games` | Alle spellen als kaarten, als het er meer dan vier zijn. Tot 0.6.1 heette deze pagina `/home/spellen` |
 | `/home/new/<spel>` | Een kamer maken voor dat spel: naam, spelleidermodus, de instellingen uit je `settings_schema`, een eigen set, en onder **Meer opties** het aantal spelers, het gedeelde scherm en later aansluiten |
 | `/home/join?room=CODE` | Een naam invullen en meedoen |
 | `/room/CODE/ROL` | De kamer zelf: deze pagina laadt je spelpagina in een iframe; zie [pagina's per rol](../game-bouwen/rolpaginas.md) |

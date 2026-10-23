@@ -194,6 +194,19 @@ body {
   align-self: center;
 }
 
+.header-pdf {
+  font-size: 0.9375rem;
+  color: var(--text);
+  text-decoration: none;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--me-r-klein);
+  white-space: nowrap;
+}
+.header-pdf:hover {
+  border-color: var(--muted);
+}
+
 
 .shell {
   display: grid;
@@ -920,6 +933,10 @@ blockquote > :last-child {
   }
   .sidebar {
     display: none;
+  }
+  .header-pdf {
+    font-size: 0.875rem;
+    padding: 5px 10px;
   }
   .menu {
     display: block;
