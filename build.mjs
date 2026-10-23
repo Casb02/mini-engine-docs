@@ -34,31 +34,27 @@ const OUT = join(ROOT, 'site');
 const BASE = process.env.DOCS_BASE ?? '/mini-engine-docs/';
 
 // Volgorde van de secties in de navigatie. De `section` uit de front matter moet hierin staan.
-const SECTIONS = ['Start', 'SDK', 'CLI', 'Branding'];
+const SECTIONS = ['Start', 'SDK', 'CLI', 'API', 'Branding'];
 
 // Optionele groepen binnen een sectie, in menuvolgorde. Een sectie met groepen vraagt een `group` per pagina.
 const GROUPS = {
   SDK: ['Aan de slag', 'Een game bouwen', 'Concepten', 'Referentie'],
 };
 
+// De API-referentie als pdf: de openbare editie. Kop- en voettekst linken ernaar.
+const PDF = 'downloads/MiniEngine-API-v0.6.pdf';
+
 // Downloads die altijd in static/ moeten staan. De build en de linkcontrole falen zonder.
-const DOWNLOADS = ['downloads/MiniEngine-Brandbook.pdf', 'downloads/MiniEngine-logos.zip'];
+const DOWNLOADS = [PDF, 'downloads/MiniEngine-Brandbook.pdf', 'downloads/MiniEngine-logos.zip'];
 
 // Oude adressen die naar een andere pagina zijn verhuisd. Elk krijgt een kleine doorverwijspagina.
-// Pagina's die zijn verdwenen (zoals het hosten van de engine) staan hier niet; die geven 404.
+// Pagina's die zijn verdwenen (zoals het hosten van de engine en api/beheer) staan hier niet; die geven 404.
 const REDIRECTS = {
   'start/een-avond.html': 'index.md',
   'aan-de-slag/eerste-kamer.html': 'concepten/kamers-en-rollen.md#een-kamer-op-miniengine-nl',
-  'api/overzicht.html': 'sdk/events-en-fouten.md#foutcodes-van-de-server',
-  'api/games.html': 'sdk/api-client.md#spellen',
-  'api/kamers.html': 'sdk/api-client.md#kamers',
-  'api/accounts.html': 'sdk/api-client.md#accounts',
-  'api/ontwikkelaars.html': 'publiceren/cli.md',
-  'api/websocket.html': 'sdk/realtime-client.md',
-  'api/limieten.html': 'sdk/grenzen.md',
 };
 
-const VERSION = '0.5';
+const VERSION = '0.6';
 
 // ---------- helpers ----------
 
@@ -324,6 +320,7 @@ function renderPage(page, { root, content, headings, isNotFound = false }) {
     crumb: crumbs,
     content,
     pager: isNotFound ? '' : pagerHtml(page, root),
+    pdf: `${root}${PDF}`,
     version: VERSION,
   });
 }

@@ -140,10 +140,18 @@ Maakt een nieuwe schermsleutel; de vorige werkt daarna niet meer. Alleen voor de
 ### register(input)
 
 ```ts
-register(input: { username: string; password: string; display_name: string; email: string }): Promise<AccountSession>
+register(input: { username: string; password: string; display_name: string; email: string }, options?: { turnstileToken?: string }): Promise<AccountSession>
 ```
 
-`email` is verplicht. Mini Engine stuurt een bevestigingsmail met een link naar `/home/account?verify=<token>`. Fouten: `invalid_request`, `username_taken`, `email_taken` (het adres is al bevestigd door een ander account), `rate_limit`.
+`email` is verplicht. Mini Engine stuurt een bevestigingsmail met een link naar `/home/account?verify=<token>`. Vraagt de server om een robotcheck, geef dan het token van het Turnstile-widget mee: `register(input, { turnstileToken })`; zie [accountConfig()](#accountconfig). Fouten: `invalid_request`, `username_taken`, `email_taken` (het adres is al bevestigd door een ander account), `turnstile_required`, `turnstile_failed`, `turnstile_unavailable`, `rate_limit`.
+
+### accountConfig()
+
+```ts
+accountConfig(): Promise<{ turnstile_site_key: string | null }>
+```
+
+De sitekey van de robotcheck, om het Cloudflare Turnstile-widget mee te tonen, of `null` als de server geen robotcheck vraagt. Het widget gebruikt de actie `register` bij registreren en `email` bij `setEmail`. Een token werkt één keer. Zie [robotcheck](../api/accounts.md#robotcheck).
 
 ### login(input)
 
@@ -178,7 +186,7 @@ Een onbekende, verlopen, al gebruikte of andermans link geeft een `MiniEngineErr
 ### setEmail(email)
 
 ```ts
-setEmail(email: string): Promise<{ account: Account; verification_sent: boolean }>
+setEmail(email: string, options?: { turnstileToken?: string }): Promise<{ account: Account; verification_sent: boolean }>
 ```
 
 Voegt een adres toe, wijzigt het (het is daarna weer onbevestigd) of stuurt de link opnieuw als het adres gelijk blijft. Gebruikt `api.accountToken`. Eén mail per account per minuut; daarboven volgt `rate_limit`. Is het adres al bevestigd, dan volgt `email_already_verified`; is het bevestigd door een ander account, dan `email_taken`.
@@ -291,7 +299,7 @@ De maker kan zijn eigen plek niet verwijderen en de kamer niet verlaten. Een spe
 | `getRoom`, `gameData`, `displayToken` | De meegegeven kamersleutel |
 | `me`, `stats`, `achievements`, `logout`, `verifyEmail`, `setEmail` | `accountToken` |
 | `listSets`, `getSet`, `createSet`, `updateSet`, `deleteSet` | `accountToken` |
-| `getGames`, `getGame`, `roomInfo`, `register`, `login` | Geen |
+| `getGames`, `getGame`, `roomInfo`, `register`, `login`, `accountConfig` | Geen |
 
 ## Losse functies
 

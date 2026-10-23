@@ -5,9 +5,9 @@
 
 # Mini Engine Docs
 
-De documentatiesite voor wie een spel bouwt voor Mini Engine: de SDK, de CLI en het merk. Statische HTML, geen JavaScript-frameworks, op `https://docs.miniengine.nl/`.
+De documentatiesite voor wie een spel bouwt voor Mini Engine: de SDK, de CLI, de API en het merk. Statische HTML, geen JavaScript-frameworks, op `https://docs.miniengine.nl/`.
 
-Deze repository is publiek. De site gaat over de SDK, de CLI en het merk. Zet hier geen sleutels, interne adressen of details over hoe Mini Engine zelf werkt of draait.
+Deze repository is publiek. De site gaat over de SDK, de CLI, de API die zij gebruiken en het merk. Zet hier geen sleutels, interne adressen, beheerroutes of details over hoe Mini Engine zelf draait of gehost wordt.
 
 ## Bouwen
 
@@ -53,7 +53,7 @@ toc: false                       # optioneel: geen inhoudsopgave
 ---
 ```
 
-- Het menu heeft vier secties, in deze volgorde: `Start`, `SDK`, `CLI` en `Branding` (`SECTIONS` in `build.mjs`).
+- Het menu heeft vijf secties, in deze volgorde: `Start`, `SDK`, `CLI`, `API` en `Branding` (`SECTIONS` in `build.mjs`).
 - De sectie `SDK` is verdeeld in groepen: `Aan de slag`, `Een game bouwen`, `Concepten` en `Referentie` (`GROUPS` in `build.mjs`). Een pagina in die sectie moet een `group` hebben; andere secties hebben er geen. Binnen een groep of sectie sorteert `order`.
 - Link naar andere pagina's met hun relatieve `.md`-pad, bijvoorbeeld `[runtimes](../concepten/runtimes.md)`. De build maakt er `.html` van en stopt bij een link naar een onbekende pagina.
 - Gebruik `{{root}}` voor bestanden uit `static/`, bijvoorbeeld `{{root}}brand/woordmerk-licht.svg`.
@@ -66,7 +66,7 @@ Verhuist een pagina, zet het oude adres dan in `REDIRECTS` in `build.mjs`, met d
 
 ## Downloads
 
-Het brandbook (`static/downloads/MiniEngine-Brandbook.pdf`) en de logobestanden (`static/downloads/MiniEngine-logos.zip`) staan in `DOWNLOADS` in `build.mjs`. De build en de linkcontrole falen als een van de twee ontbreekt.
+De API-referentie (`static/downloads/MiniEngine-API-v0.6.pdf`, de openbare editie), het brandbook (`static/downloads/MiniEngine-Brandbook.pdf`) en de logobestanden (`static/downloads/MiniEngine-logos.zip`) staan in `DOWNLOADS` in `build.mjs`. De build en de linkcontrole falen als een ervan ontbreekt. De kop en de voettekst linken naar de pdf uit `PDF` in `build.mjs`; zet een nieuwe editie ernaast en pas `PDF` aan. De pdf komt uit het merkpakket en beschrijft alleen wat een client, een game of de CLI gebruikt.
 
 ## URL's en BASE
 

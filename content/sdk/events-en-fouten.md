@@ -139,4 +139,4 @@ Elke fout van de server heeft een vaste `code` voor je code en een Nederlandse `
 | 503 | `room_limit` | De server heeft het maximale aantal kamers |
 | 503 | `connection_limit` | De server heeft het maximale aantal verbindingen |
 
-Foutcodes die je bij het publiceren tegenkomt, staan bij [de me-CLI](../publiceren/cli.md#foutmeldingen-van-de-server).
+Foutcodes die je bij het publiceren tegenkomt, staan bij [de me-CLI](../publiceren/cli.md#foutmeldingen-van-de-server). Per route staan de mogelijke fouten in de [API-sectie](../api/overzicht.md#foutcodes).
