@@ -1,14 +1,14 @@
 ---
 title: Upgraden
 nav_title: Upgraden
-description: Wat je met een bestaand spel doet bij de overstap van Mini Engine 0.4 naar 0.5, van 0.5 naar 0.6 en van 0.6 naar 0.7, en welke SDK en CLI daarbij horen.
+description: Wat je met een bestaand spel doet bij de overstap van Mini Engine 0.4 naar 0.5, van 0.5 naar 0.6, van 0.6 naar 0.7 en van 0.7 naar 0.8, en welke SDK en CLI daarbij horen.
 section: Start
 order: 2
 ---
 
 # Upgraden
 
-Mini Engine, de SDK en de CLI krijgen af en toe een nieuwe versie. Op deze pagina staat per stap wat je met een bestaand spel moet doen, wat er nieuw is als je het wilt gebruiken, en wat vanzelf goed gaat. Sla je een versie over, loop dan de stappen na elkaar door. Van 0.4 naar 0.7 zijn het er drie.
+Mini Engine, de SDK en de CLI krijgen af en toe een nieuwe versie. Op deze pagina staat per stap wat je met een bestaand spel moet doen, wat er nieuw is als je het wilt gebruiken, en wat vanzelf goed gaat. Sla je een versie over, loop dan de stappen na elkaar door. Van 0.4 naar 0.8 zijn het er vier.
 
 Een spel dat werkte, blijft werken. Manifests, kamers en sets van een oudere versie blijven geldig, en nieuwe velden zijn optioneel. De meeste stappen gaan over je gereedschap, je links en hoe je spel op een telefoon past.
 
@@ -41,8 +41,9 @@ Deze versies horen bij elkaar:
 | 0.5.2 tot en met 0.5.5 | 0.5.2 | 0.5.2 |
 | 0.6.0 tot en met 0.6.5 | 0.6.0 | 0.6.0 |
 | 0.7.0 | 0.6.0 | 0.7.0 |
+| 0.8.0 | 0.7.0 | 0.8.0 |
 
-De client in de SDK is sinds 0.5.0 niet meer veranderd; latere versies van de SDK brachten types, startsjablonen en skills. Mini Engine 0.6 en 0.7 serveren daarom nog de client van SDK 0.5.2, en die werkt precies zo. De types op `/sdk/mini-engine.d.ts` van de server zijn dan ook die van 0.5.2, zonder `author`. Haal je kopie daarom uit SDK 0.6.0, zoals hieronder.
+De client in de SDK bleef van 0.5.0 tot en met 0.6.0 gelijk; die versies brachten types, startsjablonen en skills. SDK 0.7.0 geeft `ApiClient` drie methoden voor afbeeldingen erbij. Mini Engine 0.6, 0.7 en 0.8 serveren nog de client van SDK 0.5.2. Een spelpagina mist daar niets aan: alles wat een spel tijdens het spelen gebruikt, werkt precies zo, en afbeeldingen uploadt een speler in de set-editor. De types op `/sdk/mini-engine.d.ts` van de server zijn wel die van 0.5.2, zonder `author` en zonder afbeeldingen. Haal je kopie daarom uit SDK 0.7.0, zoals hieronder.
 
 Een nieuwere CLI en SDK werken met Mini Engine 0.5 en nieuwer. Wat een nieuwere versie van de server vraagt, staat er in deze documentatie steeds bij, zoals *sinds 0.5.1*. Zie ook [versies](sdk/overzicht.md#versies) bij de SDK.
 
@@ -57,13 +58,13 @@ me skill install --force                        # de AI-skills uit die CLI, over
 
 `--force` overschrijft ook wat je zelf in een skill hebt aangepast. Zonder `--force` blijft een oudere skill staan; `me doctor` meldt dat verschil.
 
-Gebruik je de types in je editor of met `tsc`, vervang dan de kopie in je spel door die van SDK 0.6.0:
+Gebruik je de types in je editor of met `tsc`, vervang dan de kopie in je spel door die van SDK 0.7.0:
 
 ```sh
-curl -o types/mini-engine.d.ts https://raw.githubusercontent.com/Casb02/mini-engine-sdk/v0.6.0/types/mini-engine.d.ts
+curl -o types/mini-engine.d.ts https://raw.githubusercontent.com/Casb02/mini-engine-sdk/v0.7.0/types/mini-engine.d.ts
 ```
 
-Gebruik je het npm-pakket in een eigen project, installeer dan versie 0.6.0; zie [in een eigen project](sdk/overzicht.md#in-een-eigen-project).
+Gebruik je het npm-pakket in een eigen project, installeer dan versie 0.7.0; zie [in een eigen project](sdk/overzicht.md#in-een-eigen-project).
 
 Pas je daarna iets aan je spel aan, verhoog dan `version` in `manifest.json` en upload de nieuwe versie met `--activate`. Nieuwe kamers krijgen die versie; lopende kamers spelen door met de hunne. Zie [versies en kamers](publiceren/versies.md).
 
@@ -114,7 +115,7 @@ Gebruik je eigen sets, houd dan twee dingen in gedachten. Het formulier werkt al
 
 ### Checklist
 
-1. De CLI is bijgewerkt, de skills zijn opnieuw geïnstalleerd met `--force`, en `types/mini-engine.d.ts` komt uit SDK 0.6.0.
+1. De CLI is bijgewerkt, de skills zijn opnieuw geïnstalleerd met `--force`, en `types/mini-engine.d.ts` komt uit de nieuwste SDK.
 2. Er staan geen links meer naar `/demo`.
 3. Elke `enum` in `settings_schema` heeft hoogstens 64 waarden.
 4. `required` staat in de volgorde waarin het formulier de instellingen moet tonen.
@@ -178,7 +179,7 @@ html, body { height: 100%; }   /* niet: min-height: 100vh */
 
 ## Van 0.6 naar 0.7
 
-Mini Engine 0.7.0 brengt uitgelichte spellen en zoeken, en Jeopardy is niet meer ingebouwd. Voor een eigen spel verandert er bijna niets. Er is geen nieuwe SDK: 0.6.0 blijft de nieuwste. CLI 0.7.0 verandert niets aan de commando's die je gebruikt.
+Mini Engine 0.7.0 brengt uitgelichte spellen en zoeken, en Jeopardy is niet meer ingebouwd. Voor een eigen spel verandert er bijna niets. Er kwam geen nieuwe SDK: bij 0.7 hoort SDK 0.6.0. CLI 0.7.0 verandert niets aan de commando's die je gebruikt.
 
 ### Wat je moet doen
 
@@ -188,7 +189,7 @@ Mini Engine 0.7.0 brengt uitgelichte spellen en zoeken, en Jeopardy is niet meer
 
 **Werk de CLI bij naar 0.7.0.** Met CLI 0.6.0 meldt `me doctor` een ✗ zolang er een nieuwere versie is.
 
-**Lees je `GET /api/v1/games` zelf?** Het antwoord heeft naast `games` nu ook `featured`: de id's van hoogstens vier uitgelichte spellen, in hun volgorde. Er is alleen iets bijgekomen. De types van SDK 0.6.0 kennen `featured` nog niet. Zie [GET /api/v1/games](api/games.md#get-api-v1-games).
+**Lees je `GET /api/v1/games` zelf?** Het antwoord heeft naast `games` nu ook `featured`: de id's van hoogstens vier uitgelichte spellen, in hun volgorde. Er is alleen iets bijgekomen. De types van SDK 0.6.0 en 0.7.0 kennen `featured` nog niet. Zie [GET /api/v1/games](api/games.md#get-api-v1-games).
 
 ### Nieuw, als je wilt
 
@@ -206,4 +207,63 @@ Mini Engine 0.7.0 brengt uitgelichte spellen en zoeken, en Jeopardy is niet meer
 
 1. Er staat geen `jeopardy` meer in je code, scripts, tests of voorbeelden.
 2. Scripts letten op `quota_games`, niet op de tekst "10 games".
-3. De CLI is 0.7.0, en `me doctor` is groen.
+3. De CLI is 0.7.0 of nieuwer, en `me doctor` is groen.
+
+## Van 0.7 naar 0.8
+
+Mini Engine 0.8.0 brengt afbeeldingen in eigen sets: een speler zet bijvoorbeeld een foto bij een quizvraag, en je spel toont die. SDK 0.7.0 en CLI 0.8.0 horen erbij. Gebruikt je spel geen afbeeldingen, dan werk je alleen je gereedschap bij.
+
+### Wat je moet doen
+
+**Werk de CLI bij naar 0.8.0 en installeer de skills opnieuw**, zoals [hierboven](#je-gereedschap-bijwerken):
+
+```sh
+npm install -g github:Casb02/mini-engine-cli
+me skill install --force
+```
+
+Een oudere CLI kent `"format": "image"` niet: `me dev` weigert dan je manifest, en `me dev --set` kent geen afbeeldingen. De nieuwe skills leren je AI-agent wat een afbeeldingsveld is, welke grenzen gelden en hoe een spel afbeeldingen toont.
+
+**Haal de types uit SDK 0.7.0**, als je ze gebruikt:
+
+```sh
+curl -o types/mini-engine.d.ts https://raw.githubusercontent.com/Casb02/mini-engine-sdk/v0.7.0/types/mini-engine.d.ts
+```
+
+Daarin staan `format: 'image'` in `SetSchema`, en `uploadMedia`, `listMedia` en `deleteMedia` met de types `MediaItem`, `MediaUpload` en `MediaList`. Gebruik je het npm-pakket, installeer dan 0.7.0.
+
+**Upload een spel met afbeeldingen pas als de server 0.8 draait.** Een oudere server weigert een soort set met een afbeeldingsveld. `me game upload` waarschuwt je daarvoor, en `me doctor` laat zien welke versie de server draait.
+
+### Nieuw, als je wilt
+
+| Sinds | Wat | Lees verder |
+| --- | --- | --- |
+| 0.8.0 | Afbeeldingsvelden in een soort set: `{ "type": "string", "format": "image" }` | [Afbeeldingen](concepten/eigen-sets.md#afbeeldingen) |
+| 0.8.0 | Spelers uploaden afbeeldingen in het formulier op **Mijn sets**, met een voorbeeld, **Vervang** en **Verwijder** | [Afbeeldingen toevoegen](concepten/eigen-sets.md#afbeeldingen-toevoegen-op-mijn-sets) |
+| 0.8.0 | Standaardplaatjes in `data.json`, als pad onder `assets/` | [Standaardplaatjes](concepten/eigen-sets.md#standaardplaatjes-in-data-json) |
+| 0.8.0 | De routes onder `/api/v1/accounts/media` en `GET /media/{id}` | [Afbeeldingen in de API](api/accounts.md#afbeeldingen) |
+| SDK 0.7.0 | `uploadMedia`, `listMedia` en `deleteMedia`; het startsjabloon `quiz` heeft een optionele afbeelding bij elke vraag | [ApiClient](sdk/api-client.md#afbeeldingen) |
+| CLI 0.8.0 | `me dev --set` met afbeeldingen uit een map `media/`; `me doctor` controleert de afbeeldingen in `data.json` | [Afbeeldingen in een set testen](publiceren/cli.md#afbeeldingen-in-een-set-testen) |
+
+Zo geef je je eigen soort set een afbeelding:
+
+1. Zet een veld `{ "type": "string", "format": "image", "title": "Afbeelding" }` in het schema. Laat het buiten `required`, dan blijven de sets die spelers al maakten geldig. Maak je het verplicht, dan kunnen ze die sets niet meer kiezen of opslaan.
+2. Toon de waarde met `<img src>`, en toon niets als het veld ontbreekt. Zie [afbeeldingen tonen in je spel](concepten/eigen-sets.md#afbeeldingen-tonen-in-je-spel).
+3. Test het met `me dev --set` en een map `media/` naast het set-bestand.
+4. Verhoog `version` en upload met `me game upload --activate`.
+
+Maakte je een spel met het oude `quiz`-sjabloon? Daar is een eigen vragenlijst een lijst teksten, één vraag per regel. Het nieuwe sjabloon heeft een blok per vraag, met `question` en `image`. Neem je die vorm over, dan passen de vragenlijsten die spelers al maakten niet meer. Laat je hem zoals hij is, dan blijft je spel gewoon werken, zonder afbeeldingen.
+
+### Geen actie nodig
+
+- Spellen zonder afbeeldingen werken zoals in 0.7. Het manifest kreeg geen nieuwe velden, en manifests, kamers en sets uit 0.7 blijven geldig.
+- De Content-Security-Policy van spellen staat afbeeldingen van de eigen origin al toe, en `/media/…` staat op die origin.
+- Je spelpagina's laden de SDK van de server en hoeven niet te veranderen. De nieuwe methoden heb je alleen nodig in een eigen project.
+
+### Checklist
+
+1. De CLI is 0.8.0, de skills zijn opnieuw geïnstalleerd met `--force`, en `types/mini-engine.d.ts` komt uit SDK 0.7.0.
+2. `me doctor` is groen, en meldt Mini Engine 0.8 op de server voordat je een spel met afbeeldingen uploadt.
+3. Een optionele afbeelding staat buiten `required`, en je spel toont geen leeg of kapot plaatje als ze ontbreekt.
+4. Standaardplaatjes in `data.json` zijn paden onder `assets/` die in je spel staan.
+5. Heb je iets aangepast, dan heeft je spel een nieuwe `version` en is het geüpload met `--activate`.

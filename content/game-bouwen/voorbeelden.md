@@ -53,7 +53,7 @@ Vastgehouden indexen verwijzen naar de bestaande worp. Minstens één steen blij
 | `clear_history {}` | Host | Wist de zichtbare worpgeschiedenis |
 | `start {}` / `finish {}` | Iedere deelnemer in `hostless`, anders de host | Start of sluit de ronde |
 
-De types van deze acties staan in [`ActionPayloads`](../sdk/types.md#actionpayloads). Daar staan in SDK 0.6.0 ook nog de acties van Jeopardy; die bestaan sinds Mini Engine 0.7 niet meer. Een verkeerde actie geeft `400 invalid_request`, een actie die alleen de host mag `403 forbidden`, en een worp buiten een ronde `409 game_not_running`.
+De types van deze acties staan in [`ActionPayloads`](../sdk/types.md#actionpayloads). Daar staan in SDK 0.6.0 en 0.7.0 ook nog de acties van Jeopardy; die bestaan sinds Mini Engine 0.7 niet meer. Een verkeerde actie geeft `400 invalid_request`, een actie die alleen de host mag `403 forbidden`, en een worp buiten een ronde `409 game_not_running`.
 
 ## Accountresultaten en achievements
 

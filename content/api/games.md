@@ -13,7 +13,7 @@ Deze routes zijn openbaar en hebben geen sleutel nodig.
 ## GET /api/health
 
 ```json
-{ "status": "ok", "version": "0.7.0" }
+{ "status": "ok", "version": "0.8.0" }
 ```
 
 `version` is de versie van Mini Engine op de server. `me doctor` toont hem ook; zie [upgraden](../upgraden.md#eerst-welke-versie-heb-ik).
@@ -86,7 +86,7 @@ Alle spellen die aanstaan, met metadata, instellingenschema, icoon, achievements
 
 Ontbrekende manifestvelden krijgen hier hun standaardwaarde: `runtime: "host"`, `host_modes: ["moderator"]`, `default_host_mode: "moderator"`, `supports_late_join: true`, en lege lijsten voor `achievements` en `set_kinds`. Alle velden staan bij [package en manifest](../game-bouwen/package-en-manifest.md#velden). Het schemadialect voor soorten sets staat bij [eigen sets](../concepten/eigen-sets.md#het-schemadialect).
 
-`featured` is er sinds 0.7: de id's van hoogstens vier uitgelichte spellen, in de volgorde waarin de site ze toont. Er staan alleen spellen in die nu speelbaar zijn, dus elk id staat ook in `games`. Wie de site beheert, kiest ze; als ontwikkelaar stel je dat niet in. De types van SDK 0.6.0 kennen `featured` nog niet: `getGames()` heeft het type `{ games: Manifest[] }`.
+`featured` is er sinds 0.7: de id's van hoogstens vier uitgelichte spellen, in de volgorde waarin de site ze toont. Er staan alleen spellen in die nu speelbaar zijn, dus elk id staat ook in `games`. Wie de site beheert, kiest ze; als ontwikkelaar stel je dat niet in. De types van SDK 0.6.0 en 0.7.0 kennen `featured` nog niet: `getGames()` heeft het type `{ games: Manifest[] }`.
 
 `icon` staat er sinds 0.5.1, precies zoals het manifest het opgeeft, bijvoorbeeld `"icon": "assets/icon.svg"`. Heeft het spel geen icoon, dan ontbreekt het veld; ook Common Dice heeft er geen. Laad het icoon van het gewone assetadres van de actieve versie, `/games/{id}/{icon}?v={version}`, en toon het als `<img alt="">`, zodat een script in de SVG nooit draait. De regels staan bij [package en manifest](../game-bouwen/package-en-manifest.md#icon).
 

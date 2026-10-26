@@ -175,12 +175,22 @@ Deze documentatie hoort bij deze versies:
 
 | Onderdeel | Versie |
 | --- | --- |
-| Mini Engine | 0.7 (`GET /api/health` geeft de versie van de server) |
-| Mini Engine SDK | 0.6.0. De server serveert op `/sdk/mini-engine.js` de client van 0.5.2; die is gelijk aan die van 0.6.0 |
-| me-CLI | 0.7.0 |
+| Mini Engine | 0.8 (`GET /api/health` geeft de versie van de server) |
+| Mini Engine SDK | 0.7.0. De server serveert op `/sdk/mini-engine.js` de client van 0.5.2; die is gelijk aan die van 0.7.0, op `uploadMedia`, `listMedia` en `deleteMedia` na |
+| me-CLI | 0.8.0 |
 | API-referentie (pdf) | Editie 0.6, de openbare editie |
 
 Wat je met een bestaand spel doet bij een nieuwe versie, staat bij [upgraden](../upgraden.md).
+
+Nieuw in 0.8:
+
+- Afbeeldingen in eigen sets: een tekstveld met `"format": "image"` in het schema van een soort set. In een bewaarde set is de waarde `/media/{id}`, een afbeelding van hetzelfde account; in `data.json` een pad onder `assets/`. Zie [afbeeldingen](../concepten/eigen-sets.md#afbeeldingen).
+- `POST` en `GET /api/v1/accounts/media` en `DELETE /api/v1/accounts/media/{id}` om afbeeldingen te uploaden, te bekijken en te verwijderen, en de openbare route `GET /media/{id}`. Zie [afbeeldingen](accounts.md#afbeeldingen).
+- Bij het opslaan van een set controleert de server de afbeeldingen: `400 invalid_request` met het pad voor een afbeelding die niet van jou is, `409 quota_set_media` boven 100 afbeeldingen of 50 MiB per set.
+- Nieuwe foutcodes: `media_invalid`, `media_not_found`, `media_too_large`, `media_unsupported`, `quota_media`, `quota_set_media` en `media_in_use`. Uploads mogen 60 keer per minuut per IP-adres.
+- Het formulier op **Mijn sets** heeft een vak per afbeelding, met een voorbeeld, **Kies een afbeelding**, **Vervang** en **Verwijder**, en toont hoeveel ruimte je afbeeldingen innemen.
+
+Alles uit 0.7 werkt nog: manifests, kamers en sets blijven geldig, en spellen zonder afbeeldingen merken niets.
 
 Nieuw in 0.7:
 

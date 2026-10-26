@@ -275,7 +275,7 @@ Een afbeelding die geen van je sets gebruikt en die ouder is dan 24 uur, verwijd
 
 ### Standaardplaatjes in data.json
 
-Geef je `data.json` dezelfde vorm als je soort set, dan kan je spel ook zonder eigen set afbeeldingen tonen. Daar is de waarde het pad van een bestand in je package, onder `assets/`: relatief en zonder `..`.
+Geef je `data.json` dezelfde vorm als je soort set, dan kan je spel ook zonder eigen set afbeeldingen tonen. In `data.json` is de waarde van een afbeelding het pad van een bestand in je package, onder `assets/`: relatief en zonder `..`.
 
 ```json
 {
