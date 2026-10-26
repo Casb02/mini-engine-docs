@@ -65,7 +65,7 @@ Een eigen spel draait zijn regels in het tabblad van de host. De startsjablonen 
 
 | Sjabloon | Wat het voordoet |
 | --- | --- |
-| `quiz` | Geheime antwoorden in `data.json` en `host_state`, het eigen antwoord in `player_states`, een onthulling, [eigen sets](../concepten/eigen-sets.md) en een achievement |
+| `quiz` | Geheime antwoorden in `data.json` en `host_state`, het eigen antwoord in `player_states`, een onthulling, [eigen sets](../concepten/eigen-sets.md) met een optionele [afbeelding](../concepten/eigen-sets.md#afbeeldingen) bij elke vraag, en een achievement |
 | `buzzer` | [Realtime](../concepten/realtime.md): wie drukte als eerste, beslist door de host op de klok van de server |
 | `stemmen` | Een gedeeld scherm naast de spelers, en een maker die meespeelt |
 | `beurten` | Beurten, een dobbelsteen die de host gooit, en overslaan wie te lang offline is |

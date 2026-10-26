@@ -1,6 +1,6 @@
 ---
 title: ApiClient
-description: De HTTP-client van de SDK met alle methoden voor spellen, kamers, schermsleutels, accounts, achievements en eigen sets, plus de losse http-helpers.
+description: De HTTP-client van de SDK met alle methoden voor spellen, kamers, schermsleutels, accounts, achievements, eigen sets en afbeeldingen, plus de losse http-helpers.
 section: SDK
 group: Referentie
 order: 1
@@ -39,7 +39,7 @@ getGames(): Promise<{ games: Manifest[] }>
 
 Alle spellen die aanstaan, met hun metadata, instellingenschema, icoon, achievements en soorten sets, uit de actieve versie van elk spel. Ontbrekende manifestvelden krijgen hier hun standaardwaarde: `runtime: "host"`, `host_modes: ["moderator"]`, `default_host_mode: "moderator"`, `supports_late_join: true`, en lege lijsten voor `achievements` en `set_kinds`. `icon` ontbreekt als het spel er geen heeft.
 
-Sinds Mini Engine 0.7 heeft het antwoord ook `featured`: de id's van hoogstens vier uitgelichte spellen. Het type van SDK 0.6.0 kent dat veld nog niet; zie [GET /api/v1/games](../api/games.md#get-api-v1-games).
+Sinds Mini Engine 0.7 heeft het antwoord ook `featured`: de id's van hoogstens vier uitgelichte spellen. De types van SDK 0.6.0 en 0.7.0 kennen dat veld nog niet; zie [GET /api/v1/games](../api/games.md#get-api-v1-games).
 
 ### getGame(id)
 
@@ -254,11 +254,11 @@ const set = await api.createSet({
   game_id: 'quiz-bij-dani',
   kind: 'questions',
   title: "Dani's filmavond",
-  data: { questions: ['Welke film won in 1998 elf Oscars? | Titanic | Avatar | Gladiator', /* … */] },
+  data: { questions: [{ question: 'Welke film won in 1998 elf Oscars? | Titanic | Avatar | Gladiator' }, /* … */] },
 });
 ```
 
-De soort moet in de actieve versie van het spel staan en de inhoud moet aan het schema voldoen. Een fout noemt het pad, zoals `questions[2]: gebruik 5–300 tekens.` Bij 50 sets volgt `quota_sets`.
+De soort moet in de actieve versie van het spel staan en de inhoud moet aan het schema voldoen. Een fout noemt het pad, zoals `questions[2].question: gebruik 5–300 tekens.` Bij 50 sets volgt `quota_sets`. Een afbeelding in de set moet een [afbeelding](#afbeeldingen) van hetzelfde account zijn; bij meer dan 100 afbeeldingen, of samen meer dan 50 MiB, volgt `quota_set_media`.
 
 ### updateSet(id, input)
 
@@ -273,6 +273,53 @@ Vervangt titel en inhoud. Kamers die de set al gebruiken, houden hun kopie.
 ```ts
 deleteSet(id: string): Promise<null>
 ```
+
+## Afbeeldingen
+
+Sinds SDK 0.7.0, voor Mini Engine 0.8. Afbeeldingen voor de afbeeldingsvelden van [eigen sets](../concepten/eigen-sets.md#afbeeldingen). Alle methoden gebruiken `api.accountToken`. Een server ouder dan 0.8 kent deze routes niet en antwoordt met een 404.
+
+Mini Engine 0.8 serveert op `/sdk/mini-engine.js` nog de client van SDK 0.5.2, zonder deze methoden. Een spelpagina heeft ze ook niet nodig: spelers uploaden hun afbeeldingen in het formulier op **Mijn sets**. Gebruik ze in een eigen project, met het [npm-pakket](overzicht.md#in-een-eigen-project) 0.7.0.
+
+### uploadMedia(file, options?)
+
+```ts
+uploadMedia(file: Blob | ArrayBuffer | Uint8Array, options?: { contentType?: string }): Promise<MediaUpload>
+```
+
+Uploadt één afbeelding: een PNG, JPEG, WebP of GIF van hoogstens 10 MiB. De SDK stuurt het bestand zelf als body, met `contentType` als `Content-Type`, anders het type van de `Blob`. De server herkent het formaat aan de inhoud. `media.url` is de waarde voor een afbeeldingsveld.
+
+```ts
+api.accountToken = token;
+const file = input.files[0]; // uit <input type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+const { media, used_bytes, limit_bytes } = await api.uploadMedia(file);
+
+await api.createSet({
+  game_id: 'quiz-bij-dani',
+  kind: 'questions',
+  title: 'Wie is dit?',
+  data: { questions: [{ question: 'Wie is dit? | Pim | Dani | Hessel', image: media.url }, /* … */] },
+});
+```
+
+De server verkleint de afbeelding tot hoogstens 1920 pixels aan de lange kant en 1 MiB, en haalt de metadata eruit; zie [wat de server met een afbeelding doet](../concepten/eigen-sets.md#wat-de-server-met-een-afbeelding-doet). Fouten: `media_too_large`, `media_unsupported`, `media_invalid`, `quota_media` (al 250 MiB), `rate_limit` (meer dan 60 uploads per minuut).
+
+Bewaar een upload binnen een dag in een set. Een afbeelding die geen set gebruikt, ruimt de server na 24 uur op.
+
+### listMedia()
+
+```ts
+listMedia(): Promise<MediaList>
+```
+
+Jouw afbeeldingen, nieuwste eerst, met `used_bytes` en `limit_bytes` (250 MiB).
+
+### deleteMedia(id)
+
+```ts
+deleteMedia(id: string): Promise<null>
+```
+
+Verwijdert een afbeelding meteen. Gebruikt een van je sets haar nog, dan volgt `media_in_use`; een onbekende afbeelding, of een van een ander account, geeft `media_not_found`.
 
 ## Spelers en kamers beheren
 
@@ -301,6 +348,7 @@ De maker kan zijn eigen plek niet verwijderen en de kamer niet verlaten. Een spe
 | `getRoom`, `gameData`, `displayToken` | De meegegeven kamersleutel |
 | `me`, `stats`, `achievements`, `logout`, `verifyEmail`, `setEmail` | `accountToken` |
 | `listSets`, `getSet`, `createSet`, `updateSet`, `deleteSet` | `accountToken` |
+| `uploadMedia`, `listMedia`, `deleteMedia` | `accountToken` |
 | `getGames`, `getGame`, `roomInfo`, `register`, `login`, `accountConfig` | Geen |
 
 ## Losse functies

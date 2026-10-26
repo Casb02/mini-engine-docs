@@ -18,7 +18,7 @@ Een spel voor een hele tafel test je met een hele tafel: minimaal een spelleider
 me dev --players 3
 ```
 
-`me dev` controleert eerst je `manifest.json` zoals `me game upload` dat doet, en opent dan één overzicht met de spelleider, het gedeelde scherm en de spelers naast elkaar. Elke stoel draait op een eigen poort en heeft dus een eigen sessie, net als een eigen telefoon. Sla je een bestand op, dan laden de stoelen opnieuw en blijft de kamer bestaan. Kamers, klaar zijn, state met versies, acties, realtime, achievements en game-data werken zoals online. Met `--set` krijgt de game een [eigen set](../concepten/eigen-sets.md) in plaats van `data.json`.
+`me dev` controleert eerst je `manifest.json` zoals `me game upload` dat doet, en opent dan één overzicht met de spelleider, het gedeelde scherm en de spelers naast elkaar. Elke stoel draait op een eigen poort en heeft dus een eigen sessie, net als een eigen telefoon. Sla je een bestand op, dan laden de stoelen opnieuw en blijft de kamer bestaan. Kamers, klaar zijn, state met versies, acties, realtime, achievements en game-data werken zoals online. Met `--set` krijgt de game een [eigen set](../concepten/eigen-sets.md) in plaats van `data.json`, met de afbeeldingen voor die set uit een map `media/` ernaast; zie [afbeeldingen in een set testen](../publiceren/cli.md#afbeeldingen-in-een-set-testen).
 
 De kamer krijgt de `default_host_mode` uit je manifest. Wil je `tv` of `moderator` proberen, zet die dan even als standaard en kies **Nieuwe kamer**.
 

@@ -99,7 +99,7 @@ Elk sjabloon is een werkend spel dat je meteen kunt spelen, met `host_modes: ["p
 | Sjabloon | Wat het is | Wat je eraan ziet |
 | --- | --- | --- |
 | `stemmen` | Iedereen stemt ja of nee op één vraag; elk scherm toont de stand. Heeft een gedeeld scherm. | De wachtrij van de host, een maker die meespeelt, instellingen als tekst |
-| `quiz` | Meerkeuzevragen op tijd, punten en een eindstand. | Geheime antwoorden in `host_state`, het eigen antwoord in `player_states`, `data.json`, [eigen sets](../concepten/eigen-sets.md) met één vraag per regel, een achievement |
+| `quiz` | Meerkeuzevragen op tijd, punten en een eindstand. | Geheime antwoorden in `host_state`, het eigen antwoord in `player_states`, `data.json`, [eigen sets](../concepten/eigen-sets.md) met een blok per vraag en een optionele [afbeelding](../concepten/eigen-sets.md#afbeeldingen) (Mini Engine 0.8), een achievement |
 | `buzzer` | Wie drukt het snelst nadat de knop groen wordt? Te vroeg telt niet. | [Realtime](../concepten/realtime.md) met de `ts` van de server; de host wacht 150 ms, sorteert en beslist |
 | `beurten` | Om de beurt dobbelen; een 1 kost je de punten van die beurt. | Beurten, een dobbelsteen die de host gooit, spelers die weggaan, overslaan na 30 seconden offline |
 | `leeg` | Een kaal begin: lobby, start, één voorbeeldzet en een einde. | Het kleinste rondje: actie, scheidsrechter, state |
@@ -152,6 +152,8 @@ Alle bestanden in de map, behalve:
 
 Symlinks worden geweigerd. Voordat er iets verstuurd wordt, controleert de CLI het manifest, de rolpagina's, het icoon en de grenzen; zie [wat mag](overzicht.md#wat-mag).
 
+Heeft een soort set een [afbeeldingsveld](../concepten/eigen-sets.md#afbeeldingen) en draait de server een versie van Mini Engine ouder dan 0.8, dan waarschuwt `me game upload` eerst: zo'n server weigert dat schema. De upload gaat wel door. `me doctor` laat zien welke versie de server draait.
+
 Is het de eerste versie van een nieuw spel, dan zegt `me game upload` erbij dat die meteen live staat, voor iedereen op die server, met het adres om een kamer te maken.
 
 ### Foutmeldingen van de server
@@ -190,7 +192,7 @@ me dev
 | `[map]` | De map van de game; standaard de map waarin je staat |
 | `--port POORT` | Poort van het overzicht (standaard 3170); de stoelen krijgen de poorten erna. `0` kiest vrije poorten |
 | `--players N` | Aantal spelers bij de start (standaard 2) |
-| `--set BESTAND` | JSON-bestand dat de game krijgt in plaats van `data.json`, gecontroleerd als [eigen set](../concepten/eigen-sets.md) |
+| `--set BESTAND` | JSON-bestand dat de game krijgt in plaats van `data.json`, gecontroleerd als [eigen set](../concepten/eigen-sets.md); afbeeldingen staan in `media/` ernaast (sinds CLI 0.8.0, zie [hieronder](#afbeeldingen-in-een-set-testen)) |
 | `--lan` | Ook telefoons op hetzelfde wifi laten meedoen; sinds CLI 0.6.0 |
 | `--no-open` | Geen browser openen |
 
@@ -207,6 +209,31 @@ me dev --set sets/filmavond.json --no-open
 - Het overzicht en elke stoel serveren dezelfde adressen als Mini Engine, zoals `/api/v1/rooms` en `/room/CODE/ROL`. Zo kan een script als `scripts/play.mjs` uit de bouwskill er een kamer mee bespelen; zie [testen](../game-bouwen/testen.md#geautomatiseerde-controles).
 
 `me dev` is een nabootsing. Hij volgt het protocol van Mini Engine, en de tests van de CLI draaien hem met dezelfde stappen als de echte server. Test je game voor een avond met vrienden toch ook een keer als testversie op de server, met `me game upload`. Zie [testen](../game-bouwen/testen.md).
+
+### Afbeeldingen in een set testen
+
+Sinds CLI 0.8.0. Heeft je soort set een [afbeeldingsveld](../concepten/eigen-sets.md#afbeeldingen), dan test je dat met `--set`. Zet de afbeeldingen in een map `media/` naast het set-bestand, en noem ze in de set met `/media/<naam>`:
+
+```text
+sets/
+  bord.json        { "vragen": [{ "vraag": "Welk dier is dit?", "afbeelding": "/media/okapi.jpg", … }] }
+  media/
+    okapi.jpg
+```
+
+```sh
+me dev --set sets/bord.json
+```
+
+`me dev` controleert de set zoals Mini Engine dat doet, met deze regels voor een afbeelding:
+
+- Een naam heeft alleen letters, cijfers, `.`, `_` en `-`, en begint niet met een punt. Het bestand staat in `media/` en is een PNG, JPEG, WebP of GIF van hoogstens 10 MiB, herkend aan de inhoud en niet aan de naam.
+- `/media/<id>` met het id van een upload op de server (32 tekens `0-9a-f`) mag ook. Die afbeelding staat niet op je computer, dus lokaal zie je haar niet.
+- Een lege tekst is geen afbeelding. Een afbeelding die niet in `required` staat, mag je weglaten.
+
+`me dev` serveert `/media/<naam>` op het overzicht en op elke stoel, ook voor telefoons met `--lan`, met dezelfde headers als de server. `<img src="/media/okapi.jpg">` werkt in je spel dus zonder meer. Een onbekende naam geeft 404. De server verkleint uploads tot hoogstens 1920 pixels en 1 MiB; `me dev` serveert je bestand zoals het is.
+
+Zonder `--set` speelt `me dev` met je `data.json`. Daar is een afbeelding een bestand in je spel, zoals `assets/vragen/1.png`. Heeft `data.json` de vorm van een soort set, dan waarschuwt `me dev` als zo'n afbeelding geen pad onder `assets/` is of niet in je spel staat.
 
 ## Skills voor AI-agents
 
@@ -229,12 +256,12 @@ Sinds CLI 0.6.0. Loopt alles langs wat je nodig hebt, als lijst met ✓ en ✗. 
 - de server, of `/api/health` antwoordt en welke versie van Mini Engine daar draait;
 - je dev-key, zoals `me auth status` die controleert;
 - de AI-skills in `~/.claude/skills`;
-- in een map met `manifest.json`: dezelfde controles als `me game upload --dry-run`, en of de rolpagina's alleen bestanden uit het spel laden. Ben je ingelogd, dan zegt hij ook of deze versie al op de server staat.
+- in een map met `manifest.json`: dezelfde controles als `me game upload --dry-run`, of de rolpagina's alleen bestanden uit het spel laden, en sinds CLI 0.8.0 of de afbeeldingen in `data.json` in het spel staan. Ben je ingelogd, dan zegt hij ook of deze versie al op de server staat.
 
 ```text
 ✓ Node.js 22.12.0
-✓ CLI 0.7.0 is de nieuwste versie
-✓ Server https://miniengine.nl (standaard) is bereikbaar, Mini Engine 0.7.0
+✓ CLI 0.8.0 is de nieuwste versie
+✓ Server https://miniengine.nl (standaard) is bereikbaar, Mini Engine 0.8.0
 ✗ Geen dev key voor https://miniengine.nl; uploaden kan nog niet. Spelen met me dev lukt wel.
     Vraag een dev key aan wie de server beheert en log in met: me auth
 ✓ AI-skills staan in ~/.claude/skills

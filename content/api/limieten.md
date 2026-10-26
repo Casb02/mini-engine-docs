@@ -1,6 +1,6 @@
 ---
 title: Limieten
-description: Alle grenzen van Mini Engine 0.7 op één plek, van kamercodes en namen tot berichtgroottes, realtime, achievements, eigen sets, aanvraaglimieten en gamepackages.
+description: Alle grenzen van Mini Engine 0.8 op één plek, van kamercodes en namen tot berichtgroottes, realtime, achievements, eigen sets, afbeeldingen, aanvraaglimieten en gamepackages.
 section: API
 order: 7
 ---
@@ -78,6 +78,19 @@ Wat boven het budget of de grenzen voor waarden komt, valt weg. De verbinding bl
 | Inhoud van een set | 64 KiB als JSON |
 | Sets per account | 50 |
 
+## Afbeeldingen in sets (vanaf 0.8)
+
+| Grens | Waarde |
+| --- | --- |
+| Formaten | PNG, JPEG, WebP en GIF (het eerste beeld), herkend aan de inhoud; andere geven `415 media_unsupported` |
+| Eén upload | 10 MiB (`413 media_too_large`) en 40 miljoen pixels (`400 media_invalid`) |
+| Opgeslagen afbeelding | Hoogstens 1920 pixels aan de lange kant, nooit vergroot; hoogstens 1 MiB; JPEG, of PNG bij transparantie; zonder metadata |
+| Per account | 250 MiB samen (`409 quota_media`) |
+| Per set | 100 verschillende afbeeldingen, samen 50 MiB (`409 quota_set_media`) |
+| Ongebruikt | Een afbeelding die geen set van het account gebruikt en geen kamer in zijn kopie van een set heeft, verdwijnt na 24 uur |
+
+Zie [afbeeldingen](accounts.md#afbeeldingen).
+
 ## Aanvragen per IP-adres
 
 | Route | Limiet |
@@ -88,6 +101,7 @@ Wat boven het budget of de grenzen voor waarden komt, valt weg. De verbinding bl
 | `POST`, `PUT` en `DELETE` onder `/api/v1/dev/` | 60 per minuut |
 | Uploads (`POST /api/v1/dev/games/{id}/versions`) | 20 per 10 minuten |
 | Sets: `POST`, `PUT` en `DELETE` onder `/api/v1/accounts/sets` (vanaf 0.5) | 30 per minuut |
+| Afbeeldingen uploaden: `POST /api/v1/accounts/media` (vanaf 0.8) | 60 per minuut |
 | Nieuw getekende linkafbeeldingen onder `/og/` (vanaf 0.6.1) | 30 per minuut |
 | Verkeerde dev-key (401 op `/dev`) | na 10 in 10 minuten wordt dat adres 10 minuten geweigerd, ook met de goede sleutel |
 
