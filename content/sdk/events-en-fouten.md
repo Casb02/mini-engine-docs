@@ -133,7 +133,7 @@ Elke fout van de server heeft een vaste `code` voor je code en een Nederlandse `
 | 409 | `email_already_verified` | Dit adres is al bevestigd voor jouw account |
 | 409 | `quota_sets` | Het account heeft al 50 sets |
 | 409 | `quota_set_media` | Sinds 0.8. De set gebruikt meer dan 100 afbeeldingen, of samen meer dan 50 MiB |
-| 409 | `quota_media` | Sinds 0.8. De afbeeldingen van het account worden samen meer dan 250 MiB |
+| 409 | `quota_media` | Sinds 0.8. De afbeeldingen van het account worden samen meer dan de ruimte van het account (`limit_bytes`). Sinds 0.8.1 hangt die af van het account en kan ze 0 zijn |
 | 409 | `media_in_use` | Sinds 0.8. Een afbeelding verwijderen die een van je sets nog gebruikt |
 | 409 | `release_changed` | Kamer maken met een eigen set terwijl het spel net een nieuwe versie kreeg; probeer het opnieuw |
 | 413 | `state_too_large` | De gepubliceerde state is groter dan 64 KiB |
@@ -141,6 +141,7 @@ Elke fout van de server heeft een vaste `code` voor je code en een Nederlandse `
 | 413 | `media_too_large` | Sinds 0.8. Een upload van een afbeelding is groter dan 10 MiB |
 | 415 | `media_unsupported` | Sinds 0.8. Geen PNG, JPEG, WebP of GIF, maar bijvoorbeeld een SVG of HEIC |
 | 429 | `rate_limit` | Te veel verzoeken, berichten, mails, setwijzigingen, uploads van afbeeldingen of toegekende achievements |
+| 429 | `media_request_wait` | Sinds 0.8.1. Het account vroeg de afgelopen 7 dagen al om ruimte voor afbeeldingen; zie [ruimte aanvragen](../api/accounts.md#post-api-v1-accounts-media-requests) |
 | 500 | `internal_error` | Opslaan mislukt; de oude state blijft staan |
 | 503 | `room_limit` | De server heeft het maximale aantal kamers |
 | 503 | `connection_limit` | De server heeft het maximale aantal verbindingen |

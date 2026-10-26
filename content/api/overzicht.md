@@ -88,7 +88,7 @@ Elke fout heeft dezelfde vorm:
 | 409 | `game_not_running` | Serverspel: start eerst het spel. Achievement toekennen: de kamer staat nog in de lobby |
 | 409 | `quota_sets` | Het account heeft al 50 sets |
 | 409 | `quota_set_media` | Een set gebruikt meer dan 100 afbeeldingen, of samen meer dan 50 MiB (sinds 0.8) |
-| 409 | `quota_media` | De afbeeldingen van het account worden samen meer dan 250 MiB (sinds 0.8) |
+| 409 | `quota_media` | De afbeeldingen van het account worden samen meer dan de ruimte van het account, `limit_bytes` (sinds 0.8; die ruimte hangt sinds 0.8.1 af van het account) |
 | 409 | `media_in_use` | Een van je sets gebruikt deze afbeelding nog (sinds 0.8) |
 | 409 | `release_changed` | Kamer maken met een eigen set: het spel kreeg net een nieuwe versie; probeer het opnieuw |
 | 413 | `state_too_large` | Gepubliceerde state groter dan 64 KiB |
@@ -96,6 +96,7 @@ Elke fout heeft dezelfde vorm:
 | 413 | `media_too_large` | Een upload van een afbeelding is groter dan 10 MiB (sinds 0.8) |
 | 415 | `media_unsupported` | Geen PNG, JPEG, WebP of GIF, maar bijvoorbeeld een SVG of HEIC (sinds 0.8) |
 | 429 | `rate_limit` | Te veel verzoeken, berichten, mails, setwijzigingen, uploads van afbeeldingen of toegekende achievements |
+| 429 | `media_request_wait` | Het account vroeg de afgelopen 7 dagen al om ruimte voor afbeeldingen (sinds 0.8.1) |
 | 500 | `internal_error` | Opslaan mislukt; de oude state blijft staan |
 | 503 | `room_limit` | De server heeft al het maximale aantal kamers |
 | 503 | `connection_limit` | Te veel gelijktijdige websocketverbindingen |
@@ -153,6 +154,7 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | `GET`, `POST /api/v1/accounts/sets` | Account | Eigen sets bekijken (zonder inhoud) of er een maken |
 | `GET`, `PUT`, `DELETE /api/v1/accounts/sets/{id}` | Account | Eén eigen set lezen, vervangen of verwijderen |
 | `GET`, `POST /api/v1/accounts/media` | Account | Je afbeeldingen bekijken, of er een uploaden (sinds 0.8) |
+| `POST /api/v1/accounts/media/requests` | Account | Ruimte voor afbeeldingen aanvragen (sinds 0.8.1) |
 | `DELETE /api/v1/accounts/media/{id}` | Account | Een afbeelding verwijderen (sinds 0.8) |
 | `GET /media/{id}` | Openbaar | Een afbeelding uit een eigen set (sinds 0.8) |
 | `GET /api/v1/accounts/games` | Account | Je eigen geüploade spellen (sinds 0.5.1) |
@@ -175,12 +177,19 @@ Deze documentatie hoort bij deze versies:
 
 | Onderdeel | Versie |
 | --- | --- |
-| Mini Engine | 0.8 (`GET /api/health` geeft de versie van de server) |
+| Mini Engine | 0.8.1 (`GET /api/health` geeft de versie van de server) |
 | Mini Engine SDK | 0.7.0, ook op `/sdk/mini-engine.js` van de server |
 | me-CLI | 0.8.0 |
 | API-referentie (pdf) | Editie 0.6, de openbare editie |
 
 Wat je met een bestaand spel doet bij een nieuwe versie, staat bij [upgraden](../upgraden.md).
+
+Nieuw in 0.8.1:
+
+- De ruimte voor afbeeldingen hangt af van het account: 1 GiB voor een beheerder, 250 MiB voor een account met een dev-key die nog werkt, en anders niets, tot wie de server beheert een eigen hoeveelheid kiest. `limit_bytes` is de ruimte van dat account en kan 0 zijn. Zie [ruimte voor afbeeldingen](accounts.md#ruimte-voor-afbeeldingen).
+- `GET /api/v1/accounts/media` geeft ook `request`: de nieuwste aanvraag voor ruimte, of `null`.
+- `POST /api/v1/accounts/media/requests` vraagt ruimte aan, één keer per 7 dagen. Nieuwe foutcode: `429 media_request_wait`.
+- Bij een set met afbeeldingen op **Mijn sets** ziet een speler de eigen ruimte, met de knop **Ruimte aanvragen** of **Meer ruimte aanvragen** en hoe het met de aanvraag staat.
 
 Nieuw in 0.8:
 

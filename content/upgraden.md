@@ -41,7 +41,7 @@ Deze versies horen bij elkaar:
 | 0.5.2 tot en met 0.5.5 | 0.5.2 | 0.5.2 |
 | 0.6.0 tot en met 0.6.5 | 0.6.0 | 0.6.0 |
 | 0.7.0 en 0.7.1 | 0.6.0 | 0.7.0 |
-| 0.8.0 | 0.7.0 | 0.8.0 |
+| 0.8.0 en 0.8.1 | 0.7.0 | 0.8.0 |
 
 De client in de SDK bleef van 0.5.0 tot en met 0.6.0 gelijk; die versies brachten types, startsjablonen en skills. SDK 0.7.0 geeft `ApiClient` drie methoden voor afbeeldingen erbij. Mini Engine 0.6 en 0.7 serveren de client van SDK 0.5.2, die verder gelijk is; Mini Engine 0.8 serveert SDK 0.7.0, ook op `/sdk/mini-engine.d.ts`. Een spelpagina heeft de methoden voor afbeeldingen niet nodig: afbeeldingen uploadt een speler in de set-editor. Haal de types voor je eigen kopie uit SDK 0.7.0, zoals hieronder.
 
@@ -211,7 +211,7 @@ Mini Engine 0.7.0 brengt uitgelichte spellen en zoeken, en Jeopardy is niet meer
 
 ## Van 0.7 naar 0.8
 
-Mini Engine 0.8.0 brengt afbeeldingen in eigen sets: een speler zet bijvoorbeeld een foto bij een quizvraag, en je spel toont die. SDK 0.7.0 en CLI 0.8.0 horen erbij. Gebruikt je spel geen afbeeldingen, dan werk je alleen je gereedschap bij.
+Mini Engine 0.8.0 brengt afbeeldingen in eigen sets: een speler zet bijvoorbeeld een foto bij een quizvraag, en je spel toont die. SDK 0.7.0 en CLI 0.8.0 horen erbij, ook bij 0.8.1. Mini Engine 0.8.1 geeft elk account een eigen [ruimte voor afbeeldingen](#ruimte-voor-afbeeldingen-sinds-0-8-1). Gebruikt je spel geen afbeeldingen, dan werk je alleen je gereedschap bij.
 
 ### Wat je moet doen
 
@@ -242,6 +242,7 @@ Daarin staan `format: 'image'` in `SetSchema`, en `uploadMedia`, `listMedia` en 
 | 0.8.0 | Spelers uploaden afbeeldingen in het formulier op **Mijn sets**, met een voorbeeld, **Vervang** en **Verwijder** | [Afbeeldingen toevoegen](concepten/eigen-sets.md#afbeeldingen-toevoegen-op-mijn-sets) |
 | 0.8.0 | Standaardplaatjes in `data.json`, als pad onder `assets/` | [Standaardplaatjes](concepten/eigen-sets.md#standaardplaatjes-in-data-json) |
 | 0.8.0 | De routes onder `/api/v1/accounts/media` en `GET /media/{id}` | [Afbeeldingen in de API](api/accounts.md#afbeeldingen) |
+| 0.8.1 | Ruimte voor afbeeldingen per account, `request` in `GET /api/v1/accounts/media` en `POST /api/v1/accounts/media/requests` om ruimte aan te vragen | [Ruimte voor afbeeldingen](api/accounts.md#ruimte-voor-afbeeldingen) |
 | SDK 0.7.0 | `uploadMedia`, `listMedia` en `deleteMedia`; het startsjabloon `quiz` heeft een optionele afbeelding bij elke vraag | [ApiClient](sdk/api-client.md#afbeeldingen) |
 | CLI 0.8.0 | `me dev --set` met afbeeldingen uit een map `media/`; `me doctor` controleert de afbeeldingen in `data.json` | [Afbeeldingen in een set testen](publiceren/cli.md#afbeeldingen-in-een-set-testen) |
 
@@ -254,6 +255,16 @@ Zo geef je je eigen soort set een afbeelding:
 
 Maakte je een spel met het oude `quiz`-sjabloon? Daar is een eigen vragenlijst een lijst teksten, één vraag per regel. Het nieuwe sjabloon heeft een blok per vraag, met `question` en `image`. Neem je die vorm over, dan passen de vragenlijsten die spelers al maakten niet meer. Laat je hem zoals hij is, dan blijft je spel gewoon werken, zonder afbeeldingen.
 
+### Ruimte voor afbeeldingen (sinds 0.8.1)
+
+In 0.8.0 had elk account 250 MiB voor afbeeldingen. Sinds 0.8.1 hangt dat af van het account: een beheerder heeft 1 GiB, een account met een dev-key die nog werkt 250 MiB, en ieder ander eerst niets. Een speler vraagt ruimte aan op **Mijn sets**, en wie de server beheert beslist erover. Afbeeldingen die er al stonden, blijven staan en werken in sets, ook als de ruimte kleiner wordt.
+
+- **Reken er niet op dat een speler kan uploaden.** Zonder ruimte geeft een upload `409 quota_media`. Laat een afbeeldingsveld buiten `required` en toon niets als het leeg is, zoals hierboven.
+- **Lees `limit_bytes`, niet het getal 250 MiB.** Een eigen tool die de ruimte toont, gebruikt `limit_bytes` uit `listMedia` of `GET /api/v1/accounts/media`; dat kan 0 zijn.
+- **Ruimte aanvragen gaat via de API.** SDK 0.7.0 heeft er geen methode voor; zie [`POST /api/v1/accounts/media/requests`](api/accounts.md#post-api-v1-accounts-media-requests). Eén keer per 7 dagen, anders `429 media_request_wait`.
+
+Jouw eigen account heeft met een dev-key die nog werkt 250 MiB, dus `me dev --set` en je eigen sets testen gaan zoals in 0.8.0. `me dev` kijkt niet naar de ruimte.
+
 ### Geen actie nodig
 
 - Spellen zonder afbeeldingen werken zoals in 0.7. Het manifest kreeg geen nieuwe velden, en manifests, kamers en sets uit 0.7 blijven geldig.
@@ -264,6 +275,6 @@ Maakte je een spel met het oude `quiz`-sjabloon? Daar is een eigen vragenlijst e
 
 1. De CLI is 0.8.0, de skills zijn opnieuw geïnstalleerd met `--force`, en `types/mini-engine.d.ts` komt uit SDK 0.7.0.
 2. `me doctor` is groen, en meldt Mini Engine 0.8 op de server voordat je een spel met afbeeldingen uploadt.
-3. Een optionele afbeelding staat buiten `required`, en je spel toont geen leeg of kapot plaatje als ze ontbreekt.
+3. Een optionele afbeelding staat buiten `required`, en je spel toont geen leeg of kapot plaatje als ze ontbreekt, ook voor spelers die (nog) geen ruimte voor afbeeldingen hebben.
 4. Standaardplaatjes in `data.json` zijn paden onder `assets/` die in je spel staan.
 5. Heb je iets aangepast, dan heeft je spel een nieuwe `version` en is het geüpload met `--activate`.

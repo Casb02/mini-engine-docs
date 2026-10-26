@@ -315,4 +315,4 @@ interface MediaUpload { media: MediaItem; used_bytes: number; limit_bytes: numbe
 interface MediaList { media: MediaItem[]; used_bytes: number; limit_bytes: number }
 ```
 
-`used_bytes` telt alle afbeeldingen van het account; `limit_bytes` is de grens per account, 250 MiB. Zie [uploadMedia](api-client.md#uploadmedia-file-options).
+`used_bytes` telt alle afbeeldingen van het account; `limit_bytes` is de ruimte van het account in bytes. In Mini Engine 0.8.0 was dat 250 MiB voor iedereen; sinds 0.8.1 hangt het af van het account en kan het 0 zijn (zie [ruimte voor afbeeldingen](../api/accounts.md#ruimte-voor-afbeeldingen)). Sinds 0.8.1 geeft `listMedia` ook `request`, de nieuwste aanvraag voor ruimte of `null`; dat veld staat nog niet in de types van SDK 0.7.0. Zie [uploadMedia](api-client.md#uploadmedia-file-options).

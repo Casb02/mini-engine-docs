@@ -85,9 +85,10 @@ Wat boven het budget of de grenzen voor waarden komt, valt weg. De verbinding bl
 | Formaten | PNG, JPEG, WebP en GIF (het eerste beeld), herkend aan de inhoud; andere geven `415 media_unsupported` |
 | Eén upload | 10 MiB (`413 media_too_large`) en 40 miljoen pixels (`400 media_invalid`) |
 | Opgeslagen afbeelding | Hoogstens 1920 pixels aan de lange kant, nooit vergroot; hoogstens 1 MiB; JPEG, of PNG bij transparantie; zonder metadata |
-| Per account | 250 MiB samen (`409 quota_media`) |
+| Per account | De ruimte van het account, `limit_bytes` (`409 quota_media`). Sinds 0.8.1: 1 GiB voor een beheerder, 250 MiB met een dev-key die nog werkt, anders 0, tenzij wie de server beheert een eigen hoeveelheid koos (0 tot 1048576 MiB). In 0.8.0 250 MiB voor iedereen. Zie [ruimte voor afbeeldingen](accounts.md#ruimte-voor-afbeeldingen) |
 | Per set | 100 verschillende afbeeldingen, samen 50 MiB (`409 quota_set_media`) |
 | Ongebruikt | Een afbeelding die geen set van het account gebruikt en geen kamer in zijn kopie van een set heeft, verdwijnt na 24 uur |
+| Ruimte aanvragen | Eén keer per 7 dagen per account (`429 media_request_wait`), met een bericht van hoogstens 500 tekens (sinds 0.8.1) |
 
 Zie [afbeeldingen](accounts.md#afbeeldingen).
 
