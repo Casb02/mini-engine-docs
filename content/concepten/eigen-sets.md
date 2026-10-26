@@ -250,6 +250,14 @@ Past je schema niet in het formulier, dan heeft de JSON-editor een apart vak **A
 
 Met de SDK upload je een afbeelding met [`uploadMedia`](../sdk/api-client.md#afbeeldingen). Het antwoord heeft `media.url`, de waarde voor het veld.
 
+### Ruimte voor afbeeldingen
+
+Sinds 0.8.1 hangt de ruimte voor afbeeldingen af van het account. Een beheerder heeft 1 GiB, een account met een dev-key die nog werkt 250 MiB, en ieder ander heeft eerst geen ruimte. Wie de server beheert, kan een account meer of minder geven. Wordt de ruimte kleiner dan wat er al staat, dan blijven de afbeeldingen staan en werken ze in sets; alleen nieuwe uploads gaan dan niet (`quota_media`).
+
+Op **Mijn sets** ziet een speler bij een set met afbeeldingen de eigen ruimte. Is die er nog niet, dan staat er *Je account heeft nog geen ruimte voor afbeeldingen.* met de knop **Ruimte aanvragen**; wie al ruimte heeft, ziet **Meer ruimte aanvragen**. Daarna vraagt het formulier *Waarvoor wil je afbeeldingen gebruiken?*, met een bericht dat leeg mag blijven, en **Aanvraag versturen**. De pagina toont hoe het met de aanvraag staat: dat een beheerder ernaar kijkt, dat ze is afgewezen, of vanaf welke dag een nieuwe aanvraag kan. Dat kan één keer per 7 dagen. In de API is dat [`POST /api/v1/accounts/media/requests`](../api/accounts.md#post-api-v1-accounts-media-requests).
+
+Voor je spel betekent dit: de meeste spelers kunnen pas afbeeldingen uploaden als hun aanvraag is toegekend. Laat een afbeeldingsveld daarom buiten `required`, zodat een set zonder afbeeldingen ook kan, en toon niets als het veld leeg is. [Standaardplaatjes](#standaardplaatjes-in-data-json) in je `data.json` tellen niet mee voor de ruimte van een speler.
+
 ### Wat de server met een afbeelding doet
 
 De server herkent een PNG, JPEG, WebP of GIF aan de inhoud van het bestand, niet aan de naam of het `Content-Type`. Van een GIF blijft alleen het eerste beeld over. SVG, HEIC en andere formaten weigert hij.
@@ -263,7 +271,7 @@ Daarna zet hij een telefoonfoto rechtop, verkleint hij de afbeelding tot hoogste
 | Formaten | PNG, JPEG, WebP en GIF (alleen het eerste beeld); geen SVG of HEIC |
 | Eén upload | Hoogstens 10 MiB en 40 miljoen pixels |
 | Opgeslagen afbeelding | Hoogstens 1920 pixels aan de lange kant, nooit vergroot, hoogstens 1 MiB en zonder metadata |
-| Per account | 250 MiB aan afbeeldingen samen |
+| Per account | De [ruimte van het account](#ruimte-voor-afbeeldingen): sinds 0.8.1 1 GiB voor een beheerder, 250 MiB met een dev-key die nog werkt, en anders niets tot het account ruimte krijgt |
 | Per set | Hoogstens 100 verschillende afbeeldingen, samen hoogstens 50 MiB |
 | Uploads | 60 per minuut per IP-adres |
 

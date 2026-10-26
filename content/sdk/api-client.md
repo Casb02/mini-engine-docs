@@ -301,7 +301,7 @@ await api.createSet({
 });
 ```
 
-De server verkleint de afbeelding tot hoogstens 1920 pixels aan de lange kant en 1 MiB, en haalt de metadata eruit; zie [wat de server met een afbeelding doet](../concepten/eigen-sets.md#wat-de-server-met-een-afbeelding-doet). Fouten: `media_too_large`, `media_unsupported`, `media_invalid`, `quota_media` (al 250 MiB), `rate_limit` (meer dan 60 uploads per minuut).
+De server verkleint de afbeelding tot hoogstens 1920 pixels aan de lange kant en 1 MiB, en haalt de metadata eruit; zie [wat de server met een afbeelding doet](../concepten/eigen-sets.md#wat-de-server-met-een-afbeelding-doet). Fouten: `media_too_large`, `media_unsupported`, `media_invalid`, `quota_media` (de ruimte van het account is op, of het heeft nog geen ruimte), `rate_limit` (meer dan 60 uploads per minuut).
 
 Bewaar een upload binnen een dag in een set. Een afbeelding die geen set gebruikt, ruimt de server na 24 uur op.
 
@@ -311,7 +311,9 @@ Bewaar een upload binnen een dag in een set. Een afbeelding die geen set gebruik
 listMedia(): Promise<MediaList>
 ```
 
-Jouw afbeeldingen, nieuwste eerst, met `used_bytes` en `limit_bytes` (250 MiB).
+Jouw afbeeldingen, nieuwste eerst, met `used_bytes` en `limit_bytes`: de ruimte van het account in bytes. Sinds Mini Engine 0.8.1 hangt die af van het account en kan ze 0 zijn; zie [ruimte voor afbeeldingen](../api/accounts.md#ruimte-voor-afbeeldingen). Van 0.8.1 komt ook `request` mee, de nieuwste aanvraag voor ruimte of `null`; de types van SDK 0.7.0 kennen dat veld nog niet.
+
+SDK 0.7.0 heeft geen methode om ruimte aan te vragen. Doe dat met [`POST /api/v1/accounts/media/requests`](../api/accounts.md#post-api-v1-accounts-media-requests), met de accountsleutel als bearer, of laat de speler het doen op **Mijn sets**.
 
 ### deleteMedia(id)
 

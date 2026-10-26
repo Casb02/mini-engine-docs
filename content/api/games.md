@@ -13,7 +13,7 @@ Deze routes zijn openbaar en hebben geen sleutel nodig.
 ## GET /api/health
 
 ```json
-{ "status": "ok", "version": "0.8.0" }
+{ "status": "ok", "version": "0.8.1" }
 ```
 
 `version` is de versie van Mini Engine op de server. `me doctor` toont hem ook; zie [upgraden](../upgraden.md#eerst-welke-versie-heb-ik).

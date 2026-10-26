@@ -88,7 +88,7 @@ Sinds Mini Engine 0.8. Zie [afbeeldingen](../concepten/eigen-sets.md#afbeeldinge
 | Formaten | PNG, JPEG, WebP en GIF (het eerste beeld); geen SVG of HEIC (`media_unsupported`) |
 | Eén upload | 10 MiB (`media_too_large`) en 40 miljoen pixels (`media_invalid`) |
 | Opgeslagen afbeelding | Hoogstens 1920 pixels aan de lange kant, nooit vergroot; hoogstens 1 MiB; zonder metadata |
-| Per account | 250 MiB samen (`quota_media`) |
+| Per account | De ruimte van het account (`limit_bytes`, `quota_media`). Sinds 0.8.1: 1 GiB voor een beheerder, 250 MiB met een dev-key die nog werkt, anders niets, tenzij wie de server beheert iets anders koos. In 0.8.0 250 MiB voor iedereen |
 | Per set | 100 verschillende afbeeldingen, samen 50 MiB (`quota_set_media`) |
 | Uploads | 60 per minuut per IP-adres |
 | Ongebruikt | Na 24 uur opgeruimd als geen set van het account de afbeelding gebruikt |

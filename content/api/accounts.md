@@ -295,6 +295,22 @@ Aanmaken, wijzigen en verwijderen samen mag 30 keer per minuut per IP-adres; zie
 
 Sinds 0.8. Afbeeldingen voor [eigen sets](../concepten/eigen-sets.md#afbeeldingen), zoals een foto bij een quizvraag. Een afbeelding hoort bij het account dat haar uploadde; een set verwijst ernaar met haar `url`. De routes onder `/api/v1/accounts/media` vragen een accountsleutel, net als de routes voor sets. Een bevestigd e-mailadres is niet nodig.
 
+### Ruimte voor afbeeldingen
+
+Sinds 0.8.1 hangt de ruimte voor afbeeldingen af van het account. Zolang wie de server beheert geen eigen hoeveelheid koos, geldt:
+
+| Account | Ruimte (`limit_bytes`) |
+| --- | --- |
+| Beheerder | 1 GiB (1073741824 bytes) |
+| Met een dev-key die nog werkt (niet ingetrokken en niet verlopen) | 250 MiB (262144000 bytes) |
+| Ieder ander | Geen (0) |
+
+Wie de server beheert, kan een account elk heel aantal MiB geven, van 0 tot 1048576, of het terugzetten naar wat de rol geeft. Wordt de ruimte kleiner dan wat een account al gebruikt, dan blijven de afbeeldingen staan en werken ze in sets; alleen nieuwe uploads geven dan `409 quota_media`. Ruimte vraag je aan met [`POST /api/v1/accounts/media/requests`](#post-api-v1-accounts-media-requests).
+
+In 0.8.0 had elk account 250 MiB.
+
+### Een afbeelding
+
 Een **afbeelding** ziet er zo uit:
 
 ```json
@@ -335,7 +351,7 @@ curl https://miniengine.nl/api/v1/accounts/media \
 { "media": Afbeelding, "used_bytes": 412337, "limit_bytes": 262144000 }
 ```
 
-`used_bytes` is wat je afbeeldingen samen nu innemen, deze meegeteld. `limit_bytes` is de grens per account: 262144000 bytes (250 MiB).
+`used_bytes` is wat je afbeeldingen samen nu innemen, deze meegeteld. `limit_bytes` is de [ruimte van je account](#ruimte-voor-afbeeldingen) in bytes, bijvoorbeeld 262144000 (250 MiB); dat kan ook 0 zijn.
 
 De server leest PNG, JPEG, WebP en GIF; van een GIF alleen het eerste beeld. Hij zet een telefoonfoto rechtop volgens de EXIF-oriëntatie, verkleint tot hoogstens 1920 pixels aan de lange kant en slaat de afbeelding opnieuw op: met echte transparantie als PNG, anders als JPEG met kwaliteit 85. Een kleinere afbeelding wordt nooit groter. Is het resultaat groter dan 1 MiB, dan probeert hij kwaliteit 80, 70 en 60 (niet bij een PNG) en daarna telkens ongeveer 15 % kleinere afmetingen, tot het past. Metadata zoals EXIF en GPS gaat daarbij verloren.
 
@@ -343,7 +359,7 @@ De server leest PNG, JPEG, WebP en GIF; van een GIF alleen het eerste beeld. Hij
 | --- | --- |
 | `400 media_invalid` | De body is leeg, het bestand is niet te lezen, of de afbeelding heeft meer dan 40 miljoen pixels |
 | `401 unauthorized` | Geen of een ongeldige accountsleutel |
-| `409 quota_media` | Je afbeeldingen zouden samen meer dan 250 MiB worden, ook bij uploads tegelijk |
+| `409 quota_media` | Je afbeeldingen zouden samen meer worden dan de ruimte van je account (`limit_bytes`), ook bij uploads tegelijk. Heeft je account geen ruimte, dan zegt `message` dat je die kunt aanvragen |
 | `413 media_too_large` | De upload is groter dan 10 MiB |
 | `415 media_unsupported` | Geen PNG, JPEG, WebP of GIF, maar bijvoorbeeld een SVG of HEIC |
 | `429 rate_limit` | Meer dan 60 uploads per minuut vanaf dit IP-adres |
@@ -354,9 +370,58 @@ De melding in `message` is Nederlands en kan zo bij het veld staan, zoals *Dit s
 
 Jouw afbeeldingen, nieuwste eerst.
 
-**Antwoord** `200`: `{ "media": [Afbeelding, …], "used_bytes": 412337, "limit_bytes": 262144000 }`.
+**Antwoord** `200`:
+
+```json
+{ "media": [Afbeelding, …], "used_bytes": 412337, "limit_bytes": 262144000, "request": Aanvraag }
+```
+
+`limit_bytes` is de [ruimte van je account](#ruimte-voor-afbeeldingen). `request` is er sinds 0.8.1: je nieuwste aanvraag voor ruimte, of `null` als je er nooit een deed. Een **aanvraag** ziet er zo uit:
+
+```json
+{
+  "id": 12,
+  "status": "pending",
+  "message": "Voor een fotoquiz met de familie.",
+  "requested_at": 1793030400,
+  "next_request_at": 1793635200,
+  "decided_at": null,
+  "granted_mb": null
+}
+```
+
+| Veld | Betekenis |
+| --- | --- |
+| `id` | Het nummer van de aanvraag |
+| `status` | `pending` (staat open), `granted` (toegekend) of `rejected` (afgewezen) |
+| `message` | Wat je erbij schreef; leeg als je niets meegaf |
+| `requested_at` | Unix-seconden |
+| `next_request_at` | Vanaf dit moment (Unix-seconden) kun je opnieuw aanvragen: 7 dagen na `requested_at` |
+| `decided_at` | Wanneer erover beslist is, of `null` |
+| `granted_mb` | De toegekende ruimte in MiB, of `null` |
 
 **Fouten:** `401 unauthorized`.
+
+### POST /api/v1/accounts/media/requests
+
+Sinds 0.8.1. Vraagt ruimte voor afbeeldingen aan bij wie de server beheert, of meer ruimte als je account al wat heeft. Die beslist erover: kent die de aanvraag toe, dan krijgt je account die ruimte, en `GET /api/v1/accounts/media` geeft de nieuwe `limit_bytes`. SDK 0.7.0 heeft hier geen methode voor; gebruik de route zelf.
+
+```sh
+curl https://miniengine.nl/api/v1/accounts/media/requests \
+  -H "Authorization: Bearer $ACCOUNT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "message": "Voor een fotoquiz met de familie." }'
+```
+
+| Veld | Regel |
+| --- | --- |
+| `message` | Optioneel: waarvoor je de afbeeldingen wilt gebruiken, hoogstens 500 tekens. Spaties aan het begin en eind vallen weg |
+
+**Antwoord** `201`: `{ "request": Aanvraag }`, met `status` `pending`.
+
+Je kunt één keer per 7 dagen aanvragen, gerekend vanaf je vorige aanvraag, ook als die is toegekend of afgewezen. Een nieuwe aanvraag vervangt een aanvraag die nog openstaat.
+
+**Fouten:** `400 invalid_request` (een bericht van meer dan 500 tekens), `invalid_json` (onbekende velden of geen geldige JSON; status 400 of 422), `401 unauthorized`, `429 media_request_wait` (je vroeg de afgelopen 7 dagen al; `message` zegt over hoeveel dagen het weer kan).
 
 ### DELETE /api/v1/accounts/media/{id}
 
