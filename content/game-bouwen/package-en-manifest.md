@@ -161,7 +161,7 @@ Sinds 0.6.0 tonen `/home` en `/home/games` elk spel als een kaart. Wat erop staa
 | Eén regel onder de titel | De eerste zin van `description`, afgekapt op twee regels |
 | Het aantal spelers | `min_players` en `max_players`, zoals *2–8 spelers*; vanaf een maximum van 20 *Vanaf 2 spelers* |
 | *Met tv* | `has_display: true`, of `tv` in `host_modes` |
-| *Eigen …* | `set_kinds`: bij één soort *Eigen* met de titel van die soort in kleine letters, zoals *Eigen vragen*; bij meer soorten *Eigen sets* |
+| *Eigen …* | `set_kinds`: bij één soort *Eigen* met de titel van die soort in kleine letters, zoals *Eigen vragenlijst*; bij meer soorten *Eigen sets* |
 | *3 achievements* | Het aantal `achievements` |
 
 Laat de eerste zin van je beschrijving dus op zichzelf staan, en kies een `title` voor je soort set die goed leest na *Eigen*. De pagina voor een nieuwe kamer toont de kaart met de hele beschrijving; daar is ruimte voor uitleg. Sinds 0.7 zoekt het zoekveld op `/home/games` in de titel, de beschrijving, de naam van de maker en het id. Hoe je spel eruitziet als iemand een link deelt, staat bij [linkvoorbeelden](../publiceren/overzicht.md#linkvoorbeelden).
@@ -280,6 +280,7 @@ Het hele manifest, ook `icon`, `achievements` en `set_kinds`, wordt op drie plek
 - Verwijs naar assets en de SDK met absolute paden: `/games/mijn-spel/assets/app.js` en `/sdk/mini-engine.js`. Imports tussen je eigen modules schrijf je relatief; zie [versies en kamers](../publiceren/versies.md).
 - Mini Engine stuurt een strikte Content-Security-Policy mee: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'`. Inline `<script>`-blokken en scripts, lettertypes of beelden van een CDN werken dus niet. Zet alles in `assets/`. `me dev` stuurt dezelfde policy mee.
 - Inline stijlen en `data:`-beelden mogen wel.
+- Afbeeldingen uit een eigen set staan op `/media/…`, op dezelfde origin als je spel, en mogen dus ook. Zie [afbeeldingen tonen in je spel](../concepten/eigen-sets.md#afbeeldingen-tonen-in-je-spel).
 
 ## Vertrouwen
 

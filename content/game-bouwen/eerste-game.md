@@ -40,7 +40,7 @@ Meer over `me dev`, en hoe je daarna op een echte server test, staat bij [testen
 | Sjabloon | Wat het is | Goed begin voor |
 | --- | --- | --- |
 | `stemmen` | Iedereen stemt ja of nee op één vraag; elk scherm toont de stand. | Een spel waarin iedereen tegelijk iets kiest |
-| `quiz` | Meerkeuzevragen op tijd, punten en een eindstand. Spelers maken eigen vragenlijsten, één vraag per regel. | Alles met geheime antwoorden en rondes |
+| `quiz` | Meerkeuzevragen op tijd, punten en een eindstand. Spelers maken eigen vragenlijsten, met een blok per vraag en eventueel een afbeelding. | Alles met geheime antwoorden en rondes |
 | `buzzer` | Wie drukt het snelst nadat de knop groen wordt? | Snelheid en reacties met [realtime](../concepten/realtime.md) |
 | `beurten` | Om de beurt dobbelen; een 1 kost je de punten van die beurt. | Bord-, kaart- en dobbelspellen |
 | `leeg` | Een kaal begin: lobby, start, één voorbeeldzet en een einde. | Een eigen idee dat op niets lijkt |
@@ -77,7 +77,7 @@ mijn-spel/
   .meignore             wat me game upload overslaat
 ```
 
-Het stemspel heeft ook `display.html`, een gedeeld scherm naast de spelers. De quiz heeft `data.json` met de vragen; die leest alleen de host. Elk sjabloon is een spel met `runtime: "host"`: de pagina van de spelleider controleert elke zet en publiceert de stand. Laat dat tabblad open tijdens het spelen.
+Het stemspel heeft ook `display.html`, een gedeeld scherm naast de spelers. De quiz heeft `data.json` met de vragen; die leest alleen de host. Een vraag kan een afbeelding uit `assets/` hebben, zoals `"image": "assets/vragen/1.png"`, en spelers kunnen in hun eigen vragenlijst een afbeelding uploaden (Mini Engine 0.8); zie [afbeeldingen](../concepten/eigen-sets.md#afbeeldingen). Elk sjabloon is een spel met `runtime: "host"`: de pagina van de spelleider controleert elke zet en publiceert de stand. Laat dat tabblad open tijdens het spelen.
 
 ## Waar pas je wat aan?
 

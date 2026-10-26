@@ -8,16 +8,16 @@ order: 1
 
 # HTTP API-overzicht
 
-Mini Engine heeft een JSON-API onder `/api/v1` en een websocket per kamer. `v1` is de routeversie; deze pagina's horen bij Mini Engine 0.7. Een spel praat er meestal via de [SDK](../sdk/overzicht.md) mee, en de [CLI](../publiceren/cli.md) gebruikt de routes voor ontwikkelaars. Deze sectie beschrijft wat er over de lijn gaat, voor wie zelf een client schrijft of wil weten wat de SDK doet.
+Mini Engine heeft een JSON-API onder `/api/v1` en een websocket per kamer. `v1` is de routeversie; deze pagina's horen bij Mini Engine 0.8. Een spel praat er meestal via de [SDK](../sdk/overzicht.md) mee, en de [CLI](../publiceren/cli.md) gebruikt de routes voor ontwikkelaars. Deze sectie beschrijft wat er over de lijn gaat, voor wie zelf een client schrijft of wil weten wat de SDK doet.
 
-[Download de API-referentie (pdf)]({{root}}downloads/MiniEngine-API-v0.6.pdf) voor een afdrukbare versie: editie 0.6, de openbare editie, met alles wat een client, een game of de CLI gebruikt. De wijzigingen van 0.7 staan nog niet in de pdf, wel op deze pagina's.
+[Download de API-referentie (pdf)]({{root}}downloads/MiniEngine-API-v0.6.pdf) voor een afdrukbare versie: editie 0.6, de openbare editie, met alles wat een client, een game of de CLI gebruikt. De wijzigingen van 0.7 en 0.8 staan nog niet in de pdf, wel op deze pagina's.
 
 ## Basis
 
-- Verzoeken en antwoorden zijn JSON. Stuur `Content-Type: application/json` mee bij een body.
+- Verzoeken en antwoorden zijn JSON. Stuur `Content-Type: application/json` mee bij een body. Alleen een [afbeelding uploaden](accounts.md#post-api-v1-accounts-media) stuurt het bestand zelf.
 - Onbekende velden in een body worden afgewezen.
 - Kamercodes zijn niet hoofdlettergevoelig.
-- Een HTTP-body is maximaal 96 KiB.
+- Een HTTP-body is maximaal 96 KiB. Een afbeelding mag 10 MiB zijn, een upload van een game 16 MiB.
 - `/` verwijst door naar de startpagina op `/home`. Oude adressen onder `/demo` sturen door naar hetzelfde pad onder `/home`, met de query erbij.
 
 ## Authenticatie
@@ -27,7 +27,7 @@ Er zijn drie soorten sleutels, die je nooit door elkaar gebruikt:
 | Sleutel | Krijg je van | Gebruik je voor |
 | --- | --- | --- |
 | Kamersleutel | Kamer maken (host), meedoen (speler), schermsleutel (display) | Alles binnen één kamer |
-| Accountsleutel | Registreren of inloggen | `/accounts/me`, `/accounts/stats`, `/accounts/achievements`, `/accounts/sets`, `/accounts/logout`, `/accounts/verify-email`, `/accounts/email`, en optioneel bij kamer maken en meedoen |
+| Accountsleutel | Registreren of inloggen | `/accounts/me`, `/accounts/stats`, `/accounts/achievements`, `/accounts/sets`, `/accounts/media`, `/accounts/logout`, `/accounts/verify-email`, `/accounts/email`, en optioneel bij kamer maken en meedoen |
 | Dev-key (`med_…`) | Wie de server beheert | Je eigen games uploaden en beheren onder [`/dev`](ontwikkelaars.md) |
 
 Stuur een sleutel als header:
@@ -52,9 +52,10 @@ Elke fout heeft dezelfde vorm:
 
 | Status | Code | Betekenis |
 | --- | --- | --- |
-| 400 | `invalid_request` | Ongeldige invoer: naam, e-mailadres, instellingen, config, actiedata, spelregel, de inhoud van een set, een realtimebericht |
+| 400 | `invalid_request` | Ongeldige invoer: naam, e-mailadres, instellingen, config, actiedata, spelregel, de inhoud van een set (ook een afbeelding die niet van jou is), een realtimebericht |
 | 400 | `invalid_token` | Bevestigingslink onbekend, verlopen, al gebruikt of voor een ander account |
 | 400, 413, 415, 422 | `invalid_json` | Geen geldige JSON, verkeerde velden, geen `Content-Type: application/json` of een te grote body |
+| 400 | `media_invalid` | Afbeelding: leeg, niet te lezen of meer dan 40 miljoen pixels (sinds 0.8) |
 | 400 | `turnstile_required`, `turnstile_failed` | Robotcheck: het token in `X-Turnstile-Token` ontbreekt, of Cloudflare keurde het af; zie [robotcheck](accounts.md#robotcheck) |
 | 401 | `unauthorized` | Geen, een ongeldige of een verlopen sleutel; ook een mislukte login |
 | 401 | `auth_timeout` | Websocket: niet binnen vijf seconden geauthenticeerd |
@@ -69,6 +70,7 @@ Elke fout heeft dezelfde vorm:
 | 404 | `asset_not_found` | Geen publiek asset op dit pad |
 | 404 | `player_not_found` | Onbekende speler |
 | 404 | `set_not_found` | De set bestaat niet, of hoort bij een ander account |
+| 404 | `media_not_found` | De afbeelding bestaat niet, of hoort bij een ander account (sinds 0.8) |
 | 404 | `achievement_unknown` | De versie van het spel die de kamer speelt, kent dit achievement-id niet |
 | 405 | `method_not_allowed` | Verkeerde HTTP-methode voor deze route |
 | 409 | `version_conflict` | `expected_version` is verouderd; lees de snapshot opnieuw |
@@ -85,10 +87,15 @@ Elke fout heeft dezelfde vorm:
 | 409 | `email_already_verified` | Dit adres is al bevestigd voor jouw account |
 | 409 | `game_not_running` | Serverspel: start eerst het spel. Achievement toekennen: de kamer staat nog in de lobby |
 | 409 | `quota_sets` | Het account heeft al 50 sets |
+| 409 | `quota_set_media` | Een set gebruikt meer dan 100 afbeeldingen, of samen meer dan 50 MiB (sinds 0.8) |
+| 409 | `quota_media` | De afbeeldingen van het account worden samen meer dan 250 MiB (sinds 0.8) |
+| 409 | `media_in_use` | Een van je sets gebruikt deze afbeelding nog (sinds 0.8) |
 | 409 | `release_changed` | Kamer maken met een eigen set: het spel kreeg net een nieuwe versie; probeer het opnieuw |
 | 413 | `state_too_large` | Gepubliceerde state groter dan 64 KiB |
 | 413 | `set_too_large` | De inhoud van een set is groter dan 64 KiB |
-| 429 | `rate_limit` | Te veel verzoeken, berichten, mails, setwijzigingen of toegekende achievements |
+| 413 | `media_too_large` | Een upload van een afbeelding is groter dan 10 MiB (sinds 0.8) |
+| 415 | `media_unsupported` | Geen PNG, JPEG, WebP of GIF, maar bijvoorbeeld een SVG of HEIC (sinds 0.8) |
+| 429 | `rate_limit` | Te veel verzoeken, berichten, mails, setwijzigingen, uploads van afbeeldingen of toegekende achievements |
 | 500 | `internal_error` | Opslaan mislukt; de oude state blijft staan |
 | 503 | `room_limit` | De server heeft al het maximale aantal kamers |
 | 503 | `connection_limit` | Te veel gelijktijdige websocketverbindingen |
@@ -145,6 +152,9 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | `GET /api/v1/accounts/achievements` | Account | Verdiende achievements |
 | `GET`, `POST /api/v1/accounts/sets` | Account | Eigen sets bekijken (zonder inhoud) of er een maken |
 | `GET`, `PUT`, `DELETE /api/v1/accounts/sets/{id}` | Account | Eén eigen set lezen, vervangen of verwijderen |
+| `GET`, `POST /api/v1/accounts/media` | Account | Je afbeeldingen bekijken, of er een uploaden (sinds 0.8) |
+| `DELETE /api/v1/accounts/media/{id}` | Account | Een afbeelding verwijderen (sinds 0.8) |
+| `GET /media/{id}` | Openbaar | Een afbeelding uit een eigen set (sinds 0.8) |
 | `GET /api/v1/accounts/games` | Account | Je eigen geüploade spellen (sinds 0.5.1) |
 | `PUT /api/v1/accounts/games/{id}` | Account | Eigen spel aan of uit zetten (sinds 0.5.1) |
 | `POST /api/v1/accounts/verify-email` | Account waarvoor de link is | E-mailadres bevestigen met het token uit de link |
@@ -165,12 +175,22 @@ Deze documentatie hoort bij deze versies:
 
 | Onderdeel | Versie |
 | --- | --- |
-| Mini Engine | 0.7 (`GET /api/health` geeft de versie van de server) |
-| Mini Engine SDK | 0.6.0. De server serveert op `/sdk/mini-engine.js` de client van 0.5.2; die is gelijk aan die van 0.6.0 |
-| me-CLI | 0.7.0 |
+| Mini Engine | 0.8 (`GET /api/health` geeft de versie van de server) |
+| Mini Engine SDK | 0.7.0, ook op `/sdk/mini-engine.js` van de server |
+| me-CLI | 0.8.0 |
 | API-referentie (pdf) | Editie 0.6, de openbare editie |
 
 Wat je met een bestaand spel doet bij een nieuwe versie, staat bij [upgraden](../upgraden.md).
+
+Nieuw in 0.8:
+
+- Afbeeldingen in eigen sets: een tekstveld met `"format": "image"` in het schema van een soort set. In een bewaarde set is de waarde `/media/{id}`, een afbeelding van hetzelfde account; in `data.json` een pad onder `assets/`. Zie [afbeeldingen](../concepten/eigen-sets.md#afbeeldingen).
+- `POST` en `GET /api/v1/accounts/media` en `DELETE /api/v1/accounts/media/{id}` om afbeeldingen te uploaden, te bekijken en te verwijderen, en de openbare route `GET /media/{id}`. Zie [afbeeldingen](accounts.md#afbeeldingen).
+- Bij het opslaan van een set controleert de server de afbeeldingen: `400 invalid_request` met het pad voor een afbeelding die niet van jou is, `409 quota_set_media` boven 100 afbeeldingen of 50 MiB per set.
+- Nieuwe foutcodes: `media_invalid`, `media_not_found`, `media_too_large`, `media_unsupported`, `quota_media`, `quota_set_media` en `media_in_use`. Uploads mogen 60 keer per minuut per IP-adres.
+- Het formulier op **Mijn sets** heeft een vak per afbeelding, met een voorbeeld, **Kies een afbeelding**, **Vervang** en **Verwijder**, en toont hoeveel ruimte je afbeeldingen innemen.
+
+Alles uit 0.7 werkt nog: manifests, kamers en sets blijven geldig, en spellen zonder afbeeldingen merken niets.
 
 Nieuw in 0.7:
 

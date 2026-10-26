@@ -1,7 +1,7 @@
 ---
 title: Accounts
 nav_title: Accounts
-description: De accountroutes van de HTTP API voor registreren, e-mailbevestiging, inloggen, uitloggen, het eigen account, statistieken, achievements, eigen sets en je eigen spellen aan- of uitzetten.
+description: De accountroutes van de HTTP API voor registreren, e-mailbevestiging, inloggen, uitloggen, het eigen account, statistieken, achievements, eigen sets, afbeeldingen voor sets en je eigen spellen aan- of uitzetten.
 section: API
 order: 4
 toc_depth: 3
@@ -215,7 +215,12 @@ Een **set** ziet er zo uit:
   "game_id": "quiz-bij-dani",
   "kind": "questions",
   "title": "Dani's filmavond",
-  "data": { "questions": ["Welke film won in 1998 elf Oscars? | Titanic | Avatar | Gladiator", "…"] },
+  "data": {
+    "questions": [
+      { "question": "Welke film won in 1998 elf Oscars? | Titanic | Avatar | Gladiator", "image": "/media/3f9c0b6e2a7d4c1e8b5a9f0d6e2c4a71" },
+      { "question": "Hoeveel poten heeft een spin? | Acht | Zes | Tien" }
+    ]
+  },
   "size": 1834,
   "created_at": 1792656419,
   "updated_at": 1792660019
@@ -250,13 +255,13 @@ Jouw sets zonder inhoud, laatst gewijzigd eerst. Filter optioneel met `?game_id=
 | `game_id` | Een spel dat aanstaat |
 | `kind` | Een soort set uit `set_kinds` van de **actieve** versie van dat spel |
 | `title` | Getrimd; 1 tot 80 tekens zonder controletekens |
-| `data` | Voldoet aan het schema van de soort, hoogstens 64 KiB als JSON |
+| `data` | Voldoet aan het schema van de soort, hoogstens 64 KiB als JSON. Een afbeeldingsveld is `/media/{id}` van een [afbeelding](#afbeeldingen) van jouw account (sinds 0.8) |
 
 **Antwoord** `201`: de set, met `data`.
 
-Past `data` niet, dan noemt de foutmelding het pad, bijvoorbeeld `questions[2]: gebruik 5–300 tekens.`
+Past `data` niet, dan noemt de foutmelding het pad, bijvoorbeeld `questions[2].question: gebruik 5–300 tekens.` Ook een afbeelding die niet van jou is of niet meer bestaat, noemt het pad: `questions[0].image: deze afbeelding bestaat niet (meer). Kies hem opnieuw.`
 
-**Fouten:** `400 invalid_request` (titel, onbekende soort, inhoud past niet), `invalid_json` (onbekende velden of geen geldige JSON; status 400 of 422), `401 unauthorized`, `404 game_not_found`, `409 quota_sets` (al 50 sets), `413 set_too_large`, `429 rate_limit`.
+**Fouten:** `400 invalid_request` (titel, onbekende soort, inhoud past niet, een afbeelding die niet van jou is), `invalid_json` (onbekende velden of geen geldige JSON; status 400 of 422), `401 unauthorized`, `404 game_not_found`, `409 quota_sets` (al 50 sets), `409 quota_set_media` (meer dan 100 afbeeldingen, of samen meer dan 50 MiB; sinds 0.8), `413 set_too_large`, `429 rate_limit`.
 
 ### GET /api/v1/accounts/sets/{id}
 
@@ -269,7 +274,7 @@ Eén set, met `data`.
 Vervangt titel en inhoud. Spel en soort liggen vast.
 
 ```json
-{ "title": "Dani's filmavond", "data": { "categories": [ … ] } }
+{ "title": "Dani's filmavond", "data": { "questions": [ … ] } }
 ```
 
 De controle is dezelfde als bij aanmaken, tegen de actieve versie van het spel. Kamers die de set al gebruiken, houden hun eigen kopie.
@@ -285,6 +290,93 @@ De controle is dezelfde als bij aanmaken, tegen de actieve versie van het spel. 
 **Fouten:** `401 unauthorized`, `404 set_not_found`, `429 rate_limit`.
 
 Aanmaken, wijzigen en verwijderen samen mag 30 keer per minuut per IP-adres; zie [limieten](limieten.md#aanvragen-per-ip-adres).
+
+## Afbeeldingen
+
+Sinds 0.8. Afbeeldingen voor [eigen sets](../concepten/eigen-sets.md#afbeeldingen), zoals een foto bij een quizvraag. Een afbeelding hoort bij het account dat haar uploadde; een set verwijst ernaar met haar `url`. De routes onder `/api/v1/accounts/media` vragen een accountsleutel, net als de routes voor sets. Een bevestigd e-mailadres is niet nodig.
+
+Een **afbeelding** ziet er zo uit:
+
+```json
+{
+  "id": "3f9c0b6e2a7d4c1e8b5a9f0d6e2c4a71",
+  "url": "/media/3f9c0b6e2a7d4c1e8b5a9f0d6e2c4a71",
+  "content_type": "image/jpeg",
+  "width": 1920,
+  "height": 1440,
+  "size": 412337,
+  "created_at": 1793030400
+}
+```
+
+| Veld | Betekenis |
+| --- | --- |
+| `id` | 32 kleine hexadecimale tekens, willekeurig (128 bits) |
+| `url` | `/media/{id}`: de waarde voor een afbeeldingsveld in een set, en het adres voor `<img src>` |
+| `content_type` | `image/jpeg` of `image/png`; de server slaat elke upload opnieuw op |
+| `width`, `height` | De afmetingen in pixels, na het verkleinen |
+| `size` | Het aantal opgeslagen bytes, hoogstens 1 MiB |
+| `created_at` | Unix-seconden |
+
+### POST /api/v1/accounts/media
+
+Uploadt één afbeelding. De body is het bestand zelf, geen JSON, van hoogstens 10 MiB. Elk `Content-Type` mag, bijvoorbeeld dat van het bestand: de server herkent het formaat aan de inhoud, niet aan de header of de bestandsnaam.
+
+```sh
+curl https://miniengine.nl/api/v1/accounts/media \
+  -H "Authorization: Bearer $ACCOUNT_TOKEN" \
+  -H "Content-Type: image/jpeg" \
+  --data-binary @okapi.jpg
+```
+
+**Antwoord** `201`:
+
+```json
+{ "media": Afbeelding, "used_bytes": 412337, "limit_bytes": 262144000 }
+```
+
+`used_bytes` is wat je afbeeldingen samen nu innemen, deze meegeteld. `limit_bytes` is de grens per account: 262144000 bytes (250 MiB).
+
+De server leest PNG, JPEG, WebP en GIF; van een GIF alleen het eerste beeld. Hij zet een telefoonfoto rechtop volgens de EXIF-oriëntatie, verkleint tot hoogstens 1920 pixels aan de lange kant en slaat de afbeelding opnieuw op: met echte transparantie als PNG, anders als JPEG met kwaliteit 85. Een kleinere afbeelding wordt nooit groter. Is het resultaat groter dan 1 MiB, dan probeert hij kwaliteit 80, 70 en 60 (niet bij een PNG) en daarna telkens ongeveer 15 % kleinere afmetingen, tot het past. Metadata zoals EXIF en GPS gaat daarbij verloren.
+
+| Fout | Wanneer |
+| --- | --- |
+| `400 media_invalid` | De body is leeg, het bestand is niet te lezen, of de afbeelding heeft meer dan 40 miljoen pixels |
+| `401 unauthorized` | Geen of een ongeldige accountsleutel |
+| `409 quota_media` | Je afbeeldingen zouden samen meer dan 250 MiB worden, ook bij uploads tegelijk |
+| `413 media_too_large` | De upload is groter dan 10 MiB |
+| `415 media_unsupported` | Geen PNG, JPEG, WebP of GIF, maar bijvoorbeeld een SVG of HEIC |
+| `429 rate_limit` | Meer dan 60 uploads per minuut vanaf dit IP-adres |
+
+De melding in `message` is Nederlands en kan zo bij het veld staan, zoals *Dit soort bestand kan niet. Kies een PNG, JPEG, WebP of GIF.*
+
+### GET /api/v1/accounts/media
+
+Jouw afbeeldingen, nieuwste eerst.
+
+**Antwoord** `200`: `{ "media": [Afbeelding, …], "used_bytes": 412337, "limit_bytes": 262144000 }`.
+
+**Fouten:** `401 unauthorized`.
+
+### DELETE /api/v1/accounts/media/{id}
+
+Verwijdert een afbeelding meteen. Haal haar eerst uit al je sets. Deze route kijkt alleen naar je bewaarde sets: een kamer die nog speelt met een kopie van een set met deze afbeelding, kan haar daarna niet meer laden.
+
+**Antwoord** `204`.
+
+**Fouten:** `401 unauthorized`, `404 media_not_found` (onbekend, of van een ander account), `409 media_in_use` (een van je sets gebruikt haar nog).
+
+### GET /media/{id}
+
+**Toegang:** openbaar. De afbeelding zelf, met het opgeslagen `Content-Type`. Er is geen inlog nodig: het id is niet te raden, en gasten in een kamer en het gedeelde scherm moeten de afbeelding kunnen laden. Een spel toont haar met `<img src="/media/{id}">`.
+
+Het antwoord heeft `Cache-Control: public, max-age=31536000, immutable`, `X-Content-Type-Options: nosniff` en `Content-Security-Policy: default-src 'none'; sandbox`. Een afbeelding verandert nooit; een nieuwe upload krijgt een nieuw id.
+
+**Fouten:** `404 media_not_found` voor een onbekende of ongeldige id.
+
+### Ongebruikte afbeeldingen
+
+Een afbeelding die geen van je sets gebruikt en die ouder is dan 24 uur, verwijdert de server bij je volgende upload of de volgende keer dat je een set opslaat. Een afbeelding in de kopie van een set in een kamer blijft staan. Bewaar een upload dus binnen een dag in een set.
 
 ## Mijn spellen
 

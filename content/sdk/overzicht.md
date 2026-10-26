@@ -14,14 +14,14 @@ De Mini Engine SDK is een getypeerde browser- en Node-client zonder runtime-afha
 | | |
 | --- | --- |
 | Pakketnaam | `@casb02/mini-engine-sdk` |
-| Versie | `0.6.0` |
+| Versie | `0.7.0` |
 | Repository | [Casb02/mini-engine-sdk](https://github.com/Casb02/mini-engine-sdk) (openbaar, MIT) |
 | Node.js | 22 of nieuwer |
 | npm | GitHub Packages, of rechtstreeks uit de repository |
 
 ## Versies
 
-Deze documentatie hoort bij SDK 0.6.0, CLI 0.7.0 en Mini Engine 0.7. De SDK en de CLI werken met Mini Engine 0.5 en nieuwer. Wat een nieuwere versie van Mini Engine vraagt, staat er steeds bij, zoals *sinds 0.5.1*:
+Deze documentatie hoort bij SDK 0.7.0, CLI 0.8.0 en Mini Engine 0.8. De SDK en de CLI werken met Mini Engine 0.5 en nieuwer. Wat een nieuwere versie van Mini Engine vraagt, staat er steeds bij, zoals *sinds 0.5.1*:
 
 | Onderdeel | Vanaf Mini Engine |
 | --- | --- |
@@ -32,6 +32,7 @@ Deze documentatie hoort bij SDK 0.6.0, CLI 0.7.0 en Mini Engine 0.7. De SDK en d
 | De naam van de maker op de spelkaart (`author`); de kamerpagina houdt het scherm aan | 0.6.1 |
 | Het iframe past in het zichtbare deel van een telefoon; de kamer neemt de `theme-color` van je spel over | 0.6.5 |
 | Zoeken en uitgelichte spellen op `/home/games`; Jeopardy is niet meer ingebouwd | 0.7 |
+| [Afbeeldingen in eigen sets](../concepten/eigen-sets.md#afbeeldingen) (`format: "image"`) en `uploadMedia`, `listMedia` en `deleteMedia` | 0.8 |
 
 Heb je al een spel voor een oudere versie, kijk dan bij [upgraden](../upgraden.md) wat je moet doen.
 
@@ -39,13 +40,13 @@ Heb je al een spel voor een oudere versie, kijk dan bij [upgraden](../upgraden.m
 
 | Export | Waarvoor |
 | --- | --- |
-| [`ApiClient`](api-client.md) | Spellen, kamers maken en meedoen, snapshots, geheime speldata, schermsleutels, accounts, achievements, eigen sets |
+| [`ApiClient`](api-client.md) | Spellen, kamers maken en meedoen, snapshots, geheime speldata, schermsleutels, accounts, achievements, eigen sets, afbeeldingen |
 | [`MiniEngine`](realtime-client.md) | De websocketclient: snapshots, acties, klaarzetten, state, levensloop, achievements toekennen, en realtime met `client.realtime` |
 | [`http`, `getGames`, `createRoom`, `joinRoom`](api-client.md#losse-functies) | Losse helpers op de huidige origin |
 | [`sessionKey`, `saveSession`, `loadSession`, `removeSession`](sessies.md) | Kamersleutels bewaren in `sessionStorage` |
 | [`MiniEngineError`](events-en-fouten.md#miniengineerror) | Fouten met een `code` en optioneel een HTTP-`status` |
 | `normalizeCode`, `endpoint` | Kamercode naar hoofdletters; URL samenstellen |
-| [Types](types.md) | `Snapshot`, `Manifest`, `RoomCredentials`, `Realtime`, `SavedSet` en meer |
+| [Types](types.md) | `Snapshot`, `Manifest`, `RoomCredentials`, `Realtime`, `SavedSet`, `MediaItem` en meer |
 
 De grenzen die voor een spel gelden, zoals de grootte van de state en het aantal berichten per seconde, staan bij [grenzen](grenzen.md).
 
@@ -59,7 +60,7 @@ import { MiniEngine, loadSession } from '/sdk/mini-engine.js';
 
 Dat is één gebundelde ES-module. Mini Engine serveert er één vaste versie van, zodat elk spel op die server dezelfde SDK gebruikt. `me dev` serveert de SDK op hetzelfde adres. De typedeclaraties staan ernaast op `/sdk/mini-engine.d.ts`.
 
-De client is sinds SDK 0.5.0 niet veranderd; latere versies brachten types, startsjablonen en skills. Mini Engine 0.6 en 0.7 serveren daarom nog de client van SDK 0.5.2, met de typedeclaraties van 0.5.2. Wil je `author` in de types, haal ze dan uit SDK 0.6.0; zie [upgraden](../upgraden.md#je-gereedschap-bijwerken).
+De client bleef van SDK 0.5.0 tot en met 0.6.0 gelijk; die versies brachten types, startsjablonen en skills. SDK 0.7.0 geeft `ApiClient` de methoden voor [afbeeldingen](api-client.md#afbeeldingen) erbij. Mini Engine 0.6 en 0.7 serveren de client en typedeclaraties van SDK 0.5.2; Mini Engine 0.8 serveert die van SDK 0.7.0. Voor een spelpagina is elk daarvan genoeg: afbeeldingen uploadt een speler in de set-editor. Je eigen kopie van de types haal je uit SDK 0.7.0; zie [upgraden](../upgraden.md#je-gereedschap-bijwerken).
 
 ## In een eigen project
 
@@ -79,7 +80,7 @@ npm install @casb02/mini-engine-sdk
 Zonder token installeer je rechtstreeks uit de repository; npm bouwt het pakket dan zelf:
 
 ```sh
-npm install github:Casb02/mini-engine-sdk#v0.6.0
+npm install github:Casb02/mini-engine-sdk#v0.7.0
 ```
 
 ```ts

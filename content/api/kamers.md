@@ -129,7 +129,7 @@ De inhoud van de set staat nooit in een snapshot.
 
 De geheime speldata. **Toegang:** host.
 
-- Speelt de kamer met een [eigen set](../concepten/eigen-sets.md), dan is dit de inhoud van die set, precies zoals de maker hem opsloeg.
+- Speelt de kamer met een [eigen set](../concepten/eigen-sets.md), dan is dit de inhoud van die set, precies zoals de maker hem opsloeg. Een afbeelding staat erin als `/media/{id}`; zie [afbeeldingen](accounts.md#afbeeldingen).
 - Anders is het de `data.json` van de versie die de kamer speelt, of `null` als het spel er geen heeft.
 
 **Fouten:** `401 unauthorized`, `403 forbidden`, `404 room_not_found`.

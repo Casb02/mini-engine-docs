@@ -1,6 +1,6 @@
 ---
 title: Types
-description: De belangrijkste TypeScript-types van de SDK, zoals Snapshot met host_player_id, Manifest met icon, RoomCredentials, ActionPayloads, de realtimetypes, achievements en sets, en waar het volledige declaratiebestand staat.
+description: De belangrijkste TypeScript-types van de SDK, zoals Snapshot met host_player_id, Manifest met icon, RoomCredentials, ActionPayloads, de realtimetypes, achievements, sets en afbeeldingen, en waar het volledige declaratiebestand staat.
 section: SDK
 group: Referentie
 order: 5
@@ -173,11 +173,12 @@ type SetSchema =
   | { type: 'object'; properties: Record<string, SetSchema>; required?: string[]; additionalProperties: false; title?: string; description?: string }
   | { type: 'array'; items: SetSchema; minItems?: number; maxItems?: number; title?: string; description?: string }
   | { type: 'string'; minLength?: number; maxLength?: number; enum?: string[]; title?: string; description?: string }
+  | { type: 'string'; format: 'image'; title?: string; description?: string } // sinds SDK 0.7.0 (Mini Engine 0.8)
   | { type: 'integer' | 'number'; minimum?: number; maximum?: number; title?: string; description?: string }
   | { type: 'boolean'; title?: string; description?: string };
 ```
 
-De grenzen van het schemadialect staan bij [eigen sets](../concepten/eigen-sets.md#het-schemadialect).
+De grenzen van het schemadialect staan bij [eigen sets](../concepten/eigen-sets.md#het-schemadialect). Een tekstveld met `format: 'image'` is een [afbeelding](../concepten/eigen-sets.md#afbeeldingen); de types laten daar geen `minLength`, `maxLength` of `enum` bij toe.
 
 ## Websocketberichten
 
@@ -225,7 +226,7 @@ interface Realtime {
 
 ### ActionPayloads
 
-De data van de acties van de ingebouwde spellen. SDK 0.6.0 declareert ook nog de acties van Jeopardy (`choose_team` tot en met `close_clue`); die bestaan sinds Mini Engine 0.7 niet meer, nu alleen Common Dice is ingebouwd.
+De data van de acties van de ingebouwde spellen. SDK 0.6.0 en 0.7.0 declareren ook nog de acties van Jeopardy (`choose_team` tot en met `close_clue`); die bestaan sinds Mini Engine 0.7 niet meer, nu alleen Common Dice is ingebouwd.
 
 ```ts
 interface ActionPayloads {
@@ -296,3 +297,22 @@ interface SavedSet<Data = Json> extends SetSummary { data: Data }
 interface NewSet<Data = Json> { game_id: string; kind: string; title: string; data: Data }
 interface SetFilter { game_id?: string; kind?: string }
 ```
+
+### Afbeeldingen
+
+Sinds SDK 0.7.0 (Mini Engine 0.8).
+
+```ts
+interface MediaItem {
+  id: string;                            // 32 kleine hexadecimale tekens
+  url: string;                           // '/media/<id>': de waarde voor een afbeeldingsveld en voor <img src>
+  content_type: 'image/jpeg' | 'image/png';
+  width: number; height: number;         // pixels, na het verkleinen
+  size: number;                          // opgeslagen bytes, hoogstens 1 MiB
+  created_at: number;                    // Unix-seconden
+}
+interface MediaUpload { media: MediaItem; used_bytes: number; limit_bytes: number }
+interface MediaList { media: MediaItem[]; used_bytes: number; limit_bytes: number }
+```
+
+`used_bytes` telt alle afbeeldingen van het account; `limit_bytes` is de grens per account, 250 MiB. Zie [uploadMedia](api-client.md#uploadmedia-file-options).

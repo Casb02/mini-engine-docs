@@ -53,7 +53,7 @@ Vastgehouden indexen verwijzen naar de bestaande worp. Minstens één steen blij
 | `clear_history {}` | Host | Wist de zichtbare worpgeschiedenis |
 | `start {}` / `finish {}` | Iedere deelnemer in `hostless`, anders de host | Start of sluit de ronde |
 
-De types van deze acties staan in [`ActionPayloads`](../sdk/types.md#actionpayloads). Daar staan in SDK 0.6.0 ook nog de acties van Jeopardy; die bestaan sinds Mini Engine 0.7 niet meer. Een verkeerde actie geeft `400 invalid_request`, een actie die alleen de host mag `403 forbidden`, en een worp buiten een ronde `409 game_not_running`.
+De types van deze acties staan in [`ActionPayloads`](../sdk/types.md#actionpayloads). Daar staan in SDK 0.6.0 en 0.7.0 ook nog de acties van Jeopardy; die bestaan sinds Mini Engine 0.7 niet meer. Een verkeerde actie geeft `400 invalid_request`, een actie die alleen de host mag `403 forbidden`, en een worp buiten een ronde `409 game_not_running`.
 
 ## Accountresultaten en achievements
 
@@ -65,7 +65,7 @@ Een eigen spel draait zijn regels in het tabblad van de host. De startsjablonen 
 
 | Sjabloon | Wat het voordoet |
 | --- | --- |
-| `quiz` | Geheime antwoorden in `data.json` en `host_state`, het eigen antwoord in `player_states`, een onthulling, [eigen sets](../concepten/eigen-sets.md) en een achievement |
+| `quiz` | Geheime antwoorden in `data.json` en `host_state`, het eigen antwoord in `player_states`, een onthulling, [eigen sets](../concepten/eigen-sets.md) met een optionele [afbeelding](../concepten/eigen-sets.md#afbeeldingen) bij elke vraag, en een achievement |
 | `buzzer` | [Realtime](../concepten/realtime.md): wie drukte als eerste, beslist door de host op de klok van de server |
 | `stemmen` | Een gedeeld scherm naast de spelers, en een maker die meespeelt |
 | `beurten` | Beurten, een dobbelsteen die de host gooit, en overslaan wie te lang offline is |

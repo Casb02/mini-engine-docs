@@ -1,6 +1,6 @@
 ---
 title: Grenzen
-description: Alle grenzen die voor een spel gelden op één plek, van kamers en namen tot de grootte van de state, berichten per seconde, realtime, achievements, eigen sets en packages.
+description: Alle grenzen die voor een spel gelden op één plek, van kamers en namen tot de grootte van de state, berichten per seconde, realtime, achievements, eigen sets, afbeeldingen en packages.
 section: SDK
 group: Referentie
 order: 6
@@ -8,7 +8,7 @@ order: 6
 
 # Grenzen
 
-Dit zijn de grenzen van Mini Engine 0.7 die je bij het bouwen van een spel tegenkomt. `me dev` houdt dezelfde grenzen aan, zodat je ze op je eigen computer al raakt.
+Dit zijn de grenzen van Mini Engine 0.8 die je bij het bouwen van een spel tegenkomt. `me dev` houdt dezelfde grenzen aan, zodat je ze op je eigen computer al raakt.
 
 ## Kamers
 
@@ -78,6 +78,22 @@ Wat boven het budget of de grenzen voor waarden komt, valt weg. De verbinding bl
 | Inhoud van een set | 64 KiB als JSON (`set_too_large`) |
 | Sets per account | 50 (`quota_sets`) |
 | Wijzigingen | 30 per minuut per IP-adres |
+
+## Afbeeldingen in sets
+
+Sinds Mini Engine 0.8. Zie [afbeeldingen](../concepten/eigen-sets.md#afbeeldingen).
+
+| Grens | Waarde |
+| --- | --- |
+| Formaten | PNG, JPEG, WebP en GIF (het eerste beeld); geen SVG of HEIC (`media_unsupported`) |
+| Eén upload | 10 MiB (`media_too_large`) en 40 miljoen pixels (`media_invalid`) |
+| Opgeslagen afbeelding | Hoogstens 1920 pixels aan de lange kant, nooit vergroot; hoogstens 1 MiB; zonder metadata |
+| Per account | 250 MiB samen (`quota_media`) |
+| Per set | 100 verschillende afbeeldingen, samen 50 MiB (`quota_set_media`) |
+| Uploads | 60 per minuut per IP-adres |
+| Ongebruikt | Na 24 uur opgeruimd als geen set van het account de afbeelding gebruikt |
+
+`me dev` controleert de 10 MiB en de formaten van de bestanden in `media/`, maar verkleint niets: hij serveert je bestand zoals het is.
 
 ## Packages
 

@@ -68,6 +68,6 @@ Eén account bezet hooguit één spelersplek per kamer. Probeer je met hetzelfde
 
 ## Wat een account niet beschermt
 
-De pagina's onder `/home` bewaren de accountsleutel in `localStorage` onder `mini-engine:account`. Spellen draaien op dezelfde origin en kunnen die sleutel lezen, net als de kamersleutels in `sessionStorage`. Met die sleutel kan een spel alles wat jij met je account kunt, zoals je achievements lezen en je eigen sets lezen, wijzigen of verwijderen. Daarom kan alleen publiceren wie een dev-key heeft. Een spel hoort de accountsleutel niet aan te raken: wat het nodig heeft, staat in de snapshot.
+De pagina's onder `/home` bewaren de accountsleutel in `localStorage` onder `mini-engine:account`. Spellen draaien op dezelfde origin en kunnen die sleutel lezen, net als de kamersleutels in `sessionStorage`. Met die sleutel kan een spel alles wat jij met je account kunt, zoals je achievements lezen, je eigen sets lezen, wijzigen of verwijderen, en afbeeldingen uploaden of verwijderen. Daarom kan alleen publiceren wie een dev-key heeft. Een spel hoort de accountsleutel niet aan te raken: wat het nodig heeft, staat in de snapshot.
 
 De methoden staan bij [ApiClient: accounts](../sdk/api-client.md#accounts).
