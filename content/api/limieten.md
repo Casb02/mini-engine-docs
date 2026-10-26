@@ -1,6 +1,6 @@
 ---
 title: Limieten
-description: Alle grenzen van Mini Engine 0.6 op één plek, van kamercodes en namen tot berichtgroottes, realtime, achievements, eigen sets, aanvraaglimieten en gamepackages.
+description: Alle grenzen van Mini Engine 0.7 op één plek, van kamercodes en namen tot berichtgroottes, realtime, achievements, eigen sets, aanvraaglimieten en gamepackages.
 section: API
 order: 7
 ---
@@ -88,6 +88,7 @@ Wat boven het budget of de grenzen voor waarden komt, valt weg. De verbinding bl
 | `POST`, `PUT` en `DELETE` onder `/api/v1/dev/` | 60 per minuut |
 | Uploads (`POST /api/v1/dev/games/{id}/versions`) | 20 per 10 minuten |
 | Sets: `POST`, `PUT` en `DELETE` onder `/api/v1/accounts/sets` (vanaf 0.5) | 30 per minuut |
+| Nieuw getekende linkafbeeldingen onder `/og/` (vanaf 0.6.1) | 30 per minuut |
 | Verkeerde dev-key (401 op `/dev`) | na 10 in 10 minuten wordt dat adres 10 minuten geweigerd, ook met de goede sleutel |
 
 Daarboven volgt `429 rate_limit`. De tellers zijn per IP-adres, en per /64-blok voor IPv6. Registreren telt zowel mee voor de accountgrens als voor de mailgrens. Daarnaast wacht een gebruikersnaam een kwartier na tien mislukte inlogpogingen, van welk adres ook; een geslaagde login zet de teller terug.
@@ -126,5 +127,5 @@ Daarboven volgt `429 rate_limit`. De tellers zijn per IP-adres, en per /64-blok 
 | Uploadbody | 16 MiB (bestanden als base64) |
 | `version` van een upload | 1 tot 64 tekens `0-9 A-Z a-z . + _ -`, beginnend met een letter of cijfer |
 | Bestandspad | relatief, hoogstens 255 bytes en 32 niveaus |
-| Games per account | 10 |
+| Games per account | Standaard 10 (`409 quota_games`); wie de server beheert, kan je er meer geven. Nieuwe versies van een bestaande game tellen niet mee |
 | Bewaarde versies per game | 10 |

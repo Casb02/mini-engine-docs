@@ -72,9 +72,9 @@ Fouten uit `ApiClient`, `http` en de opdrachten van `MiniEngine` zijn `MiniEngin
 
 ```ts
 try {
-  await client.action('buzz');
+  await client.action('roll', { held: [0, 2] });
 } catch (error) {
-  if (error.code === 'buzzer_closed') showMessage('Een ander team was eerder.');
+  if (error.code === 'game_not_running') showMessage('Wacht tot het spel begint.');
   else showError(error.message);
 }
 ```
@@ -131,7 +131,6 @@ Elke fout van de server heeft een vaste `code` voor je code en een Nederlandse `
 | 409 | `email_already_verified` | Dit adres is al bevestigd voor jouw account |
 | 409 | `quota_sets` | Het account heeft al 50 sets |
 | 409 | `release_changed` | Kamer maken met een eigen set terwijl het spel net een nieuwe versie kreeg; probeer het opnieuw |
-| 409 | `buzzer_closed`, `teams_required`, `teams_locked`, `invalid_game_action` | Spelfouten van Jeopardy |
 | 413 | `state_too_large` | De gepubliceerde state is groter dan 64 KiB |
 | 413 | `set_too_large` | De inhoud van een set is groter dan 64 KiB |
 | 429 | `rate_limit` | Te veel verzoeken, berichten, mails, setwijzigingen of toegekende achievements |

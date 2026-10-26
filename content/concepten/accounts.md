@@ -18,9 +18,9 @@ Daarnaast bewaart een account drie soorten gegevens:
 
 | Wat | Waar het vandaan komt | Waar je het ziet |
 | --- | --- | --- |
-| **Resultaten** | Afgeronde rondes van de ingebouwde spellen | De accountpagina, en `api.stats()` |
+| **Resultaten** | Afgeronde rondes van het ingebouwde spel, Common Dice | De accountpagina, en `api.stats()` |
 | **[Achievements](achievements.md)** (sinds 0.5) | Mijlpalen die je in een spel verdient | De accountpagina, en `api.achievements()` |
-| **[Eigen sets](eigen-sets.md)** (sinds 0.5) | Inhoud die je zelf maakt, zoals een Jeopardy-bord | **Mijn sets** op `/home/sets`, en `api.listSets()` |
+| **[Eigen sets](eigen-sets.md)** (sinds 0.5) | Inhoud die je zelf maakt, zoals een eigen vragenlijst voor een quiz | **Mijn sets** op `/home/sets`, en `api.listSets()` |
 
 Heb je met een dev-key zelf spellen geüpload, dan staat op de accountpagina ook **Mijn spellen** (sinds 0.5.1). Daar zet je ze aan of uit; zie [je game publiceren](../publiceren/overzicht.md#aan-of-uit-vanaf-de-accountpagina).
 

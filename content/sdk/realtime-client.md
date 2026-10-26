@@ -159,7 +159,7 @@ Een ruwe websocketopdracht met een eigen `request_id`. De andere methoden zijn h
 Sinds 0.5. `client.realtime` stuurt en ontvangt [events en live waarden](../concepten/realtime.md). Niets daarvan wordt opgeslagen, bevestigd, in een wachtrij gezet of opnieuw verstuurd.
 
 ```ts
-client.realtime.emit('pressed', { clue: 'c2-300' });
+client.realtime.emit('pressed', { clue: 'vraag-3' });
 const off = client.realtime.on('pressed', (data, from, ts) => showPress(from, ts));
 
 client.realtime.set('cursor', { x: 0.4, y: 0.7 });

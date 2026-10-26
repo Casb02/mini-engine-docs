@@ -9,6 +9,8 @@ order: 3
 
 Elke upload is een **release**: een vaste kopie van je pakket onder het `version` uit `manifest.json`, met een contenthash. Eén release per game is **actief**; die krijgen nieuwe kamers.
 
+Deze pagina gaat over de versies van je eigen spel. Krijgt Mini Engine zelf een nieuwe versie, of de SDK of de CLI, dan staat bij [upgraden](../upgraden.md) wat je met je spel moet doen.
+
 ## Een kamer houdt zijn versie
 
 Bij het maken van een kamer onthoudt Mini Engine de actieve versie als `game_version`. Activeer je daarna een nieuwe versie, dan:

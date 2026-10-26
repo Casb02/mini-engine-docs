@@ -90,7 +90,7 @@ Komt een waarde boven de grens van 64 sleutels of 256 KiB, dan valt ze weg en te
 
 ## Voorbeeld: een buzzer
 
-Jeopardy laat zien hoe realtime en acties samenwerken. De `buzz` blijft de actie die telt: daarmee wordt beslist wie de vraag mag beantwoorden, en dat komt in de spelstand. Tegelijk stuurt de speler een event `pressed`. Host en scherm tonen daarmee meteen wie er drukte, in volgorde en met het verschil in milliseconden, zoals *Sander +14 ms*. Dat is het verschil in aankomst bij de server, niet in het moment van drukken: netwerkvertraging telt mee.
+Een quiz met een buzzer laat zien hoe realtime en acties samenwerken. De `buzz` blijft de actie die telt: daarmee beslist de host wie de vraag mag beantwoorden, en dat komt in de spelstand. Tegelijk stuurt de speler een event `pressed`. Host en scherm tonen daarmee meteen wie er drukte, in volgorde en met het verschil in milliseconden, zoals *Sander +14 ms*. Dat is het verschil in aankomst bij de server, niet in het moment van drukken: netwerkvertraging telt mee.
 
 Op de spelerspagina:
 
@@ -126,6 +126,8 @@ client.realtime.on('pressed', (data, from, ts) => {
 ```
 
 Het event beslist niets. Een speler kan een nep-`pressed` sturen, maar niet uit naam van een ander en niet op een eerder tijdstip. Wie de punten mag pakken, bepaalt nog steeds de `buzz`-actie. De lijst is er voor het oog.
+
+Het startsjabloon `buzzer` van [`me init`](../publiceren/cli.md#startsjablonen) gaat een stap verder: daar beslist de host op de `ts` van de server wie het snelst was, zonder aparte actie.
 
 ## Voorbeeld: kartposities
 

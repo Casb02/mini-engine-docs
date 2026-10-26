@@ -74,7 +74,7 @@ Het manifest van het stemspel uit de scaffolder:
 | --- | --- | --- |
 | `id` | string | 1 tot 48 kleine letters, cijfers of streepjes; uniek op de server |
 | `title` | string | Niet leeg, maximaal 200 bytes |
-| `description` | string | Maximaal 4000 bytes |
+| `description` | string | Maximaal 4000 bytes. De eerste zin is de ondertitel op de [spelkaart](#op-de-spelkaart) |
 | `version` | string | Niet leeg, maximaal 100 bytes |
 | `min_players` | getal | Minstens 1 en niet groter dan `max_players` |
 | `max_players` | getal | Maximaal 100 |
@@ -91,7 +91,7 @@ Het manifest van het stemspel uit de scaffolder:
 
 Kies `supports_late_join` voor een nieuw spel bewust. De kamer zet later aansluiten pas aan met `allow_late_join: true`, en dat wordt geweigerd als het spel het niet ondersteunt.
 
-`runtime: "server"` is er alleen voor de ingebouwde spellen Common Dice en Jeopardy. Een eigen spel gebruikt altijd `"host"`; zie [runtimes](../concepten/runtimes.md).
+`runtime: "server"` is er alleen voor het ingebouwde spel Common Dice. Een eigen spel gebruikt altijd `"host"`; zie [runtimes](../concepten/runtimes.md).
 
 ### host_modes
 
@@ -115,7 +115,7 @@ Een manifest zonder `host_modes` betekent `["moderator"]`, zoals vóór 0.5.1. M
 
 ### icon
 
-Sinds 0.5.1 kan een spel een eigen icoon meenemen. De startpagina, de lijst met alle spellen en de pagina voor een nieuwe kamer tonen het in het vierkantje van 52 pixels naast de titel. Zonder `icon` blijft alles zoals het was: de ingebouwde spellen houden hun eigen teken, andere spellen krijgen een tegel met de eerste letter van de titel.
+Sinds 0.5.1 kan een spel een eigen icoon meenemen. Sinds 0.6.0 staat het groot op de [spelkaart](#op-de-spelkaart) op de startpagina, op `/home/games` en op de pagina voor een nieuwe kamer, en sinds 0.6.1 ook op de deelafbeelding van je spel. Zonder `icon` houdt Common Dice zijn eigen teken, en krijgt een ander spel een tegel met de eerste letter van de titel.
 
 ```json
 "icon": "assets/icon.svg"
@@ -138,9 +138,9 @@ De pagina's van Mini Engine laden het icoon als `<img alt="">`, vanaf het gewone
 Zo ontwerp je een icoon dat in de lijst past:
 
 - Een vierkant `viewBox="0 0 48 48"`.
-- Een volle tegel met een eigen achtergrond en afgeronde hoeken (`rx="12"`).
+- Een volle tegel met een eigen achtergrond en afgeronde hoeken (`rx="12"`). Houd de rand van die tegel effen en dekkend: de spelkaart neemt de kleur van de rand over.
 - Eén of twee eenvoudige vormen in de kleuren van je spel.
-- Geen tekst, geen lettertypes en geen verwijzingen naar andere bestanden.
+- Geen tekst, geen lettertypes en geen verwijzingen naar andere bestanden, ook geen ingesloten afbeeldingen.
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -148,6 +148,23 @@ Zo ontwerp je een icoon dat in de lijst past:
   <circle cx="24" cy="24" r="11" fill="#f2c94c"/>
 </svg>
 ```
+
+### Op de spelkaart
+
+Sinds 0.6.0 tonen `/home` en `/home/games` elk spel als een kaart. Wat erop staat, komt uit je manifest:
+
+| Op de kaart | Komt uit |
+| --- | --- |
+| Je icoon, groot op een vlak | `icon`. Het vlak krijgt de kleur die het meest voorkomt langs de rand van je tegel, als die rand grotendeels dekkend is. Anders staat het icoon zonder gekleurd vlak |
+| De titel | `title` |
+| *door …* (sinds 0.6.1) | De weergavenaam van het account dat het spel uploadde. Een `author` in het manifest wordt genegeerd |
+| Eén regel onder de titel | De eerste zin van `description`, afgekapt op twee regels |
+| Het aantal spelers | `min_players` en `max_players`, zoals *2–8 spelers*; vanaf een maximum van 20 *Vanaf 2 spelers* |
+| *Met tv* | `has_display: true`, of `tv` in `host_modes` |
+| *Eigen …* | `set_kinds`: bij één soort *Eigen* met de titel van die soort in kleine letters, zoals *Eigen vragen*; bij meer soorten *Eigen sets* |
+| *3 achievements* | Het aantal `achievements` |
+
+Laat de eerste zin van je beschrijving dus op zichzelf staan, en kies een `title` voor je soort set die goed leest na *Eigen*. De pagina voor een nieuwe kamer toont de kaart met de hele beschrijving; daar is ruimte voor uitleg. Sinds 0.7 zoekt het zoekveld op `/home/games` in de titel, de beschrijving, de naam van de maker en het id. Hoe je spel eruitziet als iemand een link deelt, staat bij [linkvoorbeelden](../publiceren/overzicht.md#linkvoorbeelden).
 
 ## settings_schema
 
@@ -168,7 +185,7 @@ Per instelling:
 | Sleutel | Regel |
 | --- | --- |
 | `type` | `"integer"`, `"number"`, `"string"` of `"boolean"` |
-| `enum` | Niet-lege lijst zonder dubbele waarden, elk van het juiste type |
+| `enum` | Niet-lege lijst van hoogstens 64 waarden (sinds 0.5), zonder dubbele, elk van het juiste type |
 | `minimum`, `maximum` | Alleen bij `integer` en `number`; minimum niet groter dan maximum |
 | `maxLength` | Alleen bij `string`; een niet-negatief geheel getal |
 | `title`, `description` | Tekst |
@@ -191,6 +208,8 @@ Een voorbeeld met grenzen en een keuzelijst:
 ```
 
 Bij het maken van een kamer worden de meegegeven instellingen over `default_settings` heen gelegd. Daarna vervangt de host instellingen altijd als geheel object.
+
+Het formulier voor een nieuwe kamer toont de instellingen sinds 0.5.5 in de volgorde van `required`, daarna de rest. Zet de namen in `required` dus in de volgorde waarin mensen ze moeten zien. Een `title` wordt het label, een `description` de uitleg eronder.
 
 ### Instellingen liggen vast tijdens het spelen
 
@@ -219,7 +238,7 @@ In een eigen spel kent de host ze toe met `client.award(playerId, achievementId)
 
 ## set_kinds
 
-Sinds 0.5 kan een spel aangeven welke inhoud spelers zelf mogen maken en op hun account bewaren, zoals een eigen vragenbord. Elke soort heeft een schema:
+Sinds 0.5 kan een spel aangeven welke inhoud spelers zelf mogen maken en op hun account bewaren, zoals een eigen vragenlijst. Elke soort heeft een schema:
 
 ```json
 "set_kinds": [

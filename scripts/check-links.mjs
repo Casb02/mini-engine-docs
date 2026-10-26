@@ -21,17 +21,18 @@ if (!existsSync(SITE)) {
   process.exit(1);
 }
 
-async function walk(dir) {
+async function walk(dir, extension = '.html') {
   const files = [];
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) files.push(...(await walk(full)));
-    else if (entry.name.endsWith('.html')) files.push(full);
+    if (entry.isDirectory()) files.push(...(await walk(full, extension)));
+    else if (entry.name.endsWith(extension)) files.push(full);
   }
   return files;
 }
 
 const pages = await walk(SITE);
+const SITE_URL = BUILD.match(/^const SITE_URL = '([^']+)';$/m)[1];
 const idCache = new Map();
 async function idsOf(file) {
   if (!idCache.has(file)) {
@@ -80,6 +81,23 @@ for (const page of pages) {
       const ids = await idsOf(target);
       if (!ids.has(decodeURIComponent(hash))) problems.push(`${rel}: onbekend anker #${hash} in ${raw}`);
     }
+  }
+}
+
+// De Markdown voor agents linkt absoluut, naar SITE_URL: elk zo'n adres moet in site/ bestaan.
+const agentFiles = [...(await walk(SITE, '.md')), join(SITE, 'llms.txt'), join(SITE, 'llms-full.txt')];
+for (const file of agentFiles) {
+  const rel = relative(SITE, file).split(sep).join('/');
+  if (!existsSync(file)) {
+    problems.push(`agentbestand ontbreekt: ${rel}`);
+    continue;
+  }
+  const text = await readFile(file, 'utf8');
+  // Een adres eindigt bij een haakje, spatie, anker, aanhalingsteken, backtick of `<` (zoals in `<pagina>.md`).
+  for (const match of text.matchAll(new RegExp(`${SITE_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^)\\s#<>"\\x60]*)`, 'g'))) {
+    checked++;
+    const target = join(SITE, decodeURIComponent(match[1]) || 'index.html');
+    if (!existsSync(target)) problems.push(`${rel}: ontbrekend doel: ${match[0]}`);
   }
 }
 

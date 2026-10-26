@@ -82,6 +82,6 @@ Beide lettertypes vallen onder de SIL Open Font License en worden zelf gehost; d
 ## Principes
 
 1. **Eén ding per scherm.** Elke pagina heeft één hoofdactie; de rest staat erachter of eronder.
-2. **Rust in de schil, sfeer in het spel.** De schil van Mini Engine is stil en overal gelijk. Elk spel brengt zijn eigen wereld mee: vilt voor Common Dice, een tv-studio voor Jeopardy.
+2. **Rust in de schil, sfeer in het spel.** De schil van Mini Engine is stil en overal gelijk. Elk spel brengt zijn eigen wereld mee: vilt voor Common Dice, een tv-studio voor een quiz.
 3. **Groot waar het telt.** Kamercodes, scores, de buzzer en de worp zijn groot; uitleg is klein en kort.
 4. **Telefoon eerst.** Spelersschermen zijn gemaakt voor één hand; het gedeelde scherm is leesbaar vanaf de bank.

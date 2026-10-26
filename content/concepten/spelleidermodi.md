@@ -26,7 +26,6 @@ Een spel geeft in zijn manifest aan welke modi het kent (`host_modes`) en welke 
 | Spel | Modi | Standaard |
 | --- | --- | --- |
 | Common Dice | `moderator`, `playing`, `hostless` | `hostless` |
-| Jeopardy | `moderator` | `moderator` |
 | Vier pionnen, Wormenwerpen | `playing`, `tv` | `playing` |
 | Nieuw eigen spel uit `me init` of `me game new` (sinds 0.5.2) | `playing`, `tv` | `playing` |
 | Eigen spel zonder `host_modes` in het manifest | `moderator` | `moderator` |
@@ -65,7 +64,7 @@ In `tv` (sinds 0.5.2) is het apparaat dat de kamer maakt de tv: een laptop aan d
 
 ## Met een aparte spelleider
 
-In `moderator` heeft de maker geen spelersplek en geen eigen klaarstatus. Jeopardy gebruikt deze modus voor de quizmaster. Bij een eigen browserspel sturen alleen spelers acties; de host verwerkt ze en speelt zelf niet mee. Wat de spelleider doet, zoals een vraag kiezen of een antwoord goedkeuren, past de hostpagina zelf toe met `setState`.
+In `moderator` heeft de maker geen spelersplek en geen eigen klaarstatus. Een quiz gebruikt deze modus voor een quizmaster die de antwoorden kent. Bij een eigen browserspel sturen alleen spelers acties; de host verwerkt ze en speelt zelf niet mee. Wat de spelleider doet, zoals een vraag kiezen of een antwoord goedkeuren, past de hostpagina zelf toe met `setState`.
 
 ## Accounts en modi
 

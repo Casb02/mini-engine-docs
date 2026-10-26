@@ -20,6 +20,8 @@ node build.mjs
 
 `build.mjs` zet `content/**/*.md` om naar `site/`, met `template.html` als enige sjabloon, en kopieert `static/` (stijl, lettertypes, logo's, favicon, downloads) mee. De afhankelijkheden zijn [marked](https://marked.js.org/) en highlight.js, allebei vastgezet.
 
+Voor AI-agents schrijft de build elke pagina ook als Markdown, op hetzelfde pad met `.md` (`site/sdk/overzicht.md` naast `site/sdk/overzicht.html`), plus `site/llms.txt` (inhoudsopgave volgens [llmstxt.org](https://llmstxt.org)) en `site/llms-full.txt` (alle pagina's in één bestand). In die versie zijn de front matter vervangen door titel, beschrijving, sectie en adres, ruwe HTML-blokken omgezet naar Markdown, en wijzen links absoluut naar `SITE_URL` in `build.mjs`. Elke HTML-pagina linkt in de `<head>` (`rel="alternate"`) en in de voettekst naar haar `.md`.
+
 ## Lokaal bekijken
 
 ```sh
@@ -34,7 +36,7 @@ Open `http://localhost:4173/`. De server bedient de site ook op `http://localhos
 npm run check          # bouwen + linkcontrole
 ```
 
-`scripts/check-links.mjs` volgt elke interne `href`, `src` en `srcset`, inclusief ankers, en controleert dat de vaste downloads er staan. Externe links slaat hij over. Een kapotte link of een ontbrekende download laat de controle falen.
+`scripts/check-links.mjs` volgt elke interne `href`, `src` en `srcset`, inclusief ankers, en controleert dat de vaste downloads er staan. In de `.md`-bestanden, `llms.txt` en `llms-full.txt` controleert hij elk absoluut adres op de site. Externe links slaat hij over. Een kapotte link of een ontbrekende download laat de controle falen.
 
 ## Schrijven
 
@@ -57,6 +59,7 @@ toc: false                       # optioneel: geen inhoudsopgave
 - De sectie `SDK` is verdeeld in groepen: `Aan de slag`, `Een game bouwen`, `Concepten` en `Referentie` (`GROUPS` in `build.mjs`). Een pagina in die sectie moet een `group` hebben; andere secties hebben er geen. Binnen een groep of sectie sorteert `order`.
 - Link naar andere pagina's met hun relatieve `.md`-pad, bijvoorbeeld `[runtimes](../concepten/runtimes.md)`. De build maakt er `.html` van en stopt bij een link naar een onbekende pagina.
 - Gebruik `{{root}}` voor bestanden uit `static/`, bijvoorbeeld `{{root}}brand/woordmerk-licht.svg`.
+- Ruwe HTML mag, maar de Markdown-versie voor agents kent alleen wat de pagina's nu gebruiken: lijsten, links met `<strong>`-titel en `<span>`-uitleg, afbeeldingen, nadruk, code, en een illustratie met `role="img"` (die wordt haar `aria-label`). Kijk na een nieuw soort blok even in `site/<pagina>.md`.
 - Koppen krijgen automatisch een id en een ankerlink. De inhoudsopgave verschijnt bij drie of meer `##`-koppen.
 - Schrijf in het Nederlands, rustig en in zinnen, met sentence case. Merkregels: `content/branding.md`.
 

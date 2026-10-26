@@ -107,9 +107,9 @@ De eerste versie van een nieuwe game wordt altijd actief; latere versies alleen 
 | --- | --- |
 | 400 `invalid_request` | Ongeldig pakket: manifest, rolpagina's, settingsschema, pad, base64, versienaam, `runtime` niet `host`, of te groot |
 | 403 `forbidden` | De game is van een andere ontwikkelaar |
-| 409 `game_id_taken` | Het id hoort bij een ingebouwde game |
+| 409 `game_id_taken` | Het id hoort bij een ingebouwde game; sinds 0.7 alleen nog `common-dice` |
 | 409 `version_exists` | Deze versie bestaat al voor deze game |
-| 409 `quota_games` | Je hebt al 10 games |
+| 409 `quota_games` | Je zit aan je limiet voor games: standaard 10 per account. Alleen een nieuwe game telt; een nieuwe versie van een bestaande niet. Let op de code, niet op de tekst: die noemt het aantal games dat je hebt |
 | 409 `quota_releases` | Deze game heeft al 10 versies |
 | 413 | De body is groter dan 16 MiB |
 

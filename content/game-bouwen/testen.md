@@ -39,6 +39,12 @@ me game upload
 
 Na de upload toont de CLI het adres om een kamer te maken, zoals `https://miniengine.nl/home/new/mijn-spel`. Maak daar een kamer en laat anderen meedoen met de code of de QR-code. Wie de kamer maakte, opent het gedeelde scherm via **Kamer** → **Open het gedeelde scherm**. Heb je geen telefoons bij de hand: kamersleutels staan per browsertabblad, dus elk privévenster is een eigen deelnemer. Een gedupliceerd tabblad is dezelfde deelnemer. Meer over de pagina's van een kamer staat bij [kamers en rollen](../concepten/kamers-en-rollen.md#een-kamer-op-miniengine-nl).
 
+## Op een echte telefoon
+
+Een paar dingen doet alleen de kamerpagina van de server, niet `me dev`: het scherm aanhouden (sinds 0.6.1), het iframe zo groot maken als het zichtbare deel van het venster en de `theme-color` van je spel overnemen (sinds 0.6.5). Test die op een echte telefoon, met je spel als testversie op de server.
+
+Zet daarvoor `?wake` achter de kamerlink, bijvoorbeeld `https://miniengine.nl/room/HWKRTZ/player?wake`. De pagina toont dan onderaan een regel met de status van het scherm-aan-slot en van het stille filmpje dat als reserve dient, en sinds 0.6.5 ook de maat van het iframe en van het zichtbare deel. Op een iPhone 15 of 16 in Safari is het zichtbare deel ongeveer 393×660, op een iPhone SE ongeveer 375×548. Zie [op een telefoon](rolpaginas.md#op-een-telefoon).
+
 ## Checklist
 
 **Klaarzetten en rondes**
@@ -80,6 +86,9 @@ Na de upload toont de CLI het adres om een kamer te maken, zoals `https://minien
 **Telefoonschermen**
 
 - Bekijk de spelerspagina op een smal scherm (360 pixels breed) zonder horizontaal scrollen.
+- Op 393×660 en 375×548 staat de belangrijkste knop in beeld zonder te scrollen, en valt er niets onder de werkbalk van de browser.
+- De strook rond de werkbalk heeft de kleur van je spel, in licht en in donker.
+- Laat een telefoon een paar minuten liggen tijdens het spel: het scherm blijft aan.
 - Is het gedeelde scherm leesbaar vanaf de bank?
 - Scan de QR-code op het gedeelde scherm en achter **Toon QR** met een telefoon: je komt op de pagina om mee te doen.
 - Een klik op de kamercode kopieert de uitnodigingslink.

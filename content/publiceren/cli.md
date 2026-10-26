@@ -161,9 +161,9 @@ Is het de eerste versie van een nieuw spel, dan zegt `me game upload` erbij dat 
 | `invalid_request` | Het pakket klopt niet: manifest, rolpagina's, `settings_schema`, pad, versienaam, `runtime` niet `host`, of te groot. De melding noemt de reden |
 | `forbidden` | De game is van iemand anders |
 | `unauthorized` | De dev-key is ongeldig, verlopen of ingetrokken |
-| `game_id_taken` | Het id hoort bij een ingebouwde game |
+| `game_id_taken` | Het id hoort bij een ingebouwde game; sinds 0.7 alleen nog `common-dice` |
 | `version_exists` | Deze versie bestaat al; verhoog `version` in `manifest.json` |
-| `quota_games` | Je hebt al 10 games |
+| `quota_games` | Je zit aan je limiet voor games: standaard 10 per account. Nieuwe versies van een bestaande game tellen niet mee |
 | `quota_releases` | Deze game heeft al 10 versies; ruim op met `me game prune` |
 | `release_not_found` | Deze versie bestaat niet |
 | `release_active` | Je probeert de actieve versie te verwijderen; activeer eerst een andere |
@@ -226,15 +226,15 @@ Een bestaande skill met andere inhoud wordt alleen met `--force` overschreven. Z
 Sinds CLI 0.6.0. Loopt alles langs wat je nodig hebt, als lijst met ✓ en ✗. Onder elke ✗ staat één manier om het op te lossen.
 
 - de versie van Node.js en of er een nieuwere CLI is (zonder internet slaat hij dat over);
-- de server en of `/api/health` antwoordt;
+- de server, of `/api/health` antwoordt en welke versie van Mini Engine daar draait;
 - je dev-key, zoals `me auth status` die controleert;
 - de AI-skills in `~/.claude/skills`;
 - in een map met `manifest.json`: dezelfde controles als `me game upload --dry-run`, en of de rolpagina's alleen bestanden uit het spel laden. Ben je ingelogd, dan zegt hij ook of deze versie al op de server staat.
 
 ```text
 ✓ Node.js 22.12.0
-✓ CLI 0.6.0 is de nieuwste versie
-✓ Server https://miniengine.nl (standaard) is bereikbaar, Mini Engine 0.6.1
+✓ CLI 0.7.0 is de nieuwste versie
+✓ Server https://miniengine.nl (standaard) is bereikbaar, Mini Engine 0.7.0
 ✗ Geen dev key voor https://miniengine.nl; uploaden kan nog niet. Spelen met me dev lukt wel.
     Vraag een dev key aan wie de server beheert en log in met: me auth
 ✓ AI-skills staan in ~/.claude/skills
@@ -244,6 +244,8 @@ Sinds CLI 0.6.0. Loopt alles langs wat je nodig hebt, als lijst met ✓ en ✗. 
 ```
 
 Met `--json` krijg je dezelfde lijst als JSON (`ok` en `checks`). De exitcode is 1 als er iets op te lossen is.
+
+Alleen de versie van de CLI zie je met `me --version`. Meldt `me doctor` een nieuwere CLI of andere skills, werk ze dan bij met `npm install -g github:Casb02/mini-engine-cli` en `me skill install --force`. Wat je bij een nieuwe versie van Mini Engine met je spel doet, staat bij [upgraden](../upgraden.md).
 
 ## Instellingen
 

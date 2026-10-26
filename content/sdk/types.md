@@ -136,6 +136,7 @@ interface Manifest<Settings = Record<string, Json>> {
   default_host_mode?: HostMode;
   supports_late_join?: boolean;
   icon?: string;                          // sinds 0.5.1: 'assets/<naam>.svg'
+  author?: string;                        // sinds 0.6.1, alleen bij geüploade spellen
   achievements?: AchievementDefinition[]; // sinds 0.5
   set_kinds?: SetKind[];                  // sinds 0.5
 }
@@ -148,7 +149,7 @@ interface SettingsProperty {
 }
 ```
 
-`icon` is het pad van een SVG-icoon in het package, sinds SDK 0.5.1 (Mini Engine 0.5.1). De regels staan bij [package en manifest](../game-bouwen/package-en-manifest.md#icon). Een manifest zonder `host_modes` geldt als `['moderator']`; een nieuw spel uit de scaffolder heeft sinds 0.5.2 `['playing', 'tv']` met `default_host_mode: 'playing'`.
+`author` staat erin sinds SDK 0.6.0 (Mini Engine 0.6.1): de weergavenaam van het account dat het spel uploadde. De server zet het; een `author` in je manifest wordt genegeerd. `icon` is het pad van een SVG-icoon in het package, sinds SDK 0.5.1 (Mini Engine 0.5.1). De regels staan bij [package en manifest](../game-bouwen/package-en-manifest.md#icon). Een manifest zonder `host_modes` geldt als `['moderator']`; een nieuw spel uit de scaffolder heeft sinds 0.5.2 `['playing', 'tv']` met `default_host_mode: 'playing'`.
 
 ### Achievements en soorten sets
 
@@ -224,7 +225,7 @@ interface Realtime {
 
 ### ActionPayloads
 
-De data van de acties van de ingebouwde spellen:
+De data van de acties van de ingebouwde spellen. SDK 0.6.0 declareert ook nog de acties van Jeopardy (`choose_team` tot en met `close_clue`); die bestaan sinds Mini Engine 0.7 niet meer, nu alleen Common Dice is ingebouwd.
 
 ```ts
 interface ActionPayloads {
