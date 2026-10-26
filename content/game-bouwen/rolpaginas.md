@@ -72,6 +72,16 @@ Gebruik `textContent` voor namen en andere tekst van spelers, nooit `innerHTML`.
 | `host.html` | Rondes starten en afsluiten, apparaatopties wijzigen; bij een eigen spel ook acties verwerken en state publiceren, en als de maker meespeelt diens eigen zetten |
 | `display.html` | Alleen `public_state` tonen, groot en leesbaar vanaf de bank |
 
+## Op een telefoon
+
+De kamerinterface maakt het iframe precies zo groot als het zichtbare deel van het browservenster. Op een telefoon staat je spel dus tussen de adresbalk en de werkbalk van de browser. Dat is een stuk lager dan het scherm: ongeveer 393×660 op een iPhone 15 of 16 in Safari, en ongeveer 375×548 op een iPhone SE.
+
+- Vul het iframe met `html, body { height: 100% }` of `height: 100dvh`. Zet er geen `min-height: 100vh` naast: `100vh` is de hoogte zonder de balken van de browser, dus dan schuift de onderkant onder de werkbalk.
+- Houd de belangrijkste knop en het eigen spelmateriaal van de speler (hand, dobbelstenen, invoer) in beeld zonder dat de pagina hoeft te scrollen. Lange lijsten scrollen in een eigen paneel.
+- Geef randen padding met `max(12px, env(safe-area-inset-bottom))`. In het iframe is die inset meestal 0, maar op volledig scherm telt hij wel.
+- Zet per kleurschema een `theme-color` in elke pagina. De kamerinterface kleurt de strook rond de werkbalk van de browser dan in de kleur van je spel.
+- Maak je testscreenshots op 393×660 en 375×548, niet alleen op de volle schermmaat.
+
 ## Pagina's sluiten en terugkomen
 
 Het stemspel sluit de verbinding bij `pagehide` en hervat bij `pageshow`. Zo vervangt een teruggekeerd tabblad netjes zijn eigen verbinding:
