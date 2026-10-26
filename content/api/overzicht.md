@@ -8,9 +8,9 @@ order: 1
 
 # HTTP API-overzicht
 
-Mini Engine heeft een JSON-API onder `/api/v1` en een websocket per kamer. `v1` is de routeversie; deze pagina's horen bij Mini Engine 0.6. Een spel praat er meestal via de [SDK](../sdk/overzicht.md) mee, en de [CLI](../publiceren/cli.md) gebruikt de routes voor ontwikkelaars. Deze sectie beschrijft wat er over de lijn gaat, voor wie zelf een client schrijft of wil weten wat de SDK doet.
+Mini Engine heeft een JSON-API onder `/api/v1` en een websocket per kamer. `v1` is de routeversie; deze pagina's horen bij Mini Engine 0.7. Een spel praat er meestal via de [SDK](../sdk/overzicht.md) mee, en de [CLI](../publiceren/cli.md) gebruikt de routes voor ontwikkelaars. Deze sectie beschrijft wat er over de lijn gaat, voor wie zelf een client schrijft of wil weten wat de SDK doet.
 
-[Download de API-referentie (pdf)]({{root}}downloads/MiniEngine-API-v0.6.pdf) voor een afdrukbare versie: editie 0.6, de openbare editie, met alles wat een client, een game of de CLI gebruikt.
+[Download de API-referentie (pdf)]({{root}}downloads/MiniEngine-API-v0.6.pdf) voor een afdrukbare versie: editie 0.6, de openbare editie, met alles wat een client, een game of de CLI gebruikt. De wijzigingen van 0.7 staan nog niet in de pdf, wel op deze pagina's.
 
 ## Basis
 
@@ -86,10 +86,6 @@ Elke fout heeft dezelfde vorm:
 | 409 | `game_not_running` | Serverspel: start eerst het spel. Achievement toekennen: de kamer staat nog in de lobby |
 | 409 | `quota_sets` | Het account heeft al 50 sets |
 | 409 | `release_changed` | Kamer maken met een eigen set: het spel kreeg net een nieuwe versie; probeer het opnieuw |
-| 409 | `buzzer_closed` | Jeopardy: de buzzer staat niet open voor jouw team |
-| 409 | `teams_required` | Jeopardy: niet iedere speler heeft een team |
-| 409 | `teams_locked` | Jeopardy: teams liggen vast |
-| 409 | `invalid_game_action` | Jeopardy: actie past niet in de huidige spelfase |
 | 413 | `state_too_large` | Gepubliceerde state groter dan 64 KiB |
 | 413 | `set_too_large` | De inhoud van een set is groter dan 64 KiB |
 | 429 | `rate_limit` | Te veel verzoeken, berichten, mails, setwijzigingen of toegekende achievements |
@@ -116,13 +112,13 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | Methode en pad | Toegang | Resultaat |
 | --- | --- | --- |
 | `GET /api/health` | Openbaar | Status en engineversie |
-| `GET /api/v1/games` | Openbaar | `{ games: [...] }` |
+| `GET /api/v1/games` | Openbaar | `{ games: [...], featured: [...] }` |
 | `GET /api/v1/games/{id}` | Openbaar | Metadata van één spel |
 | `GET /api/v1/games/{id}/{role}` | Openbaar | HTML voor `host`, `player` of `display` |
 | `GET /games/{id}/assets/{path}` | Openbaar | Publieke gameassets |
 | `GET /sdk/mini-engine.js` | Openbaar | De SDK-bundle |
 | `GET /sdk/mini-engine.d.ts` | Openbaar | TypeScript-declaraties van de SDK (`text/plain`) |
-| `GET /home`, `/home/games`, `/home/new/{id}`, `/home/join`, `/home/account`, `/home/sets`, `/home/sets/{id}` | Openbaar | De pagina's van Mini Engine: start, alle spellen, kamer maken, meedoen, account, mijn sets. Een onbekend spel in `/home/new/{id}` geeft 404. |
+| `GET /home`, `/home/games`, `/home/new/{id}`, `/home/join`, `/home/account`, `/home/sets`, `/home/sets/{id}` | Openbaar | De pagina's van Mini Engine: start, alle spellen, kamer maken, meedoen, account, mijn sets. Een onbekend spel in `/home/new/{id}` geeft 404. Zie [pagina's van Mini Engine](games.md#pagina-s-van-mini-engine). |
 | `GET /demo/…` | Openbaar | Doorverwijzing naar hetzelfde pad onder `/home` |
 | `POST /api/v1/rooms` | Gast of account | 201 met hostsleutel |
 | `POST /api/v1/rooms/{code}/join` | Gast of account | 201 met spelerssleutel |
@@ -169,17 +165,33 @@ Deze documentatie hoort bij deze versies:
 
 | Onderdeel | Versie |
 | --- | --- |
-| Mini Engine | 0.6 (`GET /api/health` geeft de versie van de server) |
-| Mini Engine SDK | 0.5.2 |
-| me-CLI | 0.5.2 |
+| Mini Engine | 0.7 (`GET /api/health` geeft de versie van de server) |
+| Mini Engine SDK | 0.6.0. De server serveert op `/sdk/mini-engine.js` de client van 0.5.2; die is gelijk aan die van 0.6.0 |
+| me-CLI | 0.7.0 |
 | API-referentie (pdf) | Editie 0.6, de openbare editie |
+
+Wat je met een bestaand spel doet bij een nieuwe versie, staat bij [upgraden](../upgraden.md).
+
+Nieuw in 0.7:
+
+- Jeopardy is niet meer ingebouwd; Common Dice is het enige ingebouwde spel. De acties en foutcodes van Jeopardy (`buzzer_closed`, `teams_required`, `teams_locked`, `invalid_game_action`) bestaan niet meer, en het id `jeopardy` is vrij voor een geüpload spel. Bestaande sets voor Jeopardy kun je op **Mijn sets** nog bekijken en verwijderen.
+- `GET /api/v1/games` geeft naast `games` ook `featured`: hoogstens vier uitgelichte spellen. De start toont ze eerst, `/home/games` bovenaan. Zie [GET /api/v1/games](games.md#get-api-v1-games).
+- `/home/games` heeft een zoekveld voor titel, beschrijving, maker en id, met de zoekopdracht in `?q=`.
+- De limiet van 10 games per account is een standaard; wie de server beheert, kan een account er meer geven. De foutcode blijft `409 quota_games`.
 
 Nieuw in 0.6:
 
-- De web-app toont spellen als kaarten: het icoon groot op de eigen kleur van het spel, met het aantal spelers, tv, eigen sets en achievements. De kaart neemt de kleur van de rand van de icoontegel over; houd die rand dus effen.
+- De web-app toont spellen als kaarten: het icoon groot op de eigen kleur van het spel, de eerste zin van de beschrijving, en het aantal spelers, tv, eigen sets en achievements. De kaart neemt de kleur van de rand van de icoontegel over; houd die rand dus effen. Zie [op de spelkaart](../game-bouwen/package-en-manifest.md#op-de-spelkaart).
 - De pagina met alle spellen heet `/home/games` (tot 0.6.1 `/home/spellen`). Na het bewaren van een set opent `/home/sets/{id}?saved` (was `?opgeslagen`).
-- Het formulier voor een nieuwe kamer toont de instellingen in de volgorde van `required` in het `settings_schema`, daarna de rest.
-- Sinds 0.5.3 krijgen eigen sets met platte velden een formulier in plaats van een JSON-editor. Zie [eigen sets](../concepten/eigen-sets.md#het-formulier-voor-je-eigen-soort-set).
+- Sinds 0.6.1 heeft een geüpload spel `author`, de weergavenaam van wie het uploadde. Een pagina onder `/home` heeft linkvoorbeelden, en `/og/games/{id}.png` is een deelafbeelding van je spel. Zie [linkvoorbeelden](../publiceren/overzicht.md#linkvoorbeelden).
+- Sinds 0.6.1 houdt de kamerpagina het scherm aan; een spel hoeft dat niet meer zelf te doen. Sinds 0.6.3 toont `?wake` achter de kamerlink hoe dat gaat.
+- Sinds 0.6.4 gaat een gedeelde link naar de hostpagina of een spelerspagina, in een tabblad zonder die plek, naar de andere rol van dat tabblad, of anders naar de pagina om mee te doen.
+- Sinds 0.6.5 is het iframe precies het zichtbare deel van het venster, en neemt de kamerpagina de `theme-color` van je spel over. Zie [op een telefoon](../game-bouwen/rolpaginas.md#op-een-telefoon).
+
+Nieuw in 0.5.3 tot en met 0.5.5:
+
+- Eigen sets met platte velden krijgen een formulier in plaats van een JSON-editor. Zie [eigen sets](../concepten/eigen-sets.md#het-formulier-voor-je-eigen-soort-set).
+- Sinds 0.5.5 toont het formulier voor een nieuwe kamer de instellingen in de volgorde van `required` in het `settings_schema`, daarna de rest.
 
 Nieuw in 0.5.1 en 0.5.2:
 

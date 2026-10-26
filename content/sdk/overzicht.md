@@ -21,7 +21,7 @@ De Mini Engine SDK is een getypeerde browser- en Node-client zonder runtime-afha
 
 ## Versies
 
-Deze documentatie hoort bij SDK 0.6.0 en CLI 0.6.0. Ze werken met Mini Engine 0.5 en nieuwer. Wat een nieuwere versie van Mini Engine vraagt, staat er steeds bij, zoals *sinds 0.5.1*:
+Deze documentatie hoort bij SDK 0.6.0, CLI 0.7.0 en Mini Engine 0.7. De SDK en de CLI werken met Mini Engine 0.5 en nieuwer. Wat een nieuwere versie van Mini Engine vraagt, staat er steeds bij, zoals *sinds 0.5.1*:
 
 | Onderdeel | Vanaf Mini Engine |
 | --- | --- |
@@ -29,6 +29,11 @@ Deze documentatie hoort bij SDK 0.6.0 en CLI 0.6.0. Ze werken met Mini Engine 0.
 | De maker speelt mee (`playing`), een eigen icoon | 0.5.1 |
 | De maker is een tv (`tv`); nieuwe spellen uit de scaffolder bieden dit aan | 0.5.2 |
 | Een formulier voor eigen sets in plaats van een JSON-editor | 0.5.3 |
+| De naam van de maker op de spelkaart (`author`); de kamerpagina houdt het scherm aan | 0.6.1 |
+| Het iframe past in het zichtbare deel van een telefoon; de kamer neemt de `theme-color` van je spel over | 0.6.5 |
+| Zoeken en uitgelichte spellen op `/home/games`; Jeopardy is niet meer ingebouwd | 0.7 |
+
+Heb je al een spel voor een oudere versie, kijk dan bij [upgraden](../upgraden.md) wat je moet doen.
 
 ## Wat erin zit
 
@@ -53,6 +58,8 @@ import { MiniEngine, loadSession } from '/sdk/mini-engine.js';
 ```
 
 Dat is één gebundelde ES-module. Mini Engine serveert er één vaste versie van, zodat elk spel op die server dezelfde SDK gebruikt. `me dev` serveert de SDK op hetzelfde adres. De typedeclaraties staan ernaast op `/sdk/mini-engine.d.ts`.
+
+De client is sinds SDK 0.5.0 niet veranderd; latere versies brachten types, startsjablonen en skills. Mini Engine 0.6 en 0.7 serveren daarom nog de client van SDK 0.5.2, met de typedeclaraties van 0.5.2. Wil je `author` in de types, haal ze dan uit SDK 0.6.0; zie [upgraden](../upgraden.md#je-gereedschap-bijwerken).
 
 ## In een eigen project
 

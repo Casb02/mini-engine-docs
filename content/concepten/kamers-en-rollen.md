@@ -30,17 +30,19 @@ De pagina's onder `/home` zijn de speelomgeving van Mini Engine. Als je je spel 
 
 | Pagina | Wat je er doet |
 | --- | --- |
-| `/home` | Een kamercode invullen, of een spel kiezen om zelf te beginnen |
-| `/home/games` | Alle spellen als kaarten, als het er meer dan vier zijn. Tot 0.6.1 heette deze pagina `/home/spellen` |
+| `/home` | Een kamercode invullen, of een spel kiezen om zelf te beginnen. Sinds 0.7 staan de uitgelichte spellen eerst |
+| `/home/games` | Alle spellen als kaarten. Sinds 0.7 staan de uitgelichte bovenaan, en zoek je op titel, beschrijving, maker en id. Tot 0.6.1 heette deze pagina `/home/spellen` |
 | `/home/new/<spel>` | Een kamer maken voor dat spel: naam, spelleidermodus, de instellingen uit je `settings_schema`, een eigen set, en onder **Meer opties** het aantal spelers, het gedeelde scherm en later aansluiten |
 | `/home/join?room=CODE` | Een naam invullen en meedoen |
 | `/room/CODE/ROL` | De kamer zelf: deze pagina laadt je spelpagina in een iframe; zie [pagina's per rol](../game-bouwen/rolpaginas.md) |
 | `/home/account` | Inloggen, een account maken, resultaten en achievements bekijken, en je eigen geüploade spellen aan- of uitzetten |
-| `/home/sets` | Eigen sets bekijken en maken, zoals een eigen Jeopardy-bord |
+| `/home/sets` | Eigen sets bekijken en maken, zoals een eigen vragenlijst voor een quiz |
 
 De maker opent het gedeelde scherm via **Kamer** → **Open het gedeelde scherm**, bijvoorbeeld op een laptop aan de tv. Spelers doen mee met de code, met de uitnodigingslink of door de QR-code te scannen. Een klik op de kamercode kopieert de uitnodigingslink; **Toon QR** opent een grote QR-code.
 
 De hostsleutel blijft in het browsertabblad waarmee de kamer is gemaakt. Ververs je dat tabblad, dan speel je gewoon verder. Een ander apparaat kan die rol niet overnemen: er is geen hostoverdracht tussen apparaten.
+
+Deelt de maker per ongeluk de link uit de adresbalk, zoals `/room/HWKRTZ/host`, dan krijgt een ander daarmee niet de host. Sinds 0.6.4 gaat zo'n link in een tabblad zonder die plek naar de andere rol die het tabblad in die kamer wel heeft, en anders naar `/home/join?room=HWKRTZ`, met de code al ingevuld. Hetzelfde geldt voor een link naar een spelerspagina.
 
 ## Maken en meedoen
 

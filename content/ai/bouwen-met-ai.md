@@ -24,7 +24,7 @@ De bouwskill roept de ontwerpskill zelf aan als hij aan de pagina's toekomt.
 
 ## MiniEngineUI
 
-Heb je alleen een idee en geen ontwerp in je hoofd, kies dan MiniEngineUI. De bouwskill vraagt aan het begin één keer of je die stijl wilt. Zeg je niets, of heb je geen wensen voor het uiterlijk, dan gebruikt hij hem vanzelf. Je spel krijgt dan dezelfde rustige schil als Common Dice en Jeopardy: een balk met de naam van het spel en de kamercode, grote knoppen op de telefoon, een overzicht voor de spelleider en een scherm dat je vanaf de bank kunt lezen. De sfeer van jouw spel zit in één thema en één blikvanger op het speelveld, zoals het vilt bij de dobbelstenen.
+Heb je alleen een idee en geen ontwerp in je hoofd, kies dan MiniEngineUI. De bouwskill vraagt aan het begin één keer of je die stijl wilt. Zeg je niets, of heb je geen wensen voor het uiterlijk, dan gebruikt hij hem vanzelf. Je spel krijgt dan dezelfde rustige schil als de spellen van Mini Engine zelf: een balk met de naam van het spel en de kamercode, grote knoppen op de telefoon, een overzicht voor de spelleider en een scherm dat je vanaf de bank kunt lezen. De sfeer van jouw spel zit in één thema en één blikvanger op het speelveld, zoals het vilt bij de dobbelstenen.
 
 Sinds SDK 0.5.1 regelt de kit ook het uitnodigen:
 
@@ -75,6 +75,20 @@ Je kunt hem ook bij naam aanroepen: `/build-mini-engine-game`.
 - **Agents die het SKILL.md-formaat lezen**, zoals Codex, Gemini CLI en Copilot CLI, zoeken ook in `~/.agents/skills/`. Kopieer of koppel dezelfde mappen daarheen, of naar de plek die je agent documenteert.
 - **Agents zonder skills** wijs je direct naar het bestand: *Lees skills/build-mini-engine-game/SKILL.md in de Mini Engine SDK en volg het.*
 - Geef de agent ook `types/mini-engine.d.ts` uit de SDK. Daarin staan alle methoden en types exact.
+
+## Deze docs als Markdown
+
+Elke pagina van deze documentatie staat er ook als Markdown, voor agents die liever geen HTML lezen. Vervang `.html` door `.md` in het adres, of volg de link onderaan de pagina:
+
+| Adres | Wat |
+| --- | --- |
+| `https://docs.miniengine.nl/<pagina>.md` | Eén pagina als Markdown, met titel, beschrijving en sectie bovenaan. Links wijzen naar de andere `.md`-pagina's, met het volledige adres. |
+| [`llms.txt`](https://docs.miniengine.nl/llms.txt) | De inhoudsopgave volgens [llmstxt.org](https://llmstxt.org): elke pagina met een link en één zin uitleg, in de volgorde van het menu. |
+| [`llms-full.txt`](https://docs.miniengine.nl/llms-full.txt) | Alle pagina's achter elkaar in één bestand. |
+
+Een agent zonder skills geef je zo de hele documentatie in één keer: *Lees https://docs.miniengine.nl/llms-full.txt en bouw daarna het spel.* Elke HTML-pagina verwijst ook in de `<head>` naar haar Markdown-versie, met `<link rel="alternate" type="text/markdown">`.
+
+## Een spel bouwen en testen
 
 De bouwskill maakt een nieuw spel met `me init --yes` of `npx -p @casb02/mini-engine-sdk create-mini-game`, uit het startsjabloon dat het best past, en test het eerst met [`me dev`](../publiceren/cli.md#me-dev) op je eigen computer. Daarna zet hij het als testversie op de server met `me game upload`; daarvoor heb je een dev-key nodig. Ontbreekt iets, dan wijst de agent je erop. Zie ook [testen](../game-bouwen/testen.md).
 

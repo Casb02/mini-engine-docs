@@ -39,6 +39,8 @@ getGames(): Promise<{ games: Manifest[] }>
 
 Alle spellen die aanstaan, met hun metadata, instellingenschema, icoon, achievements en soorten sets, uit de actieve versie van elk spel. Ontbrekende manifestvelden krijgen hier hun standaardwaarde: `runtime: "host"`, `host_modes: ["moderator"]`, `default_host_mode: "moderator"`, `supports_late_join: true`, en lege lijsten voor `achievements` en `set_kinds`. `icon` ontbreekt als het spel er geen heeft.
 
+Sinds Mini Engine 0.7 heeft het antwoord ook `featured`: de id's van hoogstens vier uitgelichte spellen. Het type van SDK 0.6.0 kent dat veld nog niet; zie [GET /api/v1/games](../api/games.md#get-api-v1-games).
+
 ### getGame(id)
 
 ```ts
@@ -85,8 +87,8 @@ Met `set_id` speelt de kamer met een [eigen set](../concepten/eigen-sets.md) van
 
 ```ts
 api.accountToken = token;
-const { sets } = await api.listSets({ game_id: 'jeopardy', kind: 'board' });
-const room = await api.createRoom({ game_id: 'jeopardy', set_id: sets[0].id });
+const { sets } = await api.listSets({ game_id: 'quiz-bij-dani', kind: 'questions' });
+const room = await api.createRoom({ game_id: 'quiz-bij-dani', set_id: sets[0].id });
 ```
 
 ### joinRoom(code, name)
@@ -248,15 +250,15 @@ createSet<Data extends Json = Json>(input: { game_id: string; kind: string; titl
 ```
 
 ```ts
-const board = await api.createSet({
-  game_id: 'jeopardy',
-  kind: 'board',
+const set = await api.createSet({
+  game_id: 'quiz-bij-dani',
+  kind: 'questions',
   title: "Dani's filmavond",
-  data: { categories: [{ title: 'Films', clues: [/* vijf vragen */] }] },
+  data: { questions: ['Welke film won in 1998 elf Oscars? | Titanic | Avatar | Gladiator', /* … */] },
 });
 ```
 
-De soort moet in de actieve versie van het spel staan en de inhoud moet aan het schema voldoen. Een fout noemt het pad, zoals `categories[0].clues[2].question: gebruik 1–240 tekens.` Bij 50 sets volgt `quota_sets`.
+De soort moet in de actieve versie van het spel staan en de inhoud moet aan het schema voldoen. Een fout noemt het pad, zoals `questions[2]: gebruik 5–300 tekens.` Bij 50 sets volgt `quota_sets`.
 
 ### updateSet(id, input)
 

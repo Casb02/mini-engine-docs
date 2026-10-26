@@ -38,7 +38,7 @@ Deze documentatie is voor wie er zelf een spel voor maakt. Je bouwt het spel met
   <li><div><strong>Iedereen zet zich klaar, het spel begint</strong>Als alle spelers klaarstaan, start de ronde. Elke telefoon ziet direct dezelfde worp, vraag of score.</div></li>
 </ol>
 
-Spelen kan zonder account. Wie er wel een maakt, ziet resultaten en achievements terug in een profiel dat voor alle spellen geldt, en kan eigen inhoud bewaren, zoals een eigen Jeopardy-bord.
+Spelen kan zonder account. Wie er wel een maakt, ziet resultaten en achievements terug in een profiel dat voor alle spellen geldt, en kan eigen inhoud bewaren, zoals een eigen vragenlijst voor een quiz.
 
 ## Wat je bouwt
 
@@ -52,5 +52,6 @@ Je hebt Node.js 22 of nieuwer nodig. Om je spel online te zetten heb je daarnaas
   <li><a href="game-bouwen/eerste-game.md"><strong>Je eerste game</strong><span>Maak in vijf minuten een speelbaar stemspel en speel het meteen op je eigen computer.</span></a></li>
   <li><a href="concepten/kamers-en-rollen.md"><strong>De concepten</strong><span>Kamers, rollen, state, acties, realtime, achievements en eigen sets: hoe de onderdelen samenwerken.</span></a></li>
   <li><a href="publiceren/overzicht.md"><strong>Publiceren met de CLI</strong><span>Zet je spel online met een dev-key en het commando me, met versies en terugrollen.</span></a></li>
+  <li><a href="upgraden.md"><strong>Upgraden</strong><span>Heb je al een spel? Wat je doet bij de overstap naar Mini Engine 0.5, 0.6 en 0.7.</span></a></li>
   <li><a href="branding.md"><strong>Branding</strong><span>Het brandbook en de logobestanden, met naam, kleuren en lettertypes.</span></a></li>
 </ul>

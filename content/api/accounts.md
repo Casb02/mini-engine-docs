@@ -145,22 +145,22 @@ De sitekey om het widget mee te tonen, of `null` als de robotcheck uitstaat.
 
 ```json
 {
-  "totals": { "games_played": 4, "wins": 1 },
+  "totals": { "games_played": 2, "wins": 0 },
   "games": [
     {
-      "game_id": "jeopardy",
+      "game_id": "common-dice",
       "games_played": 2,
-      "wins": 1,
-      "total_score": 600,
-      "best_score": 500,
-      "counters": { "correct_answers": 5, "wrong_answers": 1 }
+      "wins": 0,
+      "total_score": 112,
+      "best_score": 64,
+      "counters": { "rolls": 9, "dice_rolled": 38 }
     }
   ],
   "recent": [
     {
-      "round_id": "…", "game_id": "jeopardy", "player_id": "…", "account_id": "…",
-      "display_name": "Hessel", "score": 500, "won": true,
-      "counters": { "correct_answers": 3, "wrong_answers": 0 },
+      "round_id": "…", "game_id": "common-dice", "player_id": "…", "account_id": "…",
+      "display_name": "Hessel", "score": 64, "won": false,
+      "counters": { "rolls": 5, "dice_rolled": 21 },
       "finished_at": 1792656419, "room_code": "HWKRTZ"
     }
   ]
@@ -173,7 +173,7 @@ De sitekey om het widget mee te tonen, of `null` als de robotcheck uitstaat.
 - Scores kunnen negatief zijn. `finished_at` is in Unix-seconden.
 - `display_name` in een resultaat is de naam op het moment van spelen.
 
-Resultaten komen alleen uit afgeronde rondes van serverspellen. Er is geen route om zelf scores te posten.
+Resultaten komen alleen uit afgeronde rondes van een serverspel, en dat is sinds 0.7 alleen Common Dice. Daar is `score` het totaal van je worpen, telt `counters` je worpen (`rolls`) en geworpen stenen (`dice_rolled`), en is `won` altijd `false`. Er is geen route om zelf scores te posten.
 
 ## GET /api/v1/accounts/achievements
 
@@ -183,11 +183,11 @@ Sinds 0.5. **Toegang:** accountsleutel. **Antwoord** `200`, nieuwste eerst:
 {
   "achievements": [
     {
-      "game_id": "jeopardy",
-      "game_title": "Jeopardy",
-      "id": "winnaar",
-      "title": "Winnaar",
-      "description": "Win een show met je team.",
+      "game_id": "common-dice",
+      "game_title": "Common Dice",
+      "id": "dubbel-zes",
+      "title": "Dubbel zes",
+      "description": "Gooi minstens twee zessen in één worp.",
       "source": "server",
       "awarded_at": 1792656419
     }
@@ -205,17 +205,17 @@ Toekennen gaat niet via deze route, maar door de server zelf of door de host van
 
 ## Sets
 
-Sinds 0.5. Een set is eigen inhoud voor een spel, zoals een Jeopardy-bord; zie [eigen sets](../concepten/eigen-sets.md). Alle routes vragen een accountsleutel. Een bevestigd e-mailadres is niet nodig.
+Sinds 0.5. Een set is eigen inhoud voor een spel, zoals een eigen vragenlijst voor een quiz; zie [eigen sets](../concepten/eigen-sets.md). Alle routes vragen een accountsleutel. Een bevestigd e-mailadres is niet nodig.
 
 Een **set** ziet er zo uit:
 
 ```json
 {
   "id": "uuid",
-  "game_id": "jeopardy",
-  "kind": "board",
+  "game_id": "quiz-bij-dani",
+  "kind": "questions",
   "title": "Dani's filmavond",
-  "data": { "categories": [ { "title": "Films", "clues": [ { "question": "…", "answer": "…" } ] } ] },
+  "data": { "questions": ["Welke film won in 1998 elf Oscars? | Titanic | Avatar | Gladiator", "…"] },
   "size": 1834,
   "created_at": 1792656419,
   "updated_at": 1792660019
@@ -228,7 +228,7 @@ Een set van een ander account bestaat voor jou niet: elke route geeft dan `404 s
 
 ### GET /api/v1/accounts/sets
 
-Jouw sets zonder inhoud, laatst gewijzigd eerst. Filter optioneel met `?game_id=jeopardy` en `?kind=board`.
+Jouw sets zonder inhoud, laatst gewijzigd eerst. Filter optioneel met `?game_id=quiz-bij-dani` en `?kind=questions`.
 
 **Antwoord** `200`: `{ "sets": [Set, …] }`, zonder `data`.
 
@@ -238,10 +238,10 @@ Jouw sets zonder inhoud, laatst gewijzigd eerst. Filter optioneel met `?game_id=
 
 ```json
 {
-  "game_id": "jeopardy",
-  "kind": "board",
+  "game_id": "quiz-bij-dani",
+  "kind": "questions",
   "title": "Dani's filmavond",
-  "data": { "categories": [ … ] }
+  "data": { "questions": [ … ] }
 }
 ```
 
@@ -250,11 +250,11 @@ Jouw sets zonder inhoud, laatst gewijzigd eerst. Filter optioneel met `?game_id=
 | `game_id` | Een spel dat aanstaat |
 | `kind` | Een soort set uit `set_kinds` van de **actieve** versie van dat spel |
 | `title` | Getrimd; 1 tot 80 tekens zonder controletekens |
-| `data` | Voldoet aan het schema van de soort, hoogstens 64 KiB als JSON. Ingebouwde spellen hebben eigen regels: Jeopardy wil unieke categorienamen en geen lege teksten. |
+| `data` | Voldoet aan het schema van de soort, hoogstens 64 KiB als JSON |
 
 **Antwoord** `201`: de set, met `data`.
 
-Past `data` niet, dan noemt de foutmelding het pad, bijvoorbeeld `categories[0].clues[2].question: gebruik 1–240 tekens.`
+Past `data` niet, dan noemt de foutmelding het pad, bijvoorbeeld `questions[2]: gebruik 5–300 tekens.`
 
 **Fouten:** `400 invalid_request` (titel, onbekende soort, inhoud past niet), `invalid_json` (onbekende velden of geen geldige JSON; status 400 of 422), `401 unauthorized`, `404 game_not_found`, `409 quota_sets` (al 50 sets), `413 set_too_large`, `429 rate_limit`.
 

@@ -44,15 +44,15 @@ Een actie die een speler toch twee keer stuurt, krijgt de host ook twee keer: bi
 
 ## Action-id's bij de ingebouwde spellen
 
-De SDK geeft elke actie een nieuwe, unieke id (`crypto.randomUUID()`). De ingebouwde spellen gebruiken die: de server onthoudt de laatste 256 action-id's per afzender en ronde, en een id die nog eens binnenkomt, heeft geen tweede effect. Een herhaalde worp levert dus geen tweede worp op, en een herhaald goed antwoord geen dubbele score. Wil je zo'n actie bewust opnieuw proberen, hergebruik dan dezelfde id:
+De SDK geeft elke actie een nieuwe, unieke id (`crypto.randomUUID()`). De ingebouwde spellen gebruiken die: de server onthoudt de laatste 256 action-id's per afzender en ronde, en een id die nog eens binnenkomt, heeft geen tweede effect. Een herhaalde worp in Common Dice levert dus geen tweede worp op. Wil je zo'n actie bewust opnieuw proberen, hergebruik dan dezelfde id:
 
 ```js
 const actionId = crypto.randomUUID();
 try {
-  await client.action('buzz', {}, { actionId });
+  await client.action('roll', {}, { actionId });
 } catch (error) {
-  // Kijk eerst naar de actuele snapshot. Is de buzz er niet, probeer dan met dezelfde id.
-  await client.action('buzz', {}, { actionId });
+  // Kijk eerst naar de actuele snapshot. Is de worp er niet, probeer dan met dezelfde id.
+  await client.action('roll', {}, { actionId });
 }
 ```
 
@@ -67,6 +67,6 @@ Een [realtime-event](realtime.md) lijkt op een actie, maar is het niet:
 | Bevestiging | `ack`: de actie staat in de wachtrij van de host | Geen |
 | Kan wegvallen | Alleen als de host wegvalt voordat hij de actie verwerkt | Ja, onder drukte |
 
-Gebruik een actie voor alles wat telt. Gebruik realtime voor wat je meteen wilt laten zien. Ze gaan goed samen: in Jeopardy stuurt een speler bij het drukken een event `pressed` én de actie `buzz`. Host en scherm tonen het event direct, met het verschil in milliseconden; de actie beslist wie de vraag krijgt.
+Gebruik een actie voor alles wat telt. Gebruik realtime voor wat je meteen wilt laten zien. Ze gaan goed samen: in een quiz met een buzzer stuurt een speler bij het drukken een event `pressed` én de actie `buzz`. Host en scherm tonen het event direct, met het verschil in milliseconden; de actie beslist wie de vraag krijgt.
 
-De acties van Common Dice en Jeopardy staan bij [de ingebouwde spellen](../game-bouwen/voorbeelden.md#de-acties).
+De acties van het ingebouwde spel Common Dice staan bij [het ingebouwde spel](../game-bouwen/voorbeelden.md#de-acties).

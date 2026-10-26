@@ -58,7 +58,7 @@ Sinds 0.5.2 kan een eigen spel ook `host_mode: "tv"` aanbieden: de sleutel van d
 Met `set_id` controleert de server dat de set van jouw account is, bij `game_id` hoort, en dat zijn soort voorkomt in de versie van het spel die de kamer krijgt. Daarna controleert hij de inhoud opnieuw tegen die versie. De kamer krijgt een kopie: wijzig of verwijder je de set later, dan blijft de kamer met de kopie spelen. De snapshot toont welke set het is in het veld [`set`](#get-api-v1-rooms-code).
 
 ```json
-{ "game_id": "jeopardy", "settings": { "team_count": 3 }, "set_id": "8a41c2d0-…" }
+{ "game_id": "quiz-bij-dani", "settings": { "count": 10, "seconds": 20 }, "set_id": "8a41c2d0-…" }
 ```
 
 **Fouten:** `400 invalid_request` (onbekende modus, capaciteit, instellingen of config; later aansluiten of scherm bij een spel dat het niet ondersteunt; een hostspel met `hostless`, of met een modus die niet in `host_modes` van het spel staat; een set van een ander spel, van een soort die deze versie niet kent of met inhoud die niet past), `401 unauthorized` (ongeldige accountsleutel, of `set_id` zonder accountsleutel), `404 game_not_found`, `404 set_not_found`, `409 release_changed` (het spel kreeg net een nieuwe versie; probeer het opnieuw), `429 rate_limit`, `503 room_limit`.
@@ -112,7 +112,7 @@ Elke snapshot bevat `code`, `game_id`, `game_version`, `status`, `version`, `max
 `set` is sinds 0.5 de [eigen set](../concepten/eigen-sets.md) waarmee de kamer speelt, voor alle rollen zichtbaar, of `null`:
 
 ```json
-{ "set": { "id": "8a41c2d0-…", "kind": "board", "title": "Dani's filmavond" } }
+{ "set": { "id": "8a41c2d0-…", "kind": "questions", "title": "Dani's filmavond" } }
 ```
 
 De inhoud van de set staat nooit in een snapshot.
@@ -166,7 +166,7 @@ Stuurt een actie. **Toegang:** bij een serverspel deelnemers en de host, volgens
 
 **Antwoord** `200`: de snapshot. Bij een serverspel is de wijziging dan al opgeslagen. Bij een hostspel betekent het alleen dat de actie in de wachtrij van de host staat.
 
-**Fouten:** `400 invalid_request`, `403 forbidden`, `409 host_offline`, `409 game_not_running` en de spelfouten van [Common Dice en Jeopardy](../game-bouwen/voorbeelden.md#de-acties).
+**Fouten:** `400 invalid_request`, `403 forbidden`, `409 host_offline` en `409 game_not_running`. Zie de acties van [Common Dice](../game-bouwen/voorbeelden.md#de-acties).
 
 ### PUT /api/v1/rooms/{code}/state
 
@@ -223,7 +223,7 @@ Gebruik deze route alleen als je spel het echt nodig heeft. De maker kiest de in
 
 Het object is maximaal 8 KiB. De server controleert het tegen het schema van het spel en tegen de spelregels.
 
-**Fouten:** `400 invalid_request`, `403 forbidden`, `409 version_conflict`, `409 teams_locked` (Jeopardy).
+**Fouten:** `400 invalid_request`, `403 forbidden`, `409 version_conflict`.
 
 ### PUT /api/v1/rooms/{code}/config
 
@@ -247,7 +247,7 @@ Wijzigt de levensloop. **Toegang:** host.
 
 Toegestaan: `lobby → running`, `running → finished`, `finished → lobby`. Starten vraagt dat alle deelnemers klaarstaan. Bij een eigen spel telt de plek van een meespelende maker daarbij niet mee. Terug naar de lobby geeft een nieuw `round_id` en reset klaarstatus en spelstand; de plek van een meespelende maker in een eigen spel staat daarna meteen weer klaar.
 
-**Fouten:** `403 forbidden`, `409 invalid_transition`, `409 players_not_ready`, `409 teams_required` (Jeopardy).
+**Fouten:** `403 forbidden`, `409 invalid_transition`, `409 players_not_ready`.
 
 ### POST /api/v1/rooms/{code}/display-token
 

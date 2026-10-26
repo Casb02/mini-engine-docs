@@ -11,6 +11,7 @@
   <link rel="icon" href="{{root}}favicon.svg" type="image/svg+xml">
   <link rel="preload" href="{{root}}fonts/dm-sans.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="{{root}}site.css">
+  {{alternate}}
 </head>
 <body class="layout-{{layout}} {{has_toc}}">
   <a class="skip" href="#inhoud">Naar de inhoud</a>
@@ -39,6 +40,7 @@
       {{pager}}
       <footer class="site-footer">
         <p>Documentatie voor de Mini Engine SDK, CLI en API, editie {{version}}. <a href="{{pdf}}" download>Download de API-referentie (pdf)</a>. <a href="https://github.com/Casb02/mini-engine-sdk" class="external">SDK</a> en <a href="https://github.com/Casb02/mini-engine-cli" class="external">CLI</a> op GitHub.</p>
+        <p>{{agents}}</p>
       </footer>
     </main>
     {{toc}}

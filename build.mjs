@@ -54,7 +54,11 @@ const REDIRECTS = {
   'aan-de-slag/eerste-kamer.html': 'concepten/kamers-en-rollen.md#een-kamer-op-miniengine-nl',
 };
 
-const VERSION = '0.6';
+const VERSION = '0.7';
+
+// Het publieke adres van de site. Alleen de Markdown voor agents gebruikt het: een agent die één .md-bestand
+// of llms-full.txt krijgt, kan dan toch elke link volgen.
+const SITE_URL = 'https://docs.miniengine.nl/';
 
 // ---------- helpers ----------
 
@@ -210,17 +214,102 @@ function renderMarkdown(page) {
   return { html, headings };
 }
 
+/** De pagina achter een relatieve .md-link, of null voor een link naar iets anders. Stopt bij een onbekende pagina. */
+function targetOf(page, href) {
+  if (!href || /^(https?:|mailto:|#)/.test(href)) return null;
+  const [path, hash] = href.split('#');
+  if (!path.endsWith('.md')) return null;
+  const target = bySrc.get(posix.normalize(posix.join(posix.dirname(page.src), path)));
+  if (!target) throw new Error(`${page.src}: link naar onbekende pagina ${href}`);
+  return { target, hash };
+}
+
 /** Vertaalt een relatieve .md-link naar het juiste relatieve .html-pad. */
 function resolveHref(page, href) {
-  if (!href || /^(https?:|mailto:|#)/.test(href)) return href;
-  const [path, hash] = href.split('#');
-  if (!path.endsWith('.md')) return href;
-  const targetSrc = posix.normalize(posix.join(posix.dirname(page.src), path));
-  const target = bySrc.get(targetSrc);
-  if (!target) throw new Error(`${page.src}: link naar onbekende pagina ${href}`);
-  let rel = posix.relative(posix.dirname(page.out), target.out);
-  return hash ? `${rel}#${hash}` : rel;
+  const found = targetOf(page, href);
+  if (!found) return href;
+  const rel = posix.relative(posix.dirname(page.out), found.target.out);
+  return found.hash ? `${rel}#${found.hash}` : rel;
 }
+
+// ---------- Markdown voor agents ----------
+
+/** Waarde van een HTML-attribuut, of ''. */
+const attrOf = (attrs, name) => attrs.match(new RegExp(`(?:^|\\s)${name}="([^"]*)"`))?.[1] ?? '';
+
+/** Haalt elk element met role="img" weg en laat alleen zijn beschrijving staan. Telt geneste tags van dezelfde naam mee. */
+function describeImages(html) {
+  const open = /<(\w+)(\s[^>]*\srole="img"[^>]*)>/;
+  let match;
+  while ((match = html.match(open))) {
+    const [tag, name, attrs] = match;
+    const tags = new RegExp(`<(/?)${name}\\b[^>]*>`, 'g');
+    tags.lastIndex = match.index + tag.length;
+    let depth = 1;
+    let end = html.length;
+    for (let next; depth && (next = tags.exec(html)); ) {
+      depth += next[1] ? -1 : 1;
+      if (!depth) end = next.index + next[0].length;
+    }
+    html = `${html.slice(0, match.index)}<p>*Afbeelding: ${attrOf(attrs, 'aria-label')}*</p>${html.slice(end)}`;
+  }
+  return html;
+}
+
+/** Ruwe HTML uit een pagina als leesbare Markdown. Kent alleen wat de pagina's gebruiken: lijsten, links met een titel
+ * en een uitleg, afbeeldingen, nadruk en code. */
+function htmlToMarkdown(html) {
+  const decode = (text) => text.replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+  let text = describeImages(html)
+    // Een link met een titel en een uitleg, zoals de routes op de startpagina en de downloads, wordt één lijstregel.
+    .replace(/<li[^>]*>\s*(?=<a\s[^>]*>\s*<strong>)/g, '')
+    .replace(/<a\s([^>]*)>\s*<strong>([\s\S]*?)<\/strong>\s*<span>([\s\S]*?)<\/span>\s*<\/a>/g, (_, attrs, title, about) => `<li>[${title}](${attrOf(attrs, 'href')}): ${about}</li>`)
+    .replace(/<a\s([^>]*)>([\s\S]*?)<\/a>/g, (_, attrs, inner) => `[${inner}](${attrOf(attrs, 'href')})`)
+    .replace(/<img\s([^>]*)>/g, (_, attrs) => (attrOf(attrs, 'alt') ? `![${attrOf(attrs, 'alt')}](${attrOf(attrs, 'src')})` : ''))
+    .replace(/<(strong|b)>([\s\S]*?)<\/\1>/g, '**$2** ')
+    .replace(/<code>([\s\S]*?)<\/code>/g, '`$1` ')
+    .replace(/<figcaption>([\s\S]*?)<\/figcaption>/g, ' ($1)')
+    .replace(/<ol[^>]*>([\s\S]*?)<\/ol>/g, (_, items) => {
+      let n = 0;
+      return items.replace(/<li[^>]*>/g, () => `\n${++n}. `);
+    })
+    .replace(/<li[^>]*>/g, '\n- ')
+    .replace(/<\/(p|ul|ol|div)>/g, '\n\n')
+    .replace(/<[^>]+>/g, ' ');
+  text = decode(text)
+    .split('\n')
+    .map((line) => line.replace(/[ \t]+/g, ' ').replace(/ ([.,:;)])/g, '$1').trim())
+    .join('\n');
+  // Lijstregels horen bij elkaar; elk ander blok staat los.
+  return text.replace(/\n{3,}/g, '\n\n').replace(/^(- .*|\d+\. .*)\n\n(?=- |\d+\. )/gm, '$1\n').trim();
+}
+
+/** De tekst van een pagina als Markdown voor agents: ruwe HTML omgezet, links absoluut en naar de .md-versies. */
+function agentMarkdown(page) {
+  const absolute = (href) => {
+    const found = targetOf(page, href);
+    if (found) return `${SITE_URL}${found.target.src}${found.hash ? `#${found.hash}` : ''}`;
+    return href;
+  };
+  const tokens = new Marked({ gfm: true }).lexer(page.body.replace(/\{\{root\}\}/g, SITE_URL));
+  let text = '';
+  for (const token of tokens) {
+    if (token.type === 'code') text += token.raw;
+    else if (token.type === 'html') text += `${htmlToMarkdown(token.raw)}\n\n`;
+    else text += token.raw;
+  }
+  // Codeblokken blijven zoals ze zijn; daarbuiten wijst elke link naar de .md-versie op de site.
+  return text
+    .split(/(```[\s\S]*?```)/)
+    .map((part, i) => (i % 2 ? part : part.replace(/\]\(([^)\s]+)\)/g, (_, href) => `](${absolute(href)})`)))
+    .join('')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/** Waar een pagina hoort in het menu, als één regel. */
+const placeOf = (page) => (page.group ? `${page.section} · ${page.group}` : page.section);
+const mdOut = (page) => page.out.replace(/\.html$/, '.md');
 
 // ---------- template ----------
 
@@ -297,6 +386,7 @@ function fill(values) {
 }
 
 function renderPage(page, { root, content, headings, isNotFound = false }) {
+  const markdown = isNotFound ? '' : `${root}${mdOut(page)}`;
   const toc = page.toc ? tocHtml(headings, page.tocDepth) : '';
   const tocBlock = toc
     ? `<aside class="toc toc-wide" aria-labelledby="toc-wide-title"><p class="toc-title" id="toc-wide-title">Op deze pagina</p>${toc}</aside>`
@@ -322,6 +412,10 @@ function renderPage(page, { root, content, headings, isNotFound = false }) {
     pager: isNotFound ? '' : pagerHtml(page, root),
     pdf: `${root}${PDF}`,
     version: VERSION,
+    alternate: markdown ? `<link rel="alternate" type="text/markdown" href="${markdown}" title="Deze pagina als Markdown">` : '',
+    agents: markdown
+      ? `Voor AI-agents: <a href="${markdown}">deze pagina als Markdown</a>, en <a href="${root}llms.txt">llms.txt</a> met alle pagina's.`
+      : `Voor AI-agents: <a href="${root}llms.txt">llms.txt</a> met alle pagina's als Markdown.`,
   });
 }
 
@@ -365,12 +459,33 @@ for (const [from, to] of Object.entries(REDIRECTS)) {
   await writeFile(out, redirectHtml(from, to));
 }
 
+// Elke pagina twee keer: als HTML voor mensen en als Markdown voor agents, op hetzelfde pad met .md.
+const agentPages = [];
 for (const page of pages) {
   const { html, headings } = renderMarkdown(page);
   const out = join(OUT, page.out);
   await mkdir(dirname(out), { recursive: true });
   await writeFile(out, renderPage(page, { root: rootFor(page.out), content: html, headings }));
+  const text = agentMarkdown(page);
+  agentPages.push({ page, text });
+  const head = ['---', `title: ${JSON.stringify(page.title)}`, `description: ${JSON.stringify(page.description)}`, `section: ${JSON.stringify(placeOf(page))}`, `url: ${SITE_URL}${page.out}`, '---'];
+  await writeFile(join(OUT, mdOut(page)), `${head.join('\n')}\n\n${text}\n`);
 }
+
+// llms.txt (zie llmstxt.org): de inhoudsopgave voor agents, per sectie en groep in menuvolgorde. llms-full.txt: alles in één bestand.
+const intro = `> Documentatie voor wie een spel bouwt voor Mini Engine (miniengine.nl): de SDK, de CLI, de API en het merk. Editie ${VERSION}. Elke pagina staat hier als Markdown; de HTML-versie staat op hetzelfde pad met .html.`;
+let index = `# Mini Engine Docs\n\n${intro}\n\nAlle pagina's in één bestand: ${SITE_URL}llms-full.txt\n`;
+let place = '';
+for (const { page } of agentPages) {
+  if (placeOf(page) !== place) {
+    place = placeOf(page);
+    index += `\n## ${place}\n\n`;
+  }
+  index += `- [${page.title}](${SITE_URL}${mdOut(page)}): ${page.description}\n`;
+}
+await writeFile(join(OUT, 'llms.txt'), index);
+const full = agentPages.map(({ page, text }) => `<!-- ${SITE_URL}${mdOut(page)} · ${placeOf(page)} -->\n\n${text}`);
+await writeFile(join(OUT, 'llms-full.txt'), `# Mini Engine Docs\n\n${intro}\n\n${full.join('\n\n')}\n`);
 
 // 404: absolute links via BASE, omdat de pagina op elk pad kan verschijnen.
 const notFound = {
@@ -389,5 +504,5 @@ await writeFile(join(OUT, '404.html'), renderPage(notFound, { root: BASE, conten
 
 const size = (await stat(join(OUT, 'index.html'))).size;
 console.log(
-  `Gebouwd: ${pages.length} pagina's, ${Object.keys(REDIRECTS).length} doorverwijzingen en 404.html naar ${toPosix(relative(process.cwd(), OUT)) || '.'}/ (index ${size} bytes).`,
+  `Gebouwd: ${pages.length} pagina's (ook als .md, met llms.txt en llms-full.txt), ${Object.keys(REDIRECTS).length} doorverwijzingen en 404.html naar ${toPosix(relative(process.cwd(), OUT)) || '.'}/ (index ${size} bytes).`,
 );

@@ -10,7 +10,7 @@ order: 3
 
 Waar de spelregels draaien, bepaalt het manifestveld `runtime`. Een eigen spel gebruikt altijd `"host"`: de regels draaien in het browsertabblad van wie de kamer maakte. Ook uploads moeten `"host"` zijn.
 
-`"server"` is er alleen voor de twee ingebouwde spellen, Common Dice en Jeopardy. Hun regels draaien op de server. Een manifest kan die runtime niet toevoegen.
+`"server"` is er alleen voor het ingebouwde spel, Common Dice. Zijn regels draaien op de server. Een manifest kan die runtime niet toevoegen. Tot 0.7 was Jeopardy ook een ingebouwd spel.
 
 ## Hoe een eigen spel werkt
 

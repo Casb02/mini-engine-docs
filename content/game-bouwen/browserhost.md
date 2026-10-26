@@ -113,7 +113,7 @@ Sinds 0.5.2 kan een spel `tv` in `host_modes` zetten. Het apparaat dat de kamer 
 Twee dingen helpen bij een spel met beurten, in beide modi:
 
 - **Wie offline is, wordt overgeslagen.** Een telefoon die op slot gaat, verliest de verbinding. Tel alleen de tijd binnen iemands beurt: start een klok op het laatste van twee momenten, het begin van de beurt of het moment dat die speler offline ging. Sla de beurt na 30 seconden over, en stop de klok als de speler terugkomt.
-- **Het scherm blijft aan.** Vraag tijdens het spel `navigator.wakeLock.request('screen')` aan, opnieuw als de pagina weer zichtbaar wordt, en negeer fouten.
+- **Het scherm blijft aan.** Sinds 0.6.1 houdt de kamerinterface het scherm van elke telefoon en van de tv zelf aan; zie [hoe een pagina laadt](rolpaginas.md#hoe-een-pagina-laadt). Je spel hoeft daar niets voor te doen. Wil je het scherm ook onder `me dev` of op een server ouder dan 0.6.1 aanhouden, vraag het dan zelf aan met `navigator.wakeLock.request('screen')`, opnieuw als de pagina weer zichtbaar wordt, en negeer fouten. Dat helpt vooral de tv: daar tikt niemand op.
 
 ## Wat de ack wel en niet betekent
 

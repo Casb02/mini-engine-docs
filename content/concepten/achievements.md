@@ -17,8 +17,8 @@ Een spel noemt zijn achievements in `manifest.json`:
 
 ```json
 "achievements": [
-  { "id": "winnaar", "title": "Winnaar", "description": "Win een show met je team." },
-  { "id": "foutloos", "title": "Foutloos", "description": "Geef minstens drie goede antwoorden in één show, zonder fout." }
+  { "id": "winnaar", "title": "Winnaar", "description": "Win een ronde." },
+  { "id": "foutloos", "title": "Foutloos", "description": "Beantwoord in één spel minstens drie vragen goed, zonder fout." }
 ]
 ```
 
@@ -43,18 +43,14 @@ Alleen spelers met een spelersplek én een account. Het account komt uit de spel
 
 Dat hangt af van de [runtime](runtimes.md) van het spel.
 
-### Ingebouwde spellen
+### Het ingebouwde spel
 
-Bij Common Dice en Jeopardy beslist de server zelf, aan het eind van een ronde: bij de overgang van `running` naar `finished`.
+Bij Common Dice beslist de server zelf, aan het eind van een ronde: bij de overgang van `running` naar `finished`.
 
-| Spel | Id | Titel | Wanneer |
-| --- | --- | --- | --- |
-| Jeopardy | `eerste-antwoord` | Eerste goede antwoord | Je gaf minstens één goed antwoord in de show |
-| Jeopardy | `winnaar` | Winnaar | Je team had de hoogste score (gedeeld telt ook) en scoorde punten |
-| Jeopardy | `foutloos` | Foutloos | Minstens drie goede antwoorden en geen enkel fout antwoord in één show |
-| Jeopardy | `eigen-bord` | Eigen bord | Je speelde in een team een show op een [eigen vragenbord](eigen-sets.md) |
-| Common Dice | `dubbel-zes` | Dubbel zes | Minstens twee zessen in één worp, met alleen de stenen die je echt gooide (vastgehouden stenen tellen niet) |
-| Common Dice | `hoogste-worp` | Hoogste worp | De hoogste losse worp van de ronde; bij gelijke stand krijgt iedereen met die worp hem |
+| Id | Titel | Wanneer |
+| --- | --- | --- |
+| `dubbel-zes` | Dubbel zes | Minstens twee zessen in één worp, met alleen de stenen die je echt gooide (vastgehouden stenen tellen niet) |
+| `hoogste-worp` | Hoogste worp | De hoogste losse worp van de ronde; bij gelijke stand krijgt iedereen met die worp hem |
 
 ### Eigen spellen
 
@@ -81,7 +77,7 @@ Een achievement die de speler al had, geeft gewoon een bevestiging.
 
 Speelt de maker mee (`host_mode: "playing"`, sinds 0.5.1 ook in eigen spellen), dan is die een speler zoals iedereen. De host mag een achievement toekennen aan de eigen plek van de maker, `host_player_id`, als de maker met een account speelt. Wat niet kan: een spelleider die alleen leidt en met hetzelfde account ook als speler meedoet, kan zichzelf niets geven. Bij `host_mode: "tv"` (sinds 0.5.2) kan het wel: de tv is een apparaat, dus wie op de tv is ingelogd, verdient op de eigen telefoon gewoon mee.
 
-Dit is een bewuste keuze over vertrouwen. Een spelleider kan de achievements van **dat ene spel** toekennen aan andere spelers in **zijn eigen kamer**. Omdat de spelcode in de browser van de host draait, kan de server niet controleren of iemand de achievement echt verdiende. Daarom staan deze achievements apart op het account, zie hieronder. Resultaten en statistieken blijven alleen voor de ingebouwde spellen.
+Dit is een bewuste keuze over vertrouwen. Een spelleider kan de achievements van **dat ene spel** toekennen aan andere spelers in **zijn eigen kamer**. Omdat de spelcode in de browser van de host draait, kan de server niet controleren of iemand de achievement echt verdiende. Daarom staan deze achievements apart op het account, zie hieronder. Resultaten en statistieken blijven alleen voor het ingebouwde spel.
 
 Een host die een ronde afsluit, kan zo de winnaar belonen:
 
@@ -107,6 +103,8 @@ Elke verdiende achievement heeft een `source`:
 
 De accountpagina op `/home/account` toont ze in twee groepen. Onder **Achievements** staan die van de server, per spel. Onder **Toegekend door eigen spellen** staan die van eigen spellen, met de uitleg dat het spel ze zelf gaf en de server ze niet heeft gecontroleerd. Die tweede groep verschijnt alleen als er iets in staat.
 
+Sinds 0.6.0 staan ze er als badges. Heb je in een spel minstens één achievement, dan staan de andere van dat spel er gedimd bij, met hun titel en beschrijving, en zie je hoeveel je er hebt, zoals *2 van 5*. Schrijf een beschrijving dus als een doel dat spelers kunnen lezen voordat ze het halen, en verklap er niets mee.
+
 Lees ze met [`api.achievements()`](../sdk/api-client.md#achievements-accounttoken) in de SDK.
 
 ## Vieren in het spel
@@ -114,7 +112,7 @@ Lees ze met [`api.achievements()`](../sdk/api-client.md#achievements-accounttoke
 Verdient een speler een achievement voor het eerst, dan krijgt iedereen in de kamer het event `achievement`:
 
 ```js
-{ player_id: '…', achievement: { id: 'winnaar', title: 'Winnaar', description: 'Win een show met je team.' } }
+{ player_id: '…', achievement: { id: 'winnaar', title: 'Winnaar', description: 'Win een ronde.' } }
 ```
 
 Het hoort niet bij de spelstand: het heeft geen versie en staat niet in de snapshot. Het komt niet als iemand de achievement al had. Wie op dat moment niet verbonden is, mist het bericht, maar de achievement staat gewoon op het account.

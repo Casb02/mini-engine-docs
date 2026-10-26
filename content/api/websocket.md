@@ -73,7 +73,7 @@ Sinds 0.5. Realtimeberichten hebben geen `request_id` en krijgen geen `ack`.
 | `rt.reset` | geen | Alleen de host: wist alle waarden in de kamer |
 
 ```json
-{ "type": "rt.emit", "channel": "pressed", "data": { "clue": "c2-300" } }
+{ "type": "rt.emit", "channel": "pressed", "data": { "clue": "vraag-3" } }
 { "type": "rt.emit", "channel": "emoji", "data": "applaus", "to": "display" }
 { "type": "rt.set", "key": "kart", "value": { "x": 12, "y": 4 } }
 { "type": "rt.reset" }
@@ -105,8 +105,8 @@ Een ongeldig realtimebericht geeft een `error` met `invalid_request` en `request
 
 ```json
 { "type": "ack", "request_id": "12" }
-{ "type": "error", "request_id": "12", "error": { "code": "buzzer_closed", "message": "Deze buzzer staat niet open voor jouw team." } }
-{ "type": "rt.event", "channel": "pressed", "data": { "clue": "c2-300" }, "from": { "role": "player", "player_id": "5f0c…" }, "ts": 1792656419123 }
+{ "type": "error", "request_id": "12", "error": { "code": "host_offline", "message": "De host is offline. Probeer opnieuw zodra de host terug is." } }
+{ "type": "rt.event", "channel": "pressed", "data": { "clue": "vraag-3" }, "from": { "role": "player", "player_id": "5f0c…" }, "ts": 1792656419123 }
 { "type": "rt.value", "key": "kart", "value": { "x": 12, "y": 4 }, "from": { "role": "player", "player_id": "5f0c…" }, "ts": 1792656419150 }
 { "type": "rt.throttled", "dropped": 12 }
 ```
