@@ -60,7 +60,7 @@ import { MiniEngine, loadSession } from '/sdk/mini-engine.js';
 
 Dat is één gebundelde ES-module. Mini Engine serveert er één vaste versie van, zodat elk spel op die server dezelfde SDK gebruikt. `me dev` serveert de SDK op hetzelfde adres. De typedeclaraties staan ernaast op `/sdk/mini-engine.d.ts`.
 
-De client bleef van SDK 0.5.0 tot en met 0.6.0 gelijk; die versies brachten types, startsjablonen en skills. SDK 0.7.0 geeft `ApiClient` de methoden voor [afbeeldingen](api-client.md#afbeeldingen) erbij. Mini Engine 0.6, 0.7 en 0.8 serveren nog de client van SDK 0.5.2, met de typedeclaraties van 0.5.2. Voor een spelpagina is dat genoeg: afbeeldingen uploadt een speler in de set-editor. Wil je de nieuwste types, met `author` en afbeeldingen, haal ze dan uit SDK 0.7.0; zie [upgraden](../upgraden.md#je-gereedschap-bijwerken).
+De client bleef van SDK 0.5.0 tot en met 0.6.0 gelijk; die versies brachten types, startsjablonen en skills. SDK 0.7.0 geeft `ApiClient` de methoden voor [afbeeldingen](api-client.md#afbeeldingen) erbij. Mini Engine 0.6 en 0.7 serveren de client en typedeclaraties van SDK 0.5.2; Mini Engine 0.8 serveert die van SDK 0.7.0. Voor een spelpagina is elk daarvan genoeg: afbeeldingen uploadt een speler in de set-editor. Je eigen kopie van de types haal je uit SDK 0.7.0; zie [upgraden](../upgraden.md#je-gereedschap-bijwerken).
 
 ## In een eigen project
 

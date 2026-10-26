@@ -176,7 +176,7 @@ Deze documentatie hoort bij deze versies:
 | Onderdeel | Versie |
 | --- | --- |
 | Mini Engine | 0.8 (`GET /api/health` geeft de versie van de server) |
-| Mini Engine SDK | 0.7.0. De server serveert op `/sdk/mini-engine.js` de client van 0.5.2; die is gelijk aan die van 0.7.0, op `uploadMedia`, `listMedia` en `deleteMedia` na |
+| Mini Engine SDK | 0.7.0, ook op `/sdk/mini-engine.js` van de server |
 | me-CLI | 0.8.0 |
 | API-referentie (pdf) | Editie 0.6, de openbare editie |
 

@@ -40,10 +40,10 @@ Deze versies horen bij elkaar:
 | 0.5.1 | 0.5.1 | 0.5.1 |
 | 0.5.2 tot en met 0.5.5 | 0.5.2 | 0.5.2 |
 | 0.6.0 tot en met 0.6.5 | 0.6.0 | 0.6.0 |
-| 0.7.0 | 0.6.0 | 0.7.0 |
+| 0.7.0 en 0.7.1 | 0.6.0 | 0.7.0 |
 | 0.8.0 | 0.7.0 | 0.8.0 |
 
-De client in de SDK bleef van 0.5.0 tot en met 0.6.0 gelijk; die versies brachten types, startsjablonen en skills. SDK 0.7.0 geeft `ApiClient` drie methoden voor afbeeldingen erbij. Mini Engine 0.6, 0.7 en 0.8 serveren nog de client van SDK 0.5.2. Een spelpagina mist daar niets aan: alles wat een spel tijdens het spelen gebruikt, werkt precies zo, en afbeeldingen uploadt een speler in de set-editor. De types op `/sdk/mini-engine.d.ts` van de server zijn wel die van 0.5.2, zonder `author` en zonder afbeeldingen. Haal je kopie daarom uit SDK 0.7.0, zoals hieronder.
+De client in de SDK bleef van 0.5.0 tot en met 0.6.0 gelijk; die versies brachten types, startsjablonen en skills. SDK 0.7.0 geeft `ApiClient` drie methoden voor afbeeldingen erbij. Mini Engine 0.6 en 0.7 serveren de client van SDK 0.5.2, die verder gelijk is; Mini Engine 0.8 serveert SDK 0.7.0, ook op `/sdk/mini-engine.d.ts`. Een spelpagina heeft de methoden voor afbeeldingen niet nodig: afbeeldingen uploadt een speler in de set-editor. Haal de types voor je eigen kopie uit SDK 0.7.0, zoals hieronder.
 
 Een nieuwere CLI en SDK werken met Mini Engine 0.5 en nieuwer. Wat een nieuwere versie van de server vraagt, staat er in deze documentatie steeds bij, zoals *sinds 0.5.1*. Zie ook [versies](sdk/overzicht.md#versies) bij de SDK.
 

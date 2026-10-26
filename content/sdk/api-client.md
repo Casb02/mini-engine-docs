@@ -278,7 +278,7 @@ deleteSet(id: string): Promise<null>
 
 Sinds SDK 0.7.0, voor Mini Engine 0.8. Afbeeldingen voor de afbeeldingsvelden van [eigen sets](../concepten/eigen-sets.md#afbeeldingen). Alle methoden gebruiken `api.accountToken`. Een server ouder dan 0.8 kent deze routes niet en antwoordt met een 404.
 
-Mini Engine 0.8 serveert op `/sdk/mini-engine.js` nog de client van SDK 0.5.2, zonder deze methoden. Een spelpagina heeft ze ook niet nodig: spelers uploaden hun afbeeldingen in het formulier op **Mijn sets**. Gebruik ze in een eigen project, met het [npm-pakket](overzicht.md#in-een-eigen-project) 0.7.0.
+Mini Engine 0.8 serveert op `/sdk/mini-engine.js` SDK 0.7.0, met deze methoden. Een spelpagina heeft ze meestal niet nodig: spelers uploaden hun afbeeldingen in het formulier op **Mijn sets**. In een eigen project gebruik je het [npm-pakket](overzicht.md#in-een-eigen-project) 0.7.0.
 
 ### uploadMedia(file, options?)
 
