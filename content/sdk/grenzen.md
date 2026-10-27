@@ -8,7 +8,7 @@ order: 6
 
 # Grenzen
 
-Dit zijn de grenzen van Mini Engine 0.8 die je bij het bouwen van een spel tegenkomt. `me dev` houdt dezelfde grenzen aan, zodat je ze op je eigen computer al raakt.
+Dit zijn de grenzen van Mini Engine 0.9 die je bij het bouwen van een spel tegenkomt. `me dev` houdt dezelfde grenzen aan, zodat je ze op je eigen computer al raakt.
 
 ## Kamers
 

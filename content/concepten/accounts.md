@@ -22,7 +22,9 @@ Daarnaast bewaart een account drie soorten gegevens:
 | **[Achievements](achievements.md)** (sinds 0.5) | Mijlpalen die je in een spel verdient | De accountpagina, en `api.achievements()` |
 | **[Eigen sets](eigen-sets.md)** (sinds 0.5) | Inhoud die je zelf maakt, zoals een eigen vragenlijst voor een quiz | **Mijn sets** op `/home/sets`, en `api.listSets()` |
 
-Heb je met een dev-key zelf spellen geüpload, dan staat op de accountpagina ook **Mijn spellen** (sinds 0.5.1). Daar zet je ze aan of uit; zie [je game publiceren](../publiceren/overzicht.md#aan-of-uit-vanaf-de-accountpagina).
+Heb je met een dev-key zelf spellen geüpload, dan staat op de accountpagina ook **Mijn spellen** (sinds 0.5.1). Daar zet je ze aan of uit; zie [je game publiceren](../publiceren/overzicht.md#aan-of-uit-vanaf-de-accountpagina). Een privéspel heeft daar sinds 0.9 het label **Privé**.
+
+Sinds 0.9 kan een account uitgenodigd zijn voor een [privéspel](../publiceren/overzicht.md#privespellen). Daar is geen dev-key voor nodig; de maker nodigt je uit op je gebruikersnaam. Ben je ingelogd, dan staat dat spel op de startpagina en bij alle spellen, met het label **Privé**, en maak je er een kamer of een eigen set mee. De uitnodiging hoort bij je account, niet bij je gebruikersnaam. Trekt de maker de uitnodiging in, dan verdwijnt het spel weer voor je; kamers die al lopen, spelen door, en je eigen sets en achievements blijven van jou.
 
 ## Regels voor gegevens
 
@@ -68,6 +70,6 @@ Eén account bezet hooguit één spelersplek per kamer. Probeer je met hetzelfde
 
 ## Wat een account niet beschermt
 
-De pagina's onder `/home` bewaren de accountsleutel in `localStorage` onder `mini-engine:account`. Spellen draaien op dezelfde origin en kunnen die sleutel lezen, net als de kamersleutels in `sessionStorage`. Met die sleutel kan een spel alles wat jij met je account kunt, zoals je achievements lezen, je eigen sets lezen, wijzigen of verwijderen, en afbeeldingen uploaden of verwijderen. Daarom kan alleen publiceren wie een dev-key heeft. Een spel hoort de accountsleutel niet aan te raken: wat het nodig heeft, staat in de snapshot.
+De pagina's onder `/home` bewaren de accountsleutel in `localStorage` onder `mini-engine:account`. Spellen draaien op dezelfde origin en kunnen die sleutel lezen, net als de kamersleutels in `sessionStorage`. Met die sleutel kan een spel alles wat jij met je account kunt, zoals je achievements lezen, je eigen sets lezen, wijzigen of verwijderen, afbeeldingen uploaden of verwijderen, en de privéspellen zien die jij mag zien en er kamers mee maken. Een spel openbaar maken of iemand uitnodigen kan die sleutel niet: dat gaat sinds 0.9 alleen met een dev-key. Daarom kan alleen publiceren wie een dev-key heeft. Een spel hoort de accountsleutel niet aan te raken: wat het nodig heeft, staat in de snapshot.
 
 De methoden staan bij [ApiClient: accounts](../sdk/api-client.md#accounts).

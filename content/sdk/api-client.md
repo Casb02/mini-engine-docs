@@ -1,6 +1,6 @@
 ---
 title: ApiClient
-description: De HTTP-client van de SDK met alle methoden voor spellen, kamers, schermsleutels, accounts, achievements, eigen sets en afbeeldingen, plus de losse http-helpers.
+description: De HTTP-client van de SDK met alle methoden voor spellen (ook privéspellen), kamers, schermsleutels, accounts, achievements, eigen sets en afbeeldingen, plus de losse http-helpers.
 section: SDK
 group: Referentie
 order: 1
@@ -16,7 +16,7 @@ import { ApiClient } from '/sdk/mini-engine.js';
 
 const api = new ApiClient({
   baseUrl: '',          // standaard: dezelfde origin
-  accountToken: undefined, // optioneel: accountsleutel voor maken en meedoen
+  accountToken: undefined, // optioneel: accountsleutel voor maken, meedoen en privéspellen
   fetch: undefined,     // optioneel: eigen fetch-implementatie
 });
 ```
@@ -34,20 +34,34 @@ const api = new ApiClient({
 ### getGames()
 
 ```ts
-getGames(): Promise<{ games: Manifest[] }>
+getGames(): Promise<{ games: GameInfo[] }>
 ```
 
 Alle spellen die aanstaan, met hun metadata, instellingenschema, icoon, achievements en soorten sets, uit de actieve versie van elk spel. Ontbrekende manifestvelden krijgen hier hun standaardwaarde: `runtime: "host"`, `host_modes: ["moderator"]`, `default_host_mode: "moderator"`, `supports_late_join: true`, en lege lijsten voor `achievements` en `set_kinds`. `icon` ontbreekt als het spel er geen heeft.
 
-Sinds Mini Engine 0.7 heeft het antwoord ook `featured`: de id's van hoogstens vier uitgelichte spellen. De types van SDK 0.6.0 en 0.7.0 kennen dat veld nog niet; zie [GET /api/v1/games](../api/games.md#get-api-v1-games).
+Sinds SDK 0.7.2 stuurt `getGames()` `api.accountToken` mee als die er is. Mini Engine 0.9 geeft dan ook de [privéspellen](../publiceren/overzicht.md#privespellen) van dat account en de spellen waarvoor het is uitgenodigd, met `private: true` en het icoon als `data:`-URL in `icon_data`. Zonder `accountToken` krijg je alleen openbare spellen. Een ongeldige of verlopen sleutel geeft ook gewoon de openbare lijst, en een oudere server negeert de sleutel. De losse functie [`getGames()`](#losse-functies) stuurt nooit een accountsleutel mee.
+
+```ts
+const api = new ApiClient({ accountToken: token }); // de sessie van Dani, die is uitgenodigd
+const { games } = await api.getGames();
+const iconSrc = (game: GameInfo) => game.icon_data ?? (game.icon ? `/games/${game.id}/${game.icon}?v=${game.version}` : null);
+```
+
+Sinds Mini Engine 0.7 heeft het antwoord ook `featured`: de id's van hoogstens vier uitgelichte spellen, nooit een privéspel. De types van de SDK, ook van 0.7.2, kennen dat veld nog niet; zie [GET /api/v1/games](../api/games.md#get-api-v1-games).
 
 ### getGame(id)
 
 ```ts
-getGame(id: string): Promise<Manifest>
+getGame(id: string, options?: { room?: string }): Promise<GameInfo>
 ```
 
-De metadata van één spel. Onbekend: `404 game_not_found`.
+De metadata van één spel. Onbekend: `404 game_not_found`. Sinds SDK 0.7.2 ook met `api.accountToken`, zoals `getGames()`. Een privéspel dat het account niet mag zien, geeft dezelfde `404 game_not_found` als een onbekend spel.
+
+Vraagt je spel in een kamer zijn eigen metadata op, geef dan de kamercode mee: `getGame(id, { room: code })` (sinds SDK 0.7.2, voor Mini Engine 0.9). Je krijgt dan de versie die de kamer speelt, voor iedereen in de kamer en ook als het spel privé is. Zonder `room` krijgt een gast of een ander account bij een privéspel `404`.
+
+```ts
+const game = await new ApiClient().getGame('mijn-spel', { room: code });
+```
 
 ## Kamers
 
@@ -81,7 +95,7 @@ const credentials = await api.createRoom({
 
 Bij `host_mode: "moderator"` en `"tv"` is `player_id` `null`. Staat het scherm uit, dan ontbreekt `display_token`. Bij `playing` is de sleutel van de maker tegelijk host en speler, en staat diens plek meteen klaar.
 
-**Fouten:** `invalid_request` (onbekende modus, een modus die het spel niet aanbiedt, capaciteit, instellingen, config, of een set die niet past), `unauthorized` (ongeldige accountsleutel, of `set_id` zonder accountsleutel), `game_not_found`, `set_not_found`, `release_changed` (het spel kreeg net een nieuwe versie; probeer het opnieuw), `rate_limit`, `room_limit` (de server heeft het maximale aantal kamers).
+**Fouten:** `invalid_request` (onbekende modus, een modus die het spel niet aanbiedt, capaciteit, instellingen, config, of een set die niet past), `unauthorized` (ongeldige accountsleutel, of `set_id` zonder accountsleutel), `game_not_found` (ook voor een privéspel als `accountToken` niet van de eigenaar of een genodigde is; sinds Mini Engine 0.9), `set_not_found`, `release_changed` (het spel kreeg net een nieuwe versie; probeer het opnieuw), `rate_limit`, `room_limit` (de server heeft het maximale aantal kamers).
 
 Met `set_id` speelt de kamer met een [eigen set](../concepten/eigen-sets.md) van het ingelogde account. Dat vraagt een `accountToken`:
 
@@ -278,7 +292,7 @@ deleteSet(id: string): Promise<null>
 
 Sinds SDK 0.7.0, voor Mini Engine 0.8. Afbeeldingen voor de afbeeldingsvelden van [eigen sets](../concepten/eigen-sets.md#afbeeldingen). Alle methoden gebruiken `api.accountToken`. Een server ouder dan 0.8 kent deze routes niet en antwoordt met een 404.
 
-Mini Engine 0.8 serveert op `/sdk/mini-engine.js` SDK 0.7.0, met deze methoden. Een spelpagina heeft ze meestal niet nodig: spelers uploaden hun afbeeldingen in het formulier op **Mijn sets**. In een eigen project gebruik je het [npm-pakket](overzicht.md#in-een-eigen-project) 0.7.0.
+Mini Engine 0.8 serveert op `/sdk/mini-engine.js` SDK 0.7.0, met deze methoden, en Mini Engine 0.9 SDK 0.7.2. Een spelpagina heeft ze meestal niet nodig: spelers uploaden hun afbeeldingen in het formulier op **Mijn sets**. In een eigen project gebruik je het [npm-pakket](overzicht.md#in-een-eigen-project) 0.7.2.
 
 ### uploadMedia(file, options?)
 
@@ -311,9 +325,15 @@ Bewaar een upload binnen een dag in een set. Een afbeelding die geen set gebruik
 listMedia(): Promise<MediaList>
 ```
 
-Jouw afbeeldingen, nieuwste eerst, met `used_bytes` en `limit_bytes`: de ruimte van het account in bytes. Sinds Mini Engine 0.8.1 hangt die af van het account en kan ze 0 zijn; zie [ruimte voor afbeeldingen](../api/accounts.md#ruimte-voor-afbeeldingen). Van 0.8.1 komt ook `request` mee, de nieuwste aanvraag voor ruimte of `null`; de types van SDK 0.7.0 kennen dat veld nog niet.
+Jouw afbeeldingen, nieuwste eerst, met `used_bytes` en `limit_bytes`: de ruimte van het account in bytes. Sinds Mini Engine 0.8.1 hangt die af van het account en kan ze 0 zijn; zie [ruimte voor afbeeldingen](../api/accounts.md#ruimte-voor-afbeeldingen). Van 0.8.1 komt ook `request` mee, de nieuwste aanvraag voor ruimte of `null`; de types kennen dat veld sinds SDK 0.7.1.
 
-SDK 0.7.0 heeft geen methode om ruimte aan te vragen. Doe dat met [`POST /api/v1/accounts/media/requests`](../api/accounts.md#post-api-v1-accounts-media-requests), met de accountsleutel als bearer, of laat de speler het doen op **Mijn sets**.
+### requestMediaSpace(options?)
+
+```ts
+requestMediaSpace(options?: { message?: string | null }): Promise<{ request: MediaRequest }>
+```
+
+Sinds SDK 0.7.1, voor Mini Engine 0.8.1. Vraagt ruimte voor afbeeldingen aan bij wie de server beheert, met een optioneel bericht van hoogstens 500 tekens. Eén keer per 7 dagen; eerder geeft `media_request_wait`. Een nieuwe aanvraag vervangt een die nog openstaat. Een oudere server antwoordt met een 404. Met SDK 0.7.0 gebruik je [`POST /api/v1/accounts/media/requests`](../api/accounts.md#post-api-v1-accounts-media-requests) zelf, of laat je de speler het doen op **Mijn sets**.
 
 ### deleteMedia(id)
 
@@ -347,11 +367,12 @@ De maker kan zijn eigen plek niet verwijderen en de kamer niet verlaten. Een spe
 | Methode | Sleutel |
 | --- | --- |
 | `createRoom`, `joinRoom` | `accountToken`, als die er is |
+| `getGames`, `getGame` | `accountToken`, als die er is (sinds SDK 0.7.2) |
 | `getRoom`, `gameData`, `displayToken` | De meegegeven kamersleutel |
 | `me`, `stats`, `achievements`, `logout`, `verifyEmail`, `setEmail` | `accountToken` |
 | `listSets`, `getSet`, `createSet`, `updateSet`, `deleteSet` | `accountToken` |
-| `uploadMedia`, `listMedia`, `deleteMedia` | `accountToken` |
-| `getGames`, `getGame`, `roomInfo`, `register`, `login`, `accountConfig` | Geen |
+| `uploadMedia`, `listMedia`, `deleteMedia`, `requestMediaSpace` | `accountToken` |
+| `roomInfo`, `register`, `login`, `accountConfig` | Geen |
 
 ## Losse functies
 
@@ -359,12 +380,12 @@ De oudere exports blijven beschikbaar en werken op de huidige origin:
 
 ```ts
 http<T>(path: string, options?: HttpOptions, fetcher?: typeof fetch): Promise<T>
-getGames(): Promise<{ games: Manifest[] }>
+getGames(): Promise<{ games: GameInfo[] }>
 createRoom(options: CreateRoomOptions): Promise<RoomCredentials>
 joinRoom(code: string, name: string): Promise<RoomCredentials>
 ```
 
-`http` zet `Content-Type: application/json` als er een body is en `Authorization: Bearer …` als je `token` meegeeft. Een `204` geeft `null`. Een fout wordt een `MiniEngineError` met de `code` en `message` van de server en de HTTP-`status`.
+De losse `getGames()` stuurt geen accountsleutel mee en geeft dus alleen openbare spellen. `http` zet `Content-Type: application/json` als er een body is en `Authorization: Bearer …` als je `token` meegeeft. Een `204` geeft `null`. Een fout wordt een `MiniEngineError` met de `code` en `message` van de server en de HTTP-`status`.
 
 ```ts
 const info = await http('/api/v1/rooms/HWKRTZ/info');

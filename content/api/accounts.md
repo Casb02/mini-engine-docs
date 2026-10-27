@@ -252,7 +252,7 @@ Jouw sets zonder inhoud, laatst gewijzigd eerst. Filter optioneel met `?game_id=
 
 | Veld | Regel |
 | --- | --- |
-| `game_id` | Een spel dat aanstaat |
+| `game_id` | Een spel dat aanstaat. Sinds 0.9 bij een [privéspel](../publiceren/overzicht.md#privespellen) alleen als je de eigenaar bent of bent uitgenodigd; anders `404 game_not_found`, zoals bij een onbekend spel |
 | `kind` | Een soort set uit `set_kinds` van de **actieve** versie van dat spel |
 | `title` | Getrimd; 1 tot 80 tekens zonder controletekens |
 | `data` | Voldoet aan het schema van de soort, hoogstens 64 KiB als JSON. Een afbeeldingsveld is `/media/{id}` van een [afbeelding](#afbeeldingen) van jouw account (sinds 0.8) |
@@ -277,7 +277,7 @@ Vervangt titel en inhoud. Spel en soort liggen vast.
 { "title": "Dani's filmavond", "data": { "questions": [ … ] } }
 ```
 
-De controle is dezelfde als bij aanmaken, tegen de actieve versie van het spel. Kamers die de set al gebruiken, houden hun eigen kopie.
+De controle is dezelfde als bij aanmaken, tegen de actieve versie van het spel. Kamers die de set al gebruiken, houden hun eigen kopie. Is het spel privé en is je uitnodiging ingetrokken, dan geeft deze route `404 game_not_found`; lezen en verwijderen blijven werken.
 
 **Antwoord** `200`: de bijgewerkte set, met `data`.
 
@@ -404,7 +404,7 @@ Jouw afbeeldingen, nieuwste eerst.
 
 ### POST /api/v1/accounts/media/requests
 
-Sinds 0.8.1. Vraagt ruimte voor afbeeldingen aan bij wie de server beheert, of meer ruimte als je account al wat heeft. Die beslist erover: kent die de aanvraag toe, dan krijgt je account die ruimte, en `GET /api/v1/accounts/media` geeft de nieuwe `limit_bytes`. SDK 0.7.0 heeft hier geen methode voor; gebruik de route zelf.
+Sinds 0.8.1. Vraagt ruimte voor afbeeldingen aan bij wie de server beheert, of meer ruimte als je account al wat heeft. Die beslist erover: kent die de aanvraag toe, dan krijgt je account die ruimte, en `GET /api/v1/accounts/media` geeft de nieuwe `limit_bytes`. Met de SDK doe je dat sinds 0.7.1 met [`api.requestMediaSpace()`](../sdk/api-client.md#requestmediaspace-options); met SDK 0.7.0 gebruik je de route zelf.
 
 ```sh
 curl https://miniengine.nl/api/v1/accounts/media/requests \
@@ -449,7 +449,7 @@ Sinds 0.5.1. Wie met een [dev-key](ontwikkelaars.md) spellen uploadde, zet ze oo
 
 ### GET /api/v1/accounts/games
 
-De geüploade spellen van jouw account. **Antwoord** `200`: `{ "games": [DevGame, …] }`, dezelfde objecten als bij [`GET /api/v1/dev/games`](ontwikkelaars.md#get-api-v1-dev-games). Een account zonder eigen spellen krijgt een lege lijst.
+De geüploade spellen van jouw account. **Antwoord** `200`: `{ "games": [DevGame, …] }`, dezelfde objecten als bij [`GET /api/v1/dev/games`](ontwikkelaars.md#get-api-v1-dev-games), sinds 0.9 met `private` en `invites`. Een account zonder eigen spellen krijgt een lege lijst. De accountpagina toont bij een privéspel het label **Privé**.
 
 **Fouten:** `401 unauthorized`.
 
@@ -461,7 +461,9 @@ De geüploade spellen van jouw account. **Antwoord** `200`: `{ "games": [DevGame
 
 Zet het spel uit of aan. **Antwoord** `200`: het bijgewerkte DevGame-object. Het werkt precies als [`PUT /api/v1/dev/games/{id}`](ontwikkelaars.md#put-api-v1-dev-games-id): een spel dat uit staat, verdwijnt van de startpagina en uit `GET /api/v1/games`, en er kunnen geen nieuwe kamers mee worden gemaakt. Kamers die al spelen, lopen door.
 
-**Fouten:** `invalid_json` (geen geldige body), `401 unauthorized`, `403 game_blocked` (aanzetten van een spel dat de beheerder blokkeerde), `404 game_not_found` (het spel bestaat niet of is niet van jou).
+Deze route neemt alleen `enabled`. Privé of openbaar maken en uitnodigen doe je met de dev-key, via de [CLI](../publiceren/cli.md#prive-en-uitnodigen). Een geüpload spel draait op dezelfde origin als de site en kan de accountsleutel lezen van een speler die ingelogd is (zie [vertrouwen](../publiceren/overzicht.md#vertrouwen)); zo'n spel kan met die sleutel dus geen spel van die speler openbaar maken.
+
+**Fouten:** `invalid_json` (geen geldige body, ook bij `private`), `401 unauthorized`, `403 game_blocked` (aanzetten van een spel dat de beheerder blokkeerde), `404 game_not_found` (het spel bestaat niet of is niet van jou).
 
 ## Sessies
 

@@ -18,11 +18,11 @@ Bij het maken van een kamer onthoudt Mini Engine de actieve versie als `game_ver
 - krijgen **nieuwe** kamers de nieuwe versie;
 - spelen **lopende** kamers door met hun eigen versie, ook als iemand de pagina ververst of later aansluit.
 
-Mini Engine regelt dat zelf. De pagina's van een kamer komen uit de juiste versie, en de verwijzingen naar `/games/<id>/assets/…` in je HTML wijzen dan naar de bestanden van die versie. In je JavaScript gebeurt dat niet. Schrijf imports tussen je eigen modules daarom **relatief**:
+Mini Engine regelt dat zelf. De pagina's van een kamer komen uit de juiste versie, en de verwijzingen naar `/games/<id>/assets/…` in je HTML wijzen dan naar de bestanden van die versie, onder `/rooms/<code>/assets/…`. Sinds 0.9 doet de engine dat ook in je CSS, JavaScript, JSON en SVG. Een oudere server deed dat alleen in de HTML, en een pad dat je code in stukjes opbouwt, herkent hij nooit. Schrijf imports tussen je eigen modules daarom **relatief**:
 
 ```js
-import { score } from './logic.js';      // goed: komt uit dezelfde versie
-import { score } from '/games/mijn-spel/assets/logic.js'; // fout: altijd de actieve versie
+import { score } from './logic.js';      // goed: komt altijd uit dezelfde versie
+import { score } from '/games/mijn-spel/assets/logic.js'; // vóór 0.9 fout: dan altijd de actieve versie
 ```
 
 ## Een nieuwe versie uitbrengen
@@ -57,5 +57,7 @@ me game prune mijn-spel --keep 3     # houdt de actieve, de nieuwste 3 en versie
 ## Aan en uit
 
 `me game disable mijn-spel` haalt de game van `/home` en uit de spellenlijst van `api.getGames()`. Nieuwe kamers kunnen dan niet meer, lopende kamers spelen door met hun eigen versie. `me game enable` zet hem terug. Sinds 0.5.1 kan dat ook op de accountpagina, onder **Mijn spellen**; zie [aan of uit vanaf de accountpagina](overzicht.md#aan-of-uit-vanaf-de-accountpagina).
+
+Uit is iets anders dan privé. Een game die uit staat, kan niemand starten, ook jij niet. Een [privégame](overzicht.md#privespellen) (sinds 0.9) staat wel aan, maar alleen voor jou en de accounts die je uitnodigt; meedoen kan iedereen met de code. Ook dan houden kamers hun versie, en een nieuwe versie wordt actief zoals hierboven.
 
 Blokkeert wie de server beheert je game, dan is dat een noodstop: er wordt niets meer van geserveerd, ook niet aan lopende kamers, en je kunt hem niet zelf weer aanzetten (`game_blocked`).

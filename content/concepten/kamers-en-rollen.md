@@ -31,8 +31,8 @@ De pagina's onder `/home` zijn de speelomgeving van Mini Engine. Als je je spel 
 | Pagina | Wat je er doet |
 | --- | --- |
 | `/home` | Een kamercode invullen, of een spel kiezen om zelf te beginnen. Sinds 0.7 staan de uitgelichte spellen eerst |
-| `/home/games` | Alle spellen als kaarten. Sinds 0.7 staan de uitgelichte bovenaan, en zoek je op titel, beschrijving, maker en id. Tot 0.6.1 heette deze pagina `/home/spellen` |
-| `/home/new/<spel>` | Een kamer maken voor dat spel: naam, spelleidermodus, de instellingen uit je `settings_schema`, een eigen set, en onder **Meer opties** het aantal spelers, het gedeelde scherm en later aansluiten |
+| `/home/games` | Alle spellen als kaarten. Sinds 0.7 staan de uitgelichte bovenaan, en zoek je op titel, beschrijving, maker en id. Sinds 0.9 staan je eigen privéspellen en die waarvoor je bent uitgenodigd erbij, met het label **Privé**, als je bent ingelogd. Tot 0.6.1 heette deze pagina `/home/spellen` |
+| `/home/new/<spel>` | Een kamer maken voor dat spel: naam, spelleidermodus, de instellingen uit je `settings_schema`, een eigen set, en onder **Meer opties** het aantal spelers, het gedeelde scherm en later aansluiten. Bij een privéspel alleen als je bent ingelogd als maker of genodigde |
 | `/home/join?room=CODE` | Een naam invullen en meedoen |
 | `/room/CODE/ROL` | De kamer zelf: deze pagina laadt je spelpagina in een iframe; zie [pagina's per rol](../game-bouwen/rolpaginas.md) |
 | `/home/account` | Inloggen, een account maken, resultaten en achievements bekijken, en je eigen geüploade spellen aan- of uitzetten |
@@ -52,6 +52,7 @@ Met de SDK maak je een kamer met `api.createRoom()` en doe je mee met `api.joinR
 - **Capaciteit.** De maker kiest het maximum aantal spelers tussen `min_players` en `max_players` van het spel; standaard het maximum van het spel, met 24 als bovengrens. De plek van een meespelende maker telt mee.
 - **Meedoen** kan normaal alleen in de lobby. Tijdens het spel alleen als het spel en de kamer [later aansluiten](rondes.md#later-aansluiten) toestaan.
 - **Eén plek per account.** Met hetzelfde account nog eens meedoen geeft `already_joined`; hervat dan de bestaande sessie.
+- **Privéspellen** (sinds 0.9). Een kamer van een [privéspel](../publiceren/overzicht.md#privespellen) maken alleen de maker en de accounts die die uitnodigde, ingelogd. Meedoen kan iedereen met de code, de link of de QR-code, ook zonder account. Een kamer speelt door als het spel privé wordt of als een uitnodiging wordt ingetrokken.
 
 ## Sleutels
 

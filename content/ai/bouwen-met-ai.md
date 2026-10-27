@@ -16,7 +16,7 @@ De skills staan in de map `skills/` van de SDK-repository en gaan mee in het pak
 
 | Skill | Waarvoor |
 | --- | --- |
-| `build-mini-engine-game` | De werkwijze van begin tot eind: scaffolden met `me init`, `me game new --template` of `create-mini-game` uit een van de vijf startsjablonen, manifest en `settings_schema`, de spelleider en de rollen, state in de hostruntime (publiek, alleen host, geheim per speler), rondes, het gedeelde scherm, testen met `me dev` en daarna als testversie op de server. Met naslag over de SDK, manifestregels, recepten voor de hostruntime en probleemoplossing, plus `scripts/play.mjs`, dat met Playwright een hele kamer bespeelt. |
+| `build-mini-engine-game` | De werkwijze van begin tot eind: scaffolden met `me init`, `me game new --template` of `create-mini-game` uit een van de vijf startsjablonen, manifest en `settings_schema`, de spelleider en de rollen, state in de hostruntime (publiek, alleen host, geheim per speler), rondes, het gedeelde scherm, testen met `me dev` en daarna als privé testversie op de server. Met naslag over de SDK, manifestregels, recepten voor de hostruntime en probleemoplossing, plus `scripts/play.mjs`, dat met Playwright een hele kamer bespeelt. |
 | `design-mini-engine-game-ui` | De drie pagina's: speler (telefoon), scherm (tv aan de overkant van de kamer) en spelleider. Een eigen sfeer per spel, raakvlakken, leesbaarheid, zelf gehoste lettertypes, geen inline scripts onder de Content-Security-Policy van Mini Engine, minder beweging als de gebruiker dat vraagt. Instellingen als gewone tekst, een kopieerbare kamercode en een QR-code om mee te doen. |
 | `mini-engine-ui` | **MiniEngineUI**: de rustige stijl van de demospellen als kant-en-klare kit. Een stylesheet, Space Grotesk en DM Sans, en pagina's voor spelleider, speler en scherm die meteen op de scaffold passen. Vier sferen (`kalk`, `nacht`, `vilt`, `studio`) en ruimte voor één eigen blikvanger per spel. |
 
@@ -90,7 +90,7 @@ Een agent zonder skills geef je zo de hele documentatie in één keer: *Lees htt
 
 ## Een spel bouwen en testen
 
-De bouwskill maakt een nieuw spel met `me init --yes` of `npx -p @casb02/mini-engine-sdk create-mini-game`, uit het startsjabloon dat het best past, en test het eerst met [`me dev`](../publiceren/cli.md#me-dev) op je eigen computer. Daarna zet hij het als testversie op de server met `me game upload`; daarvoor heb je een dev-key nodig. Ontbreekt iets, dan wijst de agent je erop. Zie ook [testen](../game-bouwen/testen.md).
+De bouwskill maakt een nieuw spel met `me init --yes` of `npx -p @casb02/mini-engine-sdk create-mini-game`, uit het startsjabloon dat het best past, en test het eerst met [`me dev`](../publiceren/cli.md#me-dev) op je eigen computer. Daarna zet hij het als testversie op de server. Sinds Mini Engine 0.9 doet hij dat met `me game upload --private`, zodat alleen jij het spel ziet, en niet iedereen op de server. Wil je vrienden laten testen, nodig ze dan uit met `me game invite <id> <gebruikersnaam>`; telefoons doen mee met de code. Voor de upload heb je een dev-key nodig. Ontbreekt iets, dan wijst de agent je erop. Mag iedereen het spel spelen, dan zet je het open met `me game public <id>`. Zie ook [testen](../game-bouwen/testen.md).
 
 ## Wat je de agent meegeeft
 

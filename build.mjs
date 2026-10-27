@@ -54,7 +54,7 @@ const REDIRECTS = {
   'aan-de-slag/eerste-kamer.html': 'concepten/kamers-en-rollen.md#een-kamer-op-miniengine-nl',
 };
 
-const VERSION = '0.8';
+const VERSION = '0.9';
 
 // Het publieke adres van de site. Alleen de Markdown voor agents gebruikt het: een agent die één .md-bestand
 // of llms-full.txt krijgt, kan dan toch elke link volgen.

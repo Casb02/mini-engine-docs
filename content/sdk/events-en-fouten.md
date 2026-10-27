@@ -112,7 +112,7 @@ Elke fout van de server heeft een vaste `code` voor je code en een Nederlandse `
 | 403 | `not_eligible` | Achievement toekennen: de speler is een gast, de kamer is zonder account gemaakt, of het is het account van de host op een andere plek dan die van de meespelende maker |
 | 404 | `not_found` | Onbekend adres |
 | 404 | `room_not_found` | De kamer bestaat niet of is verlopen |
-| 404 | `game_not_found` | Het spel bestaat niet of staat uit |
+| 404 | `game_not_found` | Het spel bestaat niet, staat uit, of is sinds 0.9 een privéspel dat je niet mag zien |
 | 404 | `game_page_not_found` | Het spel heeft geen pagina voor deze rol |
 | 404 | `asset_not_found` | Geen publiek bestand op dit pad |
 | 404 | `player_not_found` | Onbekende speler |
