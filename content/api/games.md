@@ -149,7 +149,7 @@ Sinds 0.9 geeft een privéspel hier `404 game_not_found`, net als een onbekend s
 
 ## GET /rooms/{code}/assets/{path}
 
-Sinds 0.9. De bestanden van de versie die een lopende kamer speelt, voor wie de code heeft, ook van een privéspel. De rolpagina's van een kamer laden hun bestanden hier; zie [kamers en versies](ontwikkelaars.md#kamers-en-versies). In tekstbestanden (HTML, CSS, JavaScript, JSON, SVG) wijzen absolute paden `/games/{id}/assets/…` naar dit adres. Onbekende of verlopen kamer: `404 room_not_found`; onbekend pad: `404 asset_not_found`.
+Sinds 0.9. De bestanden van de versie die een lopende kamer speelt, voor wie de code heeft, ook van een privéspel. De rolpagina's van een kamer van een privéspel laden hun bestanden hier (van een openbaar spel van `/releases/…`, dat over kamers heen in de cache blijft); zie [kamers en versies](ontwikkelaars.md#kamers-en-versies). In tekstbestanden (HTML, CSS, JavaScript, JSON, SVG) wijzen absolute paden `/games/{id}/assets/…` naar dit adres. Onbekende of verlopen kamer: `404 room_not_found`; onbekend pad: `404 asset_not_found`.
 
 ## GET /sdk/mini-engine.js
 

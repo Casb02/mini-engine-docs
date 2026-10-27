@@ -196,7 +196,7 @@ Nieuw in 0.9:
 - `GET /api/v1/games` en `GET /api/v1/games/{id}` nemen een optionele accountsessie; een privéspel heeft dan `private: true` en `icon_data`. `featured` bevat nooit een privéspel. Nieuw is `GET /api/v1/games/{id}?room=CODE`. Zie [spellen](games.md#privespellen-in-de-lijst).
 - DevGame heeft `private` en `invites`. `PUT /api/v1/dev/games/{id}` neemt `{ enabled?, private? }`, en een upload `private`. `PUT /api/v1/accounts/games/{id}` neemt alleen `enabled`. Zie [ontwikkelaars](ontwikkelaars.md#put-api-v1-dev-games-id).
 - Een upload met `"private": true` in `manifest.json` maar zonder `private` in het verzoek geeft `400 invalid_request`. Wie zijn gamelimiet heeft bereikt, krijgt voor elk id dat niet van hem is `409 quota_games`.
-- Kamers laden de bestanden van hun versie van `GET /rooms/{code}/assets/…`. Zie [kamers en versies](ontwikkelaars.md#kamers-en-versies).
+- Kamers van een privéspel laden de bestanden van hun versie van `GET /rooms/{code}/assets/…`; die van een openbaar spel van `/releases/{id}/{versie}/assets/…`. Zie [kamers en versies](ontwikkelaars.md#kamers-en-versies).
 - `GET`, `POST /api/v1/dev/games/{id}/invites` en `DELETE /api/v1/dev/games/{id}/invites/{username}`, met de nieuwe foutcodes `409 quota_invites` en `404 invite_not_found`. Zie [uitnodigingen](ontwikkelaars.md#uitnodigingen).
 - Een kamer maken voor een privéspel kan alleen met de accountsleutel van de eigenaar of een genodigde; voor ieder ander is het `404 game_not_found`, ook met een ongeldige sleutel.
 - `/home/new/{id}` geeft voor elk id dat geen openbaar, speelbaar spel is een 404 met de HTML-pagina, in plaats van een JSON-fout. `/og/games/{id}.png` geeft 404 voor een privéspel.

@@ -321,7 +321,7 @@ Daarin staan `private` en `icon_data` in het nieuwe type `GameInfo`, dat `getGam
 | 0.9.0 | Het label **Privé** op de spelkaart, op de pagina voor een nieuwe kamer en bij **Mijn spellen** | [Op de site](publiceren/overzicht.md#op-de-site) |
 | 0.9.0 | `private` en `invites` in DevGame, `private` bij `PUT` en bij de upload, en de routes voor uitnodigingen | [Ontwikkelaars](api/ontwikkelaars.md#uitnodigingen) |
 | 0.9.0 | `GET /api/v1/games/{id}?room=CODE`: het spel van een lopende kamer, ook als het privé is | [GET /api/v1/games/{id}](api/games.md#get-api-v1-games-id) |
-| 0.9.0 | `GET /rooms/{code}/assets/…`: een kamer laadt de bestanden van zijn versie met de kamercode, ook absolute paden in CSS en JavaScript | [Kamers en versies](api/ontwikkelaars.md#kamers-en-versies) |
+| 0.9.0 | `GET /rooms/{code}/assets/…`: een kamer van een privéspel laadt de bestanden van zijn versie met de kamercode, ook absolute paden in CSS en JavaScript; openbare spellen laden zoals vroeger van `/releases/…` | [Kamers en versies](api/ontwikkelaars.md#kamers-en-versies) |
 | SDK 0.7.2 | `GameInfo` met `private` en `icon_data`; `getGames()` en `getGame(id)` sturen de accountsessie mee, en `getGame(id, { room })` geeft het spel van een kamer | [ApiClient](sdk/api-client.md#getgames) |
 | CLI 0.9.0 | `me game private`, `public`, `invite`, `uninvite` en `invites`, `me game upload --private`, en een kolom PRIVÉ in `me game list` | [Privé en uitnodigen](publiceren/cli.md#prive-en-uitnodigen) |
 
