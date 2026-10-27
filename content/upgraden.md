@@ -1,14 +1,14 @@
 ---
 title: Upgraden
 nav_title: Upgraden
-description: Wat je met een bestaand spel doet bij de overstap van Mini Engine 0.4 naar 0.5, van 0.5 naar 0.6, van 0.6 naar 0.7 en van 0.7 naar 0.8, en welke SDK en CLI daarbij horen.
+description: Wat je met een bestaand spel doet bij de overstap van Mini Engine 0.4 naar 0.5, van 0.5 naar 0.6, van 0.6 naar 0.7, van 0.7 naar 0.8 en van 0.8 naar 0.9, en welke SDK en CLI daarbij horen.
 section: Start
 order: 2
 ---
 
 # Upgraden
 
-Mini Engine, de SDK en de CLI krijgen af en toe een nieuwe versie. Op deze pagina staat per stap wat je met een bestaand spel moet doen, wat er nieuw is als je het wilt gebruiken, en wat vanzelf goed gaat. Sla je een versie over, loop dan de stappen na elkaar door. Van 0.4 naar 0.8 zijn het er vier.
+Mini Engine, de SDK en de CLI krijgen af en toe een nieuwe versie. Op deze pagina staat per stap wat je met een bestaand spel moet doen, wat er nieuw is als je het wilt gebruiken, en wat vanzelf goed gaat. Sla je een versie over, loop dan de stappen na elkaar door. Van 0.4 naar 0.9 zijn het er vijf.
 
 Een spel dat werkte, blijft werken. Manifests, kamers en sets van een oudere versie blijven geldig, en nieuwe velden zijn optioneel. De meeste stappen gaan over je gereedschap, je links en hoe je spel op een telefoon past.
 
@@ -41,9 +41,11 @@ Deze versies horen bij elkaar:
 | 0.5.2 tot en met 0.5.5 | 0.5.2 | 0.5.2 |
 | 0.6.0 tot en met 0.6.5 | 0.6.0 | 0.6.0 |
 | 0.7.0 en 0.7.1 | 0.6.0 | 0.7.0 |
-| 0.8.0 en 0.8.1 | 0.7.0 | 0.8.0 |
+| 0.8.0 | 0.7.0 | 0.8.0 |
+| 0.8.1 | 0.7.1 | 0.8.1 |
+| 0.9.0 | 0.7.2 | 0.9.0 |
 
-De client in de SDK bleef van 0.5.0 tot en met 0.6.0 gelijk; die versies brachten types, startsjablonen en skills. SDK 0.7.0 geeft `ApiClient` drie methoden voor afbeeldingen erbij. Mini Engine 0.6 en 0.7 serveren de client van SDK 0.5.2, die verder gelijk is; Mini Engine 0.8 serveert SDK 0.7.0, ook op `/sdk/mini-engine.d.ts`. Een spelpagina heeft de methoden voor afbeeldingen niet nodig: afbeeldingen uploadt een speler in de set-editor. Haal de types voor je eigen kopie uit SDK 0.7.0, zoals hieronder.
+De client in de SDK bleef van 0.5.0 tot en met 0.6.0 gelijk; die versies brachten types, startsjablonen en skills. SDK 0.7.0 geeft `ApiClient` drie methoden voor afbeeldingen erbij, en SDK 0.7.1 een om ruimte voor afbeeldingen aan te vragen. In SDK 0.7.2 sturen `getGames()` en `getGame(id)` de accountsessie mee, zodat ook [privéspellen](publiceren/overzicht.md#privespellen) meekomen. Mini Engine 0.6 en 0.7 serveren de client van SDK 0.5.2, die verder gelijk is; Mini Engine 0.8 serveert SDK 0.7.0 en Mini Engine 0.9 SDK 0.7.2, ook op `/sdk/mini-engine.d.ts`. Een spelpagina heeft die nieuwe methoden niet nodig: afbeeldingen uploadt een speler in de set-editor, en privéspellen toont de site zelf. Haal de types voor je eigen kopie uit SDK 0.7.2, zoals hieronder.
 
 Een nieuwere CLI en SDK werken met Mini Engine 0.5 en nieuwer. Wat een nieuwere versie van de server vraagt, staat er in deze documentatie steeds bij, zoals *sinds 0.5.1*. Zie ook [versies](sdk/overzicht.md#versies) bij de SDK.
 
@@ -58,13 +60,13 @@ me skill install --force                        # de AI-skills uit die CLI, over
 
 `--force` overschrijft ook wat je zelf in een skill hebt aangepast. Zonder `--force` blijft een oudere skill staan; `me doctor` meldt dat verschil.
 
-Gebruik je de types in je editor of met `tsc`, vervang dan de kopie in je spel door die van SDK 0.7.0:
+Gebruik je de types in je editor of met `tsc`, vervang dan de kopie in je spel door die van SDK 0.7.2:
 
 ```sh
-curl -o types/mini-engine.d.ts https://raw.githubusercontent.com/Casb02/mini-engine-sdk/v0.7.0/types/mini-engine.d.ts
+curl -o types/mini-engine.d.ts https://raw.githubusercontent.com/Casb02/mini-engine-sdk/v0.7.2/types/mini-engine.d.ts
 ```
 
-Gebruik je het npm-pakket in een eigen project, installeer dan versie 0.7.0; zie [in een eigen project](sdk/overzicht.md#in-een-eigen-project).
+Gebruik je het npm-pakket in een eigen project, installeer dan versie 0.7.2; zie [in een eigen project](sdk/overzicht.md#in-een-eigen-project).
 
 Pas je daarna iets aan je spel aan, verhoog dan `version` in `manifest.json` en upload de nieuwe versie met `--activate`. Nieuwe kamers krijgen die versie; lopende kamers spelen door met de hunne. Zie [versies en kamers](publiceren/versies.md).
 
@@ -278,3 +280,72 @@ Jouw eigen account heeft met een dev-key die nog werkt 250 MiB, dus `me dev --se
 3. Een optionele afbeelding staat buiten `required`, en je spel toont geen leeg of kapot plaatje als ze ontbreekt, ook voor spelers die (nog) geen ruimte voor afbeeldingen hebben.
 4. Standaardplaatjes in `data.json` zijn paden onder `assets/` die in je spel staan.
 5. Heb je iets aangepast, dan heeft je spel een nieuwe `version` en is het geüpload met `--activate`.
+
+## Van 0.8 naar 0.9
+
+Mini Engine 0.9.0 brengt privéspellen: een spel dat alleen jij en de accounts die je uitnodigt zien en starten. Wie de code heeft, doet gewoon mee, ook zonder account. SDK 0.7.2 en CLI 0.9.0 horen erbij. Je spel zelf hoeft meestal niet te veranderen: het manifest kreeg geen nieuwe velden, en elk spel blijft openbaar tot je het zelf privé maakt.
+
+### Wat je moet doen
+
+**Werk de CLI bij naar 0.9.0 en installeer de skills opnieuw**, zoals [hierboven](#je-gereedschap-bijwerken):
+
+```sh
+npm install -g github:Casb02/mini-engine-cli
+me skill install --force
+```
+
+Een oudere CLI kent `me game private`, `me game invite` en `me game upload --private` niet. De nieuwe skills laten je AI-agent een testversie privé uploaden, in plaats van als openbare kopie die iedereen op de server ziet.
+
+**Haal de types uit SDK 0.7.2**, als je ze gebruikt:
+
+```sh
+curl -o types/mini-engine.d.ts https://raw.githubusercontent.com/Casb02/mini-engine-sdk/v0.7.2/types/mini-engine.d.ts
+```
+
+Daarin staan `private` en `icon_data` in het nieuwe type `GameInfo`, dat `getGames()` en `getGame()` teruggeven. `Manifest` kent ze niet, want een manifest kan een spel niet privé maken. Gebruik je het npm-pakket, installeer dan 0.7.2.
+
+**Staat er `private` in je `manifest.json`, haal het dan weg.** Het maakte nooit iets privé. Sinds CLI 0.9.0 stoppen `me game upload`, `me dev` en `me doctor` erop, en Mini Engine 0.9 weigert een upload met `"private": true` in het manifest zonder `--private`. Zo gaat een spel dat je voor jezelf bedoelde, niet per ongeluk voor iedereen live. Privé maak je met `me game upload --private` of `me game private <id>`.
+
+**Vraagt je spel in een kamer zijn eigen metadata op, geef dan de kamercode mee.** Met `GET /api/v1/games/{id}?room=CODE`, of `getGame(id, { room: code })` uit SDK 0.7.2, krijg je de versie van de kamer, ook als het spel privé is. Zonder de code geeft een privéspel iedereen behalve de maker en de genodigden een 404, ook in een kamer. Leest je spel die metadata niet, dan hoef je niets te doen; de ingebouwde kamerpagina's doen het zelf.
+
+**Lees je `GET /api/v1/games` zelf, stuur dan de accountsessie mee als je privéspellen wilt zien.** Zonder sessie staan er alleen openbare spellen in, zoals voorheen. Met de sessie van de maker of van een genodigde komen ook die privéspellen mee, met `private: true` en het icoon als `data:`-URL in `icon_data`. Toon dat icoon uit `icon_data`: het gewone assetadres van een privéspel geeft zonder sessie 404. Een ongeldige of verlopen sessie geeft gewoon de openbare lijst, nooit 401. `getGames()` en `getGame(id)` van `ApiClient` doen dit sinds SDK 0.7.2 vanzelf als `accountToken` gezet is. Zie [GET /api/v1/games](api/games.md#get-api-v1-games).
+
+**Let bij `/home/new/{id}` op de status, niet op de inhoud.** Tot 0.9 gaf een onbekend spel daar een JSON-fout. Sinds 0.9 geeft elk id dat geen openbaar, speelbaar spel is (onbekend, uit, geblokkeerd of privé) een 404 met de HTML-pagina *Nieuwe kamer*. Het script van die pagina haalt het spel daarna op met de sessie. Een script of test die de JSON-fout verwacht, laat je op de 404 letten.
+
+### Nieuw, als je wilt
+
+| Sinds | Wat | Lees verder |
+| --- | --- | --- |
+| 0.9.0 | Privéspellen: alleen jij en wie je uitnodigt, zien het spel en maken er een kamer mee; meedoen kan iedereen met de code | [Privéspellen](publiceren/overzicht.md#privespellen) |
+| 0.9.0 | Uitnodigen op gebruikersnaam, ook accounts zonder dev-key, hoogstens 50 per spel | [Uitnodigen](publiceren/overzicht.md#uitnodigen) |
+| 0.9.0 | Het label **Privé** op de spelkaart, op de pagina voor een nieuwe kamer en bij **Mijn spellen** | [Op de site](publiceren/overzicht.md#op-de-site) |
+| 0.9.0 | `private` en `invites` in DevGame, `private` bij `PUT` en bij de upload, en de routes voor uitnodigingen | [Ontwikkelaars](api/ontwikkelaars.md#uitnodigingen) |
+| 0.9.0 | `GET /api/v1/games/{id}?room=CODE`: het spel van een lopende kamer, ook als het privé is | [GET /api/v1/games/{id}](api/games.md#get-api-v1-games-id) |
+| 0.9.0 | `GET /rooms/{code}/assets/…`: een kamer laadt de bestanden van zijn versie met de kamercode, ook absolute paden in CSS en JavaScript | [Kamers en versies](api/ontwikkelaars.md#kamers-en-versies) |
+| SDK 0.7.2 | `GameInfo` met `private` en `icon_data`; `getGames()` en `getGame(id)` sturen de accountsessie mee, en `getGame(id, { room })` geeft het spel van een kamer | [ApiClient](sdk/api-client.md#getgames) |
+| CLI 0.9.0 | `me game private`, `public`, `invite`, `uninvite` en `invites`, `me game upload --private`, en een kolom PRIVÉ in `me game list` | [Privé en uitnodigen](publiceren/cli.md#prive-en-uitnodigen) |
+
+Zo test je voortaan een spel zonder dat de rest van de server het ziet:
+
+1. Upload met `me game upload --private`. Een nieuw spel is dan privé voordat de eerste versie live gaat, dus ook niet even voor iedereen te zien.
+2. Nodig je testers uit met `me game invite <id> <gebruikersnaam>`. Ze hebben alleen een account nodig, geen dev-key.
+3. Wie is uitgenodigd, logt in en maakt een kamer op `/home/new/<id>`. Telefoons doen mee met de code of de QR-code, zoals altijd.
+4. Mag iedereen het spelen, dan zet `me game public <id>` het open.
+
+Wil je een nieuwe versie van een openbaar spel eerst proberen, upload dan een kopie met een eigen `id`, zoals `mijn-spel-test`, ook met `--private`, en verwijder hem daarna met `me game delete mijn-spel-test`. Staat er nog een openbare testkopie van vroeger, maak die dan privé met `me game private mijn-spel-test`, of verwijder hem. Zie [testen](game-bouwen/testen.md#daarna-als-testversie-op-de-server).
+
+### Geen actie nodig
+
+- Bestaande spellen blijven openbaar. Privé zet je zelf aan, per spel.
+- Het manifest, de regels voor uploads, kamers, de websocket, realtime, achievements en eigen sets zijn gelijk gebleven, op `private` in het manifest na (zie hierboven).
+- Meedoen werkt zoals altijd, ook in een kamer van een privéspel, ook zonder account. Kamers spelen door als een spel privé wordt of als je een uitnodiging intrekt.
+- Je spelpagina's laden de SDK van de server en hoeven niet te veranderen. In een kamer laden ze hun bestanden voortaan van `/rooms/<code>/assets/…`; de engine zet je paden `/games/<id>/assets/…` zelf om, ook in CSS, JavaScript, JSON en SVG.
+
+### Checklist
+
+1. De CLI is 0.9.0, de skills zijn opnieuw geïnstalleerd met `--force`, en `types/mini-engine.d.ts` komt uit SDK 0.7.2.
+2. `manifest.json` heeft geen `private`, en een spel dat in een kamer zijn eigen metadata leest, stuurt `?room=CODE` mee.
+3. `me doctor` meldt Mini Engine 0.9 op de server voordat je `--private` of `me game invite` gebruikt. Op een oudere server stopt de CLI met `unsupported` en uploadt hij niets.
+4. Een eigen client die privéspellen moet tonen, stuurt de accountsessie mee bij `GET /api/v1/games` en toont het icoon uit `icon_data` als dat er is.
+5. Scripts en tests letten bij `/home/new/{id}` op de status 404, niet op een JSON-fout.
+6. Openbare testkopieën zijn privé gemaakt of verwijderd.

@@ -1,6 +1,6 @@
 ---
 title: Testen
-description: Een eigen spel testen, eerst op je eigen computer met me dev en daarna als testversie op de server met telefoons, plus een checklist en geautomatiseerde controles.
+description: Een eigen spel testen, eerst op je eigen computer met me dev en daarna als privé testversie op de server met telefoons, plus een checklist en geautomatiseerde controles.
 section: SDK
 group: Aan de slag
 order: 3
@@ -26,18 +26,22 @@ De kamer krijgt de `default_host_mode` uit je manifest. Wil je `tv` of `moderato
 
 ## Daarna als testversie op de server
 
-Daarvoor heb je een dev-key nodig; zie [je game publiceren](../publiceren/overzicht.md). Log één keer in met `me auth`. Kijk met `me doctor` of alles klaarstaat, en upload vanuit de map van je spel:
+Daarvoor heb je een dev-key nodig; zie [je game publiceren](../publiceren/overzicht.md). Log één keer in met `me auth`. Kijk met `me doctor` of alles klaarstaat, en upload vanuit de map van je spel. Sinds Mini Engine 0.9 en CLI 0.9.0 kan dat privé:
 
 ```sh
 me doctor
-me game upload
+me game upload --private
+me game invite mijn-spel dani sander
 ```
 
-- **De eerste upload van een nieuw spel is meteen live.** Het staat dan voor iedereen op de startpagina van die server.
+- **Een testversie is privé, niet openbaar.** Met `--private` zien alleen jij en de accounts die je uitnodigt het spel, en alleen jullie maken er een kamer mee. Telefoons doen gewoon mee met de code, ook zonder account. Zie [privéspellen](../publiceren/overzicht.md#privespellen).
+- **Zonder `--private` is de eerste upload van een nieuw spel meteen live**, voor iedereen op de startpagina van die server. Op een server ouder dan 0.9 kan het alleen zo.
+- **Nodig je testers uit** met `me game invite <id> <gebruikersnaam>`. Ze hebben alleen een account nodig, geen dev-key. Ze loggen in op de site en maken dan zelf een kamer.
 - **Latere versies worden pas actief met `--activate`**, of later met `me game activate`. Verhoog eerst `version` in `manifest.json`; een versie overschrijven kan niet. Nieuwe kamers krijgen de actieve versie, lopende kamers houden de hunne. Ging er iets mis, activeer dan de vorige versie. Zie [versies en kamers](../publiceren/versies.md).
-- Wil je testen zonder dat je echte spel verandert, upload dan een kopie met een eigen `id` in `manifest.json`, zoals `mijn-spel-test`. Ook die is meteen live. Zet hem na het testen uit met `me game disable mijn-spel-test`, of verwijder hem met `me game delete mijn-spel-test`.
+- **Is je spel al openbaar** en wil je een nieuwe versie testen zonder dat het echte spel verandert, upload dan een kopie met een eigen `id` in `manifest.json`, zoals `mijn-spel-test`, ook met `--private`. Zonder `--private` is die kopie meteen live, voor iedereen. Verwijder hem na het testen met `me game delete mijn-spel-test`.
+- **Klaar met testen**, en mag iedereen het spelen? Dan zet `me game public mijn-spel` het open.
 
-Na de upload toont de CLI het adres om een kamer te maken, zoals `https://miniengine.nl/home/new/mijn-spel`. Maak daar een kamer en laat anderen meedoen met de code of de QR-code. Wie de kamer maakte, opent het gedeelde scherm via **Kamer** → **Open het gedeelde scherm**. Heb je geen telefoons bij de hand: kamersleutels staan per browsertabblad, dus elk privévenster is een eigen deelnemer. Een gedupliceerd tabblad is dezelfde deelnemer. Meer over de pagina's van een kamer staat bij [kamers en rollen](../concepten/kamers-en-rollen.md#een-kamer-op-miniengine-nl).
+Na de upload toont de CLI het adres om een kamer te maken, zoals `https://miniengine.nl/home/new/mijn-spel`. Bij een privéspel werkt dat adres alleen als je bent ingelogd als maker of genodigde; anders zegt de pagina *Dit spel bestaat niet.* Maak daar een kamer en laat anderen meedoen met de code of de QR-code. Wie de kamer maakte, opent het gedeelde scherm via **Kamer** → **Open het gedeelde scherm**. Heb je geen telefoons bij de hand: kamersleutels staan per browsertabblad, dus elk privévenster is een eigen deelnemer. Een gedupliceerd tabblad is dezelfde deelnemer. Meer over de pagina's van een kamer staat bij [kamers en rollen](../concepten/kamers-en-rollen.md#een-kamer-op-miniengine-nl).
 
 ## Op een echte telefoon
 
@@ -114,4 +118,4 @@ me dev --no-open                         # in een tweede terminal
 node tests/play.mjs                      # standaard tegen me dev op http://127.0.0.1:3170
 ```
 
-De schermafbeeldingen komen in `tests/`. Tegen de server werkt hetzelfde script, zodra je spel daar actief is: `node tests/play.mjs https://miniengine.nl`. Het maakt dan een echte kamer. Opmaak en WebGL beoordeel je met de schermafbeeldingen of in een echte browser.
+De schermafbeeldingen komen in `tests/`. Tegen de server werkt hetzelfde script, zodra je spel daar actief is: `node tests/play.mjs https://miniengine.nl`. Het maakt dan een echte kamer. Is je spel privé, geef het verzoek om de kamer te maken dan de accountsleutel van jou of van een genodigde mee, als `Authorization: Bearer …`; zonder sleutel antwoordt de server `404 game_not_found`, net als bij een onbekend spel. Meedoen gaat zonder sleutel. Opmaak en WebGL beoordeel je met de schermafbeeldingen of in een echte browser.

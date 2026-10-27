@@ -93,6 +93,8 @@ Kies `supports_late_join` voor een nieuw spel bewust. De kamer zet later aanslui
 
 `runtime: "server"` is er alleen voor het ingebouwde spel Common Dice. Een eigen spel gebruikt altijd `"host"`; zie [runtimes](../concepten/runtimes.md).
 
+Er is geen veld om een spel privé te maken. Een [privéspel](../publiceren/overzicht.md#privespellen) maak je met `me game upload --private` of `me game private <id>`. Staat er `private` in het manifest, dan stoppen `me dev` en `me game upload` met een fout (CLI 0.9), en de server weigert een upload met `"private": true` in het manifest zonder `--private` (Mini Engine 0.9). Zo gaat een spel dat je voor jezelf bedoelde, niet per ongeluk voor iedereen live.
+
 ### host_modes
 
 `host_modes` zegt wie het spel mag leiden; de maker van de kamer kiest er een op de pagina voor een nieuwe kamer. Zie [spelleidermodi](../concepten/spelleidermodi.md).
@@ -133,7 +135,7 @@ De server controleert het icoon bij elke upload, en `me game upload` en `me dev`
 
 Klopt het icoon niet, dan noemen `me dev` en `me game upload` de reden (*manifest.json: icon …*); de server weigert een upload met *Invalid icon: …*.
 
-De pagina's van Mini Engine laden het icoon als `<img alt="">`, vanaf het gewone assetadres van de actieve versie: `/games/{id}/{icon}?v={version}`. In een `<img>` voert de browser geen scripts uit een SVG uit.
+De pagina's van Mini Engine laden het icoon als `<img alt="">`, vanaf het gewone assetadres van de actieve versie: `/games/{id}/{icon}?v={version}`. In een `<img>` voert de browser geen scripts uit een SVG uit. Van een [privéspel](../publiceren/overzicht.md#privespellen) (sinds 0.9) laden ze hetzelfde icoon uit `icon_data`, een `data:`-URL in de metadata, omdat dat assetadres zonder sessie 404 geeft.
 
 Zo ontwerp je een icoon dat in de lijst past:
 
@@ -163,6 +165,7 @@ Sinds 0.6.0 tonen `/home` en `/home/games` elk spel als een kaart. Wat erop staa
 | *Met tv* | `has_display: true`, of `tv` in `host_modes` |
 | *Eigen …* | `set_kinds`: bij één soort *Eigen* met de titel van die soort in kleine letters, zoals *Eigen vragenlijst*; bij meer soorten *Eigen sets* |
 | *3 achievements* | Het aantal `achievements` |
+| *Privé* (sinds 0.9) | Je hebt het spel [privé](../publiceren/overzicht.md#privespellen) gemaakt; alleen jij en wie je uitnodigt, zien de kaart |
 
 Laat de eerste zin van je beschrijving dus op zichzelf staan, en kies een `title` voor je soort set die goed leest na *Eigen*. De pagina voor een nieuwe kamer toont de kaart met de hele beschrijving; daar is ruimte voor uitleg. Sinds 0.7 zoekt het zoekveld op `/home/games` in de titel, de beschrijving, de naam van de maker en het id. Hoe je spel eruitziet als iemand een link deelt, staat bij [linkvoorbeelden](../publiceren/overzicht.md#linkvoorbeelden).
 
@@ -278,6 +281,7 @@ Het hele manifest, ook `icon`, `achievements` en `set_kinds`, wordt op drie plek
 ## HTML en assets
 
 - Verwijs naar assets en de SDK met absolute paden: `/games/mijn-spel/assets/app.js` en `/sdk/mini-engine.js`. Imports tussen je eigen modules schrijf je relatief; zie [versies en kamers](../publiceren/versies.md).
+- In een kamer wijzen die paden sinds 0.9 naar de bestanden van de kamer, `/rooms/<code>/assets/…`, ook in je CSS, JavaScript, JSON en SVG. Zo laadt bijvoorbeeld een lettertype dat je stylesheet als `/games/mijn-spel/assets/…` noemt uit de versie van de kamer, ook als het spel privé is. Bouw zo'n pad niet in stukjes op in je code, want dan herkent de engine het niet; gebruik `new URL('./bestand', import.meta.url)` of een relatief pad.
 - Mini Engine stuurt een strikte Content-Security-Policy mee: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'`. Inline `<script>`-blokken en scripts, lettertypes of beelden van een CDN werken dus niet. Zet alles in `assets/`. `me dev` stuurt dezelfde policy mee.
 - Inline stijlen en `data:`-beelden mogen wel.
 - Afbeeldingen uit een eigen set staan op `/media/…`, op dezelfde origin als je spel, en mogen dus ook. Zie [afbeeldingen tonen in je spel](../concepten/eigen-sets.md#afbeeldingen-tonen-in-je-spel).

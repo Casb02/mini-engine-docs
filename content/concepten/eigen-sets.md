@@ -119,7 +119,7 @@ Haalt een nieuwe versie van een spel een soort set weg, dan kun je bestaande set
 
 ## Kiezen bij een nieuwe kamer
 
-Op de pagina voor een nieuwe kamer (`/home/new/{id}`) staat een keuze als het spel sets kent en je bent ingelogd. Die heeft de titel van je soort set, of *Eigen set* bij meer soorten. Je kiest *Standaard* voor de `data.json` van het spel, of een van je eigen sets, en er is een link *Maak een eigen set*. Gasten zien een korte hint om in te loggen.
+Op de pagina voor een nieuwe kamer (`/home/new/{id}`) staat een keuze als het spel sets kent en je bent ingelogd. Bij een [privéspel](../publiceren/overzicht.md#privespellen) maken en kiezen alleen de maker en de genodigden sets (sinds 0.9); voor ieder ander geeft een set voor dat spel `404 game_not_found`. Die heeft de titel van je soort set, of *Eigen set* bij meer soorten. Je kiest *Standaard* voor de `data.json` van het spel, of een van je eigen sets, en er is een link *Maak een eigen set*. Gasten zien een korte hint om in te loggen.
 
 Met de SDK geef je `set_id` mee aan [`api.createRoom()`](../sdk/api-client.md#createroom-options), met een accountsleutel. De server controleert dat de set van dat account is, bij dit spel hoort en dat zijn soort voorkomt in de versie die de kamer krijgt. Daarna controleert hij de inhoud opnieuw tegen die versie.
 

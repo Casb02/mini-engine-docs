@@ -1,6 +1,6 @@
 ---
 title: Types
-description: De belangrijkste TypeScript-types van de SDK, zoals Snapshot met host_player_id, Manifest met icon, RoomCredentials, ActionPayloads, de realtimetypes, achievements, sets en afbeeldingen, en waar het volledige declaratiebestand staat.
+description: De belangrijkste TypeScript-types van de SDK, zoals Snapshot met host_player_id, Manifest met icon en private, RoomCredentials, ActionPayloads, de realtimetypes, achievements, sets en afbeeldingen, en waar het volledige declaratiebestand staat.
 section: SDK
 group: Referentie
 order: 5
@@ -141,6 +141,12 @@ interface Manifest<Settings = Record<string, Json>> {
   set_kinds?: SetKind[];                  // sinds 0.5
 }
 
+// Sinds SDK 0.7.2: een spel zoals getGames() en getGame() het teruggeven.
+interface GameInfo<Settings = Record<string, Json>> extends Manifest<Settings> {
+  private?: boolean;                      // sinds 0.9, alleen bij een privéspel: true
+  icon_data?: string;                     // sinds 0.9, alleen bij een privéspel: het icoon als data:-URL
+}
+
 interface SettingsProperty {
   type: 'integer' | 'number' | 'string' | 'boolean';
   enum?: Json[];
@@ -150,6 +156,8 @@ interface SettingsProperty {
 ```
 
 `author` staat erin sinds SDK 0.6.0 (Mini Engine 0.6.1): de weergavenaam van het account dat het spel uploadde. De server zet het; een `author` in je manifest wordt genegeerd. `icon` is het pad van een SVG-icoon in het package, sinds SDK 0.5.1 (Mini Engine 0.5.1). De regels staan bij [package en manifest](../game-bouwen/package-en-manifest.md#icon). Een manifest zonder `host_modes` geldt als `['moderator']`; een nieuw spel uit de scaffolder heeft sinds 0.5.2 `['playing', 'tv']` met `default_host_mode: 'playing'`.
+
+`private` en `icon_data` staan sinds SDK 0.7.2 (Mini Engine 0.9) in `GameInfo`, niet in `Manifest`: de server zet ze alleen bij een [privéspel](../publiceren/overzicht.md#privespellen), voor wie dat spel mag zien, en een manifest kan ze niet zetten. Met `"private": true` in `manifest.json` weigert de server de upload, tenzij je met `--private` uploadt. `icon_data` is hetzelfde icoon als `icon`, als `data:`-URL, omdat het assetadres van een privéspel zonder sessie 404 geeft. Toon het icoon dus uit `icon_data` als dat er is, en anders van het assetadres. Zie [privéspellen in de lijst](../api/games.md#privespellen-in-de-lijst).
 
 ### Achievements en soorten sets
 
@@ -226,7 +234,7 @@ interface Realtime {
 
 ### ActionPayloads
 
-De data van de acties van de ingebouwde spellen. SDK 0.6.0 en 0.7.0 declareren ook nog de acties van Jeopardy (`choose_team` tot en met `close_clue`); die bestaan sinds Mini Engine 0.7 niet meer, nu alleen Common Dice is ingebouwd.
+De data van de acties van de ingebouwde spellen. SDK 0.6.0 tot en met 0.7.2 declareren ook nog de acties van Jeopardy (`choose_team` tot en met `close_clue`); die bestaan sinds Mini Engine 0.7 niet meer, nu alleen Common Dice is ingebouwd.
 
 ```ts
 interface ActionPayloads {
@@ -312,7 +320,16 @@ interface MediaItem {
   created_at: number;                    // Unix-seconden
 }
 interface MediaUpload { media: MediaItem; used_bytes: number; limit_bytes: number }
-interface MediaList { media: MediaItem[]; used_bytes: number; limit_bytes: number }
+interface MediaList { media: MediaItem[]; used_bytes: number; limit_bytes: number; request: MediaRequest | null }
+interface MediaRequest {                 // sinds SDK 0.7.1 (Mini Engine 0.8.1)
+  id: number;
+  status: 'pending' | 'granted' | 'rejected';
+  message: string;                       // leeg als de speler niets meegaf
+  requested_at: number;                  // Unix-seconden
+  next_request_at: number;               // vanaf dan kan het account opnieuw aanvragen
+  decided_at: number | null;
+  granted_mb: number | null;
+}
 ```
 
-`used_bytes` telt alle afbeeldingen van het account; `limit_bytes` is de ruimte van het account in bytes. In Mini Engine 0.8.0 was dat 250 MiB voor iedereen; sinds 0.8.1 hangt het af van het account en kan het 0 zijn (zie [ruimte voor afbeeldingen](../api/accounts.md#ruimte-voor-afbeeldingen)). Sinds 0.8.1 geeft `listMedia` ook `request`, de nieuwste aanvraag voor ruimte of `null`; dat veld staat nog niet in de types van SDK 0.7.0. Zie [uploadMedia](api-client.md#uploadmedia-file-options).
+`used_bytes` telt alle afbeeldingen van het account; `limit_bytes` is de ruimte van het account in bytes. In Mini Engine 0.8.0 was dat 250 MiB voor iedereen; sinds 0.8.1 hangt het af van het account en kan het 0 zijn (zie [ruimte voor afbeeldingen](../api/accounts.md#ruimte-voor-afbeeldingen)). Sinds 0.8.1 geeft `listMedia` ook `request`, de nieuwste aanvraag voor ruimte of `null`; dat veld en `MediaRequest` staan in de types sinds SDK 0.7.1. Zie [uploadMedia](api-client.md#uploadmedia-file-options).

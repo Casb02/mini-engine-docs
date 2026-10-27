@@ -1,6 +1,6 @@
 ---
 title: Limieten
-description: Alle grenzen van Mini Engine 0.8 op één plek, van kamercodes en namen tot berichtgroottes, realtime, achievements, eigen sets, afbeeldingen, aanvraaglimieten en gamepackages.
+description: Alle grenzen van Mini Engine 0.9 op één plek, van kamercodes en namen tot berichtgroottes, realtime, achievements, eigen sets, afbeeldingen, uitnodigingen, aanvraaglimieten en gamepackages.
 section: API
 order: 7
 ---
@@ -92,6 +92,16 @@ Wat boven het budget of de grenzen voor waarden komt, valt weg. De verbinding bl
 
 Zie [afbeeldingen](accounts.md#afbeeldingen).
 
+## Uitnodigingen voor privéspellen (vanaf 0.9)
+
+| Grens | Waarde |
+| --- | --- |
+| Uitnodigingen per spel | 50 (`409 quota_invites`) |
+| Namen per verzoek | 1 tot 50, na trimmen, kleine letters en ontdubbelen (`400 invalid_request`) |
+| Wie | Elk account, op gebruikersnaam; niet de eigenaar zelf (`400 invalid_request`) |
+
+Zie [uitnodigingen](ontwikkelaars.md#uitnodigingen).
+
 ## Aanvragen per IP-adres
 
 | Route | Limiet |
@@ -99,7 +109,7 @@ Zie [afbeeldingen](accounts.md#afbeeldingen).
 | `POST /api/v1/rooms` en `POST /api/v1/rooms/{code}/join` | 60 per minuut |
 | `POST /api/v1/accounts/register`, `POST /api/v1/accounts/login` en `POST /api/v1/accounts/verify-email` | 10 per minuut |
 | Mails: `POST /api/v1/accounts/register` en `PUT /api/v1/accounts/email` (vanaf 0.4) | 5 per 10 minuten |
-| `POST`, `PUT` en `DELETE` onder `/api/v1/dev/` | 60 per minuut |
+| `POST`, `PUT` en `DELETE` onder `/api/v1/dev/`, ook uitnodigingen (sinds 0.9) | 60 per minuut |
 | Uploads (`POST /api/v1/dev/games/{id}/versions`) | 20 per 10 minuten |
 | Sets: `POST`, `PUT` en `DELETE` onder `/api/v1/accounts/sets` (vanaf 0.5) | 30 per minuut |
 | Afbeeldingen uploaden: `POST /api/v1/accounts/media` (vanaf 0.8) | 60 per minuut |

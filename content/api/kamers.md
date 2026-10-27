@@ -28,7 +28,7 @@ Maakt een kamer. **Toegang:** iedereen. Met een optionele accountsleutel koppelt
 
 | Veld | Verplicht | Regel |
 | --- | --- | --- |
-| `game_id` | ja | Een geïnstalleerd spel |
+| `game_id` | ja | Een geïnstalleerd spel dat aanstaat. Een privéspel alleen met de accountsleutel van de eigenaar of een genodigde (sinds 0.9) |
 | `name` | nee | Naam van een meespelende maker, 1 tot 24 tekens; standaard `Spelleider`. Op de pagina voor een nieuwe kamer is dit het veld *Jouw naam* |
 | `max_players` | nee | Binnen `min_players` en `max_players` van het spel. Standaard het maximum van het spel, begrensd op 24. Een meespelende maker telt mee |
 | `settings` | nee | Wordt over `default_settings` gelegd en daarna gecontroleerd |
@@ -61,11 +61,13 @@ Met `set_id` controleert de server dat de set van jouw account is, bij `game_id`
 { "game_id": "quiz-bij-dani", "settings": { "count": 10, "seconds": 20 }, "set_id": "8a41c2d0-…" }
 ```
 
-**Fouten:** `400 invalid_request` (onbekende modus, capaciteit, instellingen of config; later aansluiten of scherm bij een spel dat het niet ondersteunt; een hostspel met `hostless`, of met een modus die niet in `host_modes` van het spel staat; een set van een ander spel, van een soort die deze versie niet kent of met inhoud die niet past), `401 unauthorized` (ongeldige accountsleutel, of `set_id` zonder accountsleutel), `404 game_not_found`, `404 set_not_found`, `409 release_changed` (het spel kreeg net een nieuwe versie; probeer het opnieuw), `429 rate_limit`, `503 room_limit`.
+Sinds 0.9 maakt een [privéspel](../publiceren/overzicht.md#privespellen) alleen een kamer voor zijn eigenaar en de accounts die die uitnodigde, met hun accountsleutel. Voor ieder ander antwoordt de server `404 game_not_found`, precies zoals bij een onbekend spel. Dat geldt ook met een ongeldige accountsleutel: de server kijkt eerst of je het spel mag zien, en pas daarna naar de sleutel. Bij een openbaar spel geeft een ongeldige sleutel `401 unauthorized`, zoals voorheen. Body en antwoord zijn gelijk gebleven. Meedoen blijft open: iedereen met de code doet mee in een kamer van een privéspel.
+
+**Fouten:** `400 invalid_request` (onbekende modus, capaciteit, instellingen of config; later aansluiten of scherm bij een spel dat het niet ondersteunt; een hostspel met `hostless`, of met een modus die niet in `host_modes` van het spel staat; een set van een ander spel, van een soort die deze versie niet kent of met inhoud die niet past), `401 unauthorized` (ongeldige accountsleutel, of `set_id` zonder accountsleutel), `404 game_not_found` (onbekend, uit, of een privéspel dat je niet mag zien), `404 set_not_found`, `409 release_changed` (het spel kreeg net een nieuwe versie; probeer het opnieuw), `429 rate_limit`, `503 room_limit`.
 
 ### POST /api/v1/rooms/{code}/join
 
-Doet mee als speler. **Toegang:** iedereen; met een optionele accountsleutel.
+Doet mee als speler. **Toegang:** iedereen; met een optionele accountsleutel. Ook in een kamer van een privéspel is geen account nodig.
 
 ```json
 { "name": "Sander" }

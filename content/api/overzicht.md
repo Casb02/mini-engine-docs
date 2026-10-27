@@ -8,9 +8,9 @@ order: 1
 
 # HTTP API-overzicht
 
-Mini Engine heeft een JSON-API onder `/api/v1` en een websocket per kamer. `v1` is de routeversie; deze pagina's horen bij Mini Engine 0.8. Een spel praat er meestal via de [SDK](../sdk/overzicht.md) mee, en de [CLI](../publiceren/cli.md) gebruikt de routes voor ontwikkelaars. Deze sectie beschrijft wat er over de lijn gaat, voor wie zelf een client schrijft of wil weten wat de SDK doet.
+Mini Engine heeft een JSON-API onder `/api/v1` en een websocket per kamer. `v1` is de routeversie; deze pagina's horen bij Mini Engine 0.9. Een spel praat er meestal via de [SDK](../sdk/overzicht.md) mee, en de [CLI](../publiceren/cli.md) gebruikt de routes voor ontwikkelaars. Deze sectie beschrijft wat er over de lijn gaat, voor wie zelf een client schrijft of wil weten wat de SDK doet.
 
-[Download de API-referentie (pdf)]({{root}}downloads/MiniEngine-API-v0.6.pdf) voor een afdrukbare versie: editie 0.6, de openbare editie, met alles wat een client, een game of de CLI gebruikt. De wijzigingen van 0.7 en 0.8 staan nog niet in de pdf, wel op deze pagina's.
+[Download de API-referentie (pdf)]({{root}}downloads/MiniEngine-API-v0.6.pdf) voor een afdrukbare versie: editie 0.6, de openbare editie, met alles wat een client, een game of de CLI gebruikt. De wijzigingen van 0.7, 0.8 en 0.9 staan nog niet in de pdf, wel op deze pagina's.
 
 ## Basis
 
@@ -27,7 +27,7 @@ Er zijn drie soorten sleutels, die je nooit door elkaar gebruikt:
 | Sleutel | Krijg je van | Gebruik je voor |
 | --- | --- | --- |
 | Kamersleutel | Kamer maken (host), meedoen (speler), schermsleutel (display) | Alles binnen één kamer |
-| Accountsleutel | Registreren of inloggen | `/accounts/me`, `/accounts/stats`, `/accounts/achievements`, `/accounts/sets`, `/accounts/media`, `/accounts/logout`, `/accounts/verify-email`, `/accounts/email`, en optioneel bij kamer maken en meedoen |
+| Accountsleutel | Registreren of inloggen | `/accounts/me`, `/accounts/stats`, `/accounts/achievements`, `/accounts/sets`, `/accounts/media`, `/accounts/logout`, `/accounts/verify-email`, `/accounts/email`, `/accounts/games`, en optioneel bij kamer maken, meedoen en sinds 0.9 bij `GET /api/v1/games` |
 | Dev-key (`med_…`) | Wie de server beheert | Je eigen games uploaden en beheren onder [`/dev`](ontwikkelaars.md) |
 
 Stuur een sleutel als header:
@@ -65,11 +65,13 @@ Elke fout heeft dezelfde vorm:
 | 403 | `not_eligible` | Achievement toekennen: de speler is een gast, de kamer is zonder account gemaakt, of het is je eigen account op een andere plek dan die van de meespelende maker |
 | 404 | `not_found` | Onbekende route |
 | 404 | `room_not_found` | De kamer bestaat niet of is verlopen |
-| 404 | `game_not_found` | Het spel is niet geïnstalleerd |
+| 404 | `game_not_found` | Het spel is niet geïnstalleerd, staat uit, of is een privéspel dat je niet mag zien (sinds 0.9) |
 | 404 | `game_page_not_found` | Het spel heeft geen pagina voor deze rol |
 | 404 | `asset_not_found` | Geen publiek asset op dit pad |
 | 404 | `player_not_found` | Onbekende speler |
 | 404 | `set_not_found` | De set bestaat niet, of hoort bij een ander account |
+| 404 | `account_not_found` | Uitnodigen: er is geen account met deze gebruikersnaam (sinds 0.9) |
+| 404 | `invite_not_found` | Dit account is niet uitgenodigd voor deze game (sinds 0.9) |
 | 404 | `media_not_found` | De afbeelding bestaat niet, of hoort bij een ander account (sinds 0.8) |
 | 404 | `achievement_unknown` | De versie van het spel die de kamer speelt, kent dit achievement-id niet |
 | 405 | `method_not_allowed` | Verkeerde HTTP-methode voor deze route |
@@ -87,6 +89,7 @@ Elke fout heeft dezelfde vorm:
 | 409 | `email_already_verified` | Dit adres is al bevestigd voor jouw account |
 | 409 | `game_not_running` | Serverspel: start eerst het spel. Achievement toekennen: de kamer staat nog in de lobby |
 | 409 | `quota_sets` | Het account heeft al 50 sets |
+| 409 | `quota_invites` | Een game heeft al 50 uitnodigingen (sinds 0.9) |
 | 409 | `quota_set_media` | Een set gebruikt meer dan 100 afbeeldingen, of samen meer dan 50 MiB (sinds 0.8) |
 | 409 | `quota_media` | De afbeeldingen van het account worden samen meer dan de ruimte van het account, `limit_bytes` (sinds 0.8; die ruimte hangt sinds 0.8.1 af van het account) |
 | 409 | `media_in_use` | Een van je sets gebruikt deze afbeelding nog (sinds 0.8) |
@@ -120,15 +123,16 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | Methode en pad | Toegang | Resultaat |
 | --- | --- | --- |
 | `GET /api/health` | Openbaar | Status en engineversie |
-| `GET /api/v1/games` | Openbaar | `{ games: [...], featured: [...] }` |
-| `GET /api/v1/games/{id}` | Openbaar | Metadata van één spel |
-| `GET /api/v1/games/{id}/{role}` | Openbaar | HTML voor `host`, `player` of `display` |
-| `GET /games/{id}/assets/{path}` | Openbaar | Publieke gameassets |
+| `GET /api/v1/games` | Openbaar, optionele accountsessie (sinds 0.9) | `{ games: [...], featured: [...] }`; met de sessie ook je privéspellen |
+| `GET /api/v1/games/{id}` | Openbaar, optionele accountsessie (sinds 0.9) | Metadata van één spel; met `?room=CODE` het spel van een lopende kamer (sinds 0.9) |
+| `GET /api/v1/games/{id}/{role}` | Openbaar | HTML voor `host`, `player` of `display`; van een privéspel zonder sessie alleen met `?room=CODE` |
+| `GET /games/{id}/assets/{path}` | Openbaar | Publieke gameassets van de actieve versie; een privéspel alleen met de sessie van de eigenaar of een genodigde |
+| `GET /rooms/{code}/assets/{path}` | Kamercode | De assets van de versie die de kamer speelt, ook van een privéspel (sinds 0.9) |
 | `GET /sdk/mini-engine.js` | Openbaar | De SDK-bundle |
 | `GET /sdk/mini-engine.d.ts` | Openbaar | TypeScript-declaraties van de SDK (`text/plain`) |
-| `GET /home`, `/home/games`, `/home/new/{id}`, `/home/join`, `/home/account`, `/home/sets`, `/home/sets/{id}` | Openbaar | De pagina's van Mini Engine: start, alle spellen, kamer maken, meedoen, account, mijn sets. Een onbekend spel in `/home/new/{id}` geeft 404. Zie [pagina's van Mini Engine](games.md#pagina-s-van-mini-engine). |
+| `GET /home`, `/home/games`, `/home/new/{id}`, `/home/join`, `/home/account`, `/home/sets`, `/home/sets/{id}` | Openbaar | De pagina's van Mini Engine: start, alle spellen, kamer maken, meedoen, account, mijn sets. Elk id dat geen openbaar, speelbaar spel is, geeft in `/home/new/{id}` een 404 met de pagina (sinds 0.9; daarvoor een JSON-fout). Zie [pagina's van Mini Engine](games.md#pagina-s-van-mini-engine). |
 | `GET /demo/…` | Openbaar | Doorverwijzing naar hetzelfde pad onder `/home` |
-| `POST /api/v1/rooms` | Gast of account | 201 met hostsleutel |
+| `POST /api/v1/rooms` | Gast of account; bij een privéspel de eigenaar of een genodigde | 201 met hostsleutel |
 | `POST /api/v1/rooms/{code}/join` | Gast of account | 201 met spelerssleutel |
 | `GET /api/v1/rooms/{code}/info` | Openbaar | Openbare kamerinfo |
 | `GET /api/v1/rooms/{code}` | Kamersleutel | Snapshot voor jouw rol |
@@ -161,10 +165,12 @@ connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; o
 | `PUT /api/v1/accounts/games/{id}` | Account | Eigen spel aan of uit zetten (sinds 0.5.1) |
 | `POST /api/v1/accounts/verify-email` | Account waarvoor de link is | E-mailadres bevestigen met het token uit de link |
 | `PUT /api/v1/accounts/email` | Account | E-mailadres toevoegen of wijzigen, of de link opnieuw sturen |
-| `GET /releases/{id}/{version}/{path}` | Openbaar | Assets van de actieve versie, of van een versie die een lopende kamer speelt |
+| `GET /releases/{id}/{version}/{path}` | Openbaar | Assets van de actieve versie, of van een versie die een lopende kamer van een openbaar spel speelt; van een privéspel alleen met de sessie van de eigenaar of een genodigde |
 | `GET /api/v1/dev/me` | Dev-key | Account en key |
 | `GET /api/v1/dev/games` | Dev-key | Jouw games |
-| `GET`, `PUT`, `DELETE /api/v1/dev/games/{id}` | Dev-key | Eén game bekijken, aan/uit zetten, verwijderen |
+| `GET`, `PUT`, `DELETE /api/v1/dev/games/{id}` | Dev-key | Eén game bekijken, aan/uit of privé zetten, verwijderen |
+| `GET`, `POST /api/v1/dev/games/{id}/invites` | Dev-key | Uitnodigingen bekijken of accounts uitnodigen (sinds 0.9) |
+| `DELETE /api/v1/dev/games/{id}/invites/{username}` | Dev-key | Een uitnodiging intrekken (sinds 0.9) |
 | `POST /api/v1/dev/games/{id}/versions` | Dev-key | Nieuwe versie uploaden |
 | `POST /api/v1/dev/games/{id}/versions/{version}/activate` | Dev-key | Versie actief maken |
 | `DELETE /api/v1/dev/games/{id}/versions/{version}` | Dev-key | Versie verwijderen |
@@ -177,12 +183,26 @@ Deze documentatie hoort bij deze versies:
 
 | Onderdeel | Versie |
 | --- | --- |
-| Mini Engine | 0.8.1 (`GET /api/health` geeft de versie van de server) |
-| Mini Engine SDK | 0.7.0, ook op `/sdk/mini-engine.js` van de server |
-| me-CLI | 0.8.0 |
+| Mini Engine | 0.9.0 (`GET /api/health` geeft de versie van de server) |
+| Mini Engine SDK | 0.7.2, ook op `/sdk/mini-engine.js` van de server |
+| me-CLI | 0.9.0 |
 | API-referentie (pdf) | Editie 0.6, de openbare editie |
 
 Wat je met een bestaand spel doet bij een nieuwe versie, staat bij [upgraden](../upgraden.md).
+
+Nieuw in 0.9:
+
+- Privéspellen: een geüpload spel is openbaar, zoals voorheen, of privé. Een privéspel zien en starten alleen de eigenaar en de accounts die die uitnodigde, ingelogd. Voor ieder ander bestaat het niet: elke route zonder kamer antwoordt zoals bij een onbekend id. Meedoen kan iedereen met de code. Zie [privéspellen](../publiceren/overzicht.md#privespellen).
+- `GET /api/v1/games` en `GET /api/v1/games/{id}` nemen een optionele accountsessie; een privéspel heeft dan `private: true` en `icon_data`. `featured` bevat nooit een privéspel. Nieuw is `GET /api/v1/games/{id}?room=CODE`. Zie [spellen](games.md#privespellen-in-de-lijst).
+- DevGame heeft `private` en `invites`. `PUT /api/v1/dev/games/{id}` neemt `{ enabled?, private? }`, en een upload `private`. `PUT /api/v1/accounts/games/{id}` neemt alleen `enabled`. Zie [ontwikkelaars](ontwikkelaars.md#put-api-v1-dev-games-id).
+- Een upload met `"private": true` in `manifest.json` maar zonder `private` in het verzoek geeft `400 invalid_request`. Wie zijn gamelimiet heeft bereikt, krijgt voor elk id dat niet van hem is `409 quota_games`.
+- Kamers laden de bestanden van hun versie van `GET /rooms/{code}/assets/…`. Zie [kamers en versies](ontwikkelaars.md#kamers-en-versies).
+- `GET`, `POST /api/v1/dev/games/{id}/invites` en `DELETE /api/v1/dev/games/{id}/invites/{username}`, met de nieuwe foutcodes `409 quota_invites` en `404 invite_not_found`. Zie [uitnodigingen](ontwikkelaars.md#uitnodigingen).
+- Een kamer maken voor een privéspel kan alleen met de accountsleutel van de eigenaar of een genodigde; voor ieder ander is het `404 game_not_found`, ook met een ongeldige sleutel.
+- `/home/new/{id}` geeft voor elk id dat geen openbaar, speelbaar spel is een 404 met de HTML-pagina, in plaats van een JSON-fout. `/og/games/{id}.png` geeft 404 voor een privéspel.
+- Het label **Privé** op de spelkaart, op de pagina voor een nieuwe kamer, bij **Mijn spellen** en in het beheer. Een privéspel kan niet uitgelicht worden.
+
+Alles uit 0.8 werkt nog: bestaande spellen blijven openbaar, en manifests, kamers en sets blijven geldig.
 
 Nieuw in 0.8.1:
 

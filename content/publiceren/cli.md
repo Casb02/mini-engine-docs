@@ -129,12 +129,16 @@ Laat zien als wie je bent ingelogd, of vergeet de key op je eigen computer. De k
 
 | Commando | Wat het doet |
 | --- | --- |
-| `me game list` | Je games met actieve versie en of ze aan staan |
+| `me game list` | Je games met actieve versie, of ze aan staan en sinds CLI 0.9.0 of ze privé zijn (kolom PRIVÉ) |
 | `me game new <slug> [--dir MAP]` | Een nieuw spel uit een sjabloon, in `./<slug>`; zie [me game new](#me-game-new) |
-| `me game upload [map] [--activate] [--dry-run]` | Pakt de map in en uploadt een nieuwe versie; `--dry-run` laat alleen zien wat meegaat |
+| `me game upload [map] [--activate] [--private] [--dry-run]` | Pakt de map in en uploadt een nieuwe versie; `--private` maakt de game eerst privé (sinds CLI 0.9.0), `--dry-run` laat alleen zien wat meegaat |
 | `me game versions <id>` | Alle bewaarde versies; welke actief is en welke een kamer gebruikt |
 | `me game activate <id> <versie>` | Maakt een versie actief, ook om terug te gaan |
 | `me game enable <id>` / `me game disable <id>` | Toont of verbergt de game op `/home`; kan sinds 0.5.1 ook op de accountpagina |
+| `me game private <id>` / `me game public <id>` | Maakt de game privé, of weer openbaar voor iedereen op de server; sinds CLI 0.9.0, zie [privé en uitnodigen](#prive-en-uitnodigen) |
+| `me game invite <id> <gebruikersnaam>…` | Nodigt accounts uit die je privégame mogen starten, hoogstens 50 per game |
+| `me game uninvite <id> <gebruikersnaam>` | Trekt een uitnodiging in; rooms die al lopen, spelen door |
+| `me game invites <id>` | Wie je voor een game hebt uitgenodigd |
 | `me game delete-version <id> <versie>` | Verwijdert één oude versie |
 | `me game prune <id> [--keep N] [--dry-run]` | Verwijdert oude versies, behalve de actieve, de nieuwste N (standaard 3) en versies in gebruik |
 | `me game delete <id>` | Verwijdert de hele game (vraagt om bevestiging, of `--yes`) |
@@ -154,25 +158,70 @@ Symlinks worden geweigerd. Voordat er iets verstuurd wordt, controleert de CLI h
 
 Heeft een soort set een [afbeeldingsveld](../concepten/eigen-sets.md#afbeeldingen) en draait de server een versie van Mini Engine ouder dan 0.8, dan waarschuwt `me game upload` eerst: zo'n server weigert dat schema. De upload gaat wel door. `me doctor` laat zien welke versie de server draait.
 
-Is het de eerste versie van een nieuw spel, dan zegt `me game upload` erbij dat die meteen live staat, voor iedereen op die server, met het adres om een kamer te maken.
+Is het de eerste versie van een nieuw spel, dan zegt `me game upload` erbij dat die meteen live staat, voor iedereen op die server, met het adres om een kamer te maken. Met `--private` zegt hij dat de versie actief is maar privé, en hoe je vrienden uitnodigt.
+
+### Privé en uitnodigen
+
+Sinds CLI 0.9.0, voor Mini Engine 0.9. Een privégame zien en starten alleen jij en de accounts die je uitnodigt; meedoen kan iedereen met de code. Wat dat op de site betekent, staat bij [privéspellen](overzicht.md#privespellen).
+
+```text
+$ me game upload --private
+Geüpload: mijn-spel 0.1.0 naar https://miniengine.nl
+  Bestanden  20
+  Grootte    196,4 KiB
+  Hash       9f2c…
+  Actief     ja
+  Privé      ja
+
+Dit is de eerste versie van mijn-spel. Die is meteen actief, maar privé: alleen jij ziet hem op de site als je bent ingelogd. Meedoen kan iedereen met de code.
+Vrienden uitnodigen: me game invite mijn-spel <gebruikersnaam>
+Volgende versies gaan pas live met me game upload --activate.
+
+Spelen: https://miniengine.nl/home/new/mijn-spel
+
+$ me game invite mijn-spel @dani sander
+Uitgenodigd voor mijn-spel: @dani en @sander.
+Wie is uitgenodigd, ziet mijn-spel na het inloggen op https://miniengine.nl/home/new/mijn-spel
+
+$ me game invites mijn-spel
+mijn-spel is privé. Deze accounts kunnen hem starten:
+
+GEBRUIKERSNAAM  NAAM    UITGENODIGD
+dani            Dani    2026-10-27 20:15
+sander          Sander  2026-10-27 20:15
+```
+
+- **`--private` bij een upload** maakt de game privé voordat de nieuwe versie live kan gaan. Een nieuwe game is zo nooit, ook niet even, voor iedereen te zien. Een upload zonder `--private` verandert niets aan privé: een privégame blijft privé. Met `--dry-run --private` zegt de CLI alleen dat de game privé wordt.
+- **Niet in `manifest.json`.** Staat er `private` in het manifest, dan stoppen `me game upload`, `me dev` en `me doctor` met *manifest.json: private hoort niet in het manifest; daarmee wordt een game niet privé.* Er is dan niets verstuurd. Haal het weg en gebruik `--private`.
+- **`me game private <id>`** maakt een bestaande game privé, en haalt hem uit de uitgelichte spellen als hij daar stond; de CLI zegt dat er dan bij. **`me game public <id>`** maakt hem weer openbaar; je uitnodigingen blijven bewaard en tellen weer als je hem opnieuw privé maakt. Was de game al privé of al openbaar, dan zegt de CLI *was al* in plaats van *is nu*, en verandert er niets.
+- **`me game invite <id> <gebruikersnaam>…`** nodigt een of meer accounts uit, ook gewone spelers zonder dev-key. Een `@` voor de naam mag. Hoogstens 50 per game. Wie al was uitgenodigd, noemt de CLI apart. Uitnodigen kan ook bij een openbare game; de uitnodiging telt zodra je hem privé maakt.
+- **`me game uninvite <id> <gebruikersnaam>`** trekt één uitnodiging in. Rooms die al lopen, spelen door.
+- **`me game invites <id>`** toont wie er is uitgenodigd en of de game privé is.
+
+Deze commando's en `--private` vragen eerst de versie van de server op. Draait die een versie ouder dan Mini Engine 0.9, dan stopt de CLI met de foutcode `unsupported`, zoals *https://miniengine.nl draait Mini Engine 0.8.1. Privégames en uitnodigingen werken vanaf Mini Engine 0.9.*, en bij een upload staat erachter *Er is niets geüpload.* Met `--json` geven `me game private` en `me game public` de DevGame, `invite` en `invites` `{ private, invites }` (`invite` ook `added`), en `uninvite` `{ id, username, uninvited: true }`.
 
 ### Foutmeldingen van de server
 
 | Code | Wanneer |
 | --- | --- |
-| `invalid_request` | Het pakket klopt niet: manifest, rolpagina's, `settings_schema`, pad, versienaam, `runtime` niet `host`, of te groot. De melding noemt de reden |
-| `forbidden` | De game is van iemand anders |
+| `invalid_request` | Het pakket klopt niet: manifest, rolpagina's, `settings_schema`, pad, versienaam, `runtime` niet `host`, of te groot. Sinds 0.9 ook `"private": true` in het manifest zonder `--private`; de CLI vangt dat zelf al af. De melding noemt de reden |
+| `forbidden` | De game is van iemand anders. Zit je aan je limiet voor games, dan krijg je sinds 0.9 eerst `quota_games` |
 | `unauthorized` | De dev-key is ongeldig, verlopen of ingetrokken |
 | `game_id_taken` | Het id hoort bij een ingebouwde game; sinds 0.7 alleen nog `common-dice` |
 | `version_exists` | Deze versie bestaat al; verhoog `version` in `manifest.json` |
-| `quota_games` | Je zit aan je limiet voor games: standaard 10 per account. Nieuwe versies van een bestaande game tellen niet mee |
+| `quota_games` | Je zit aan je limiet voor games: standaard 10 per account. Nieuwe versies van een bestaande game tellen niet mee. Aan je limiet krijg je het sinds 0.9 voor elk id dat niet van jou is |
 | `quota_releases` | Deze game heeft al 10 versies; ruim op met `me game prune` |
 | `release_not_found` | Deze versie bestaat niet |
 | `release_active` | Je probeert de actieve versie te verwijderen; activeer eerst een andere |
 | `release_in_use` | Een lopende kamer speelt deze versie nog |
 | `game_in_use` | Je probeert een game te verwijderen waar nog een kamer mee speelt |
 | `game_blocked` | Wie de server beheert, heeft deze game geblokkeerd; aanzetten of verwijderen kan dan niet |
+| `account_not_found` | `me game invite` of `uninvite`: er is geen account met die gebruikersnaam (sinds 0.9) |
+| `invite_not_found` | `me game uninvite`: dat account is niet uitgenodigd voor deze game (sinds 0.9) |
+| `quota_invites` | De game heeft al 50 uitnodigingen; trek er eerst een in (sinds 0.9) |
 | `rate_limit` | Te veel verzoeken; wacht even |
+
+Daarnaast geeft de CLI zelf `unsupported` als de server te oud is voor een commando, zoals Mini Engine 0.8 voor `--private` en de uitnodigingen.
 
 ## Lokaal testen
 
@@ -260,8 +309,8 @@ Sinds CLI 0.6.0. Loopt alles langs wat je nodig hebt, als lijst met ✓ en ✗. 
 
 ```text
 ✓ Node.js 22.12.0
-✓ CLI 0.8.0 is de nieuwste versie
-✓ Server https://miniengine.nl (standaard) is bereikbaar, Mini Engine 0.8.0
+✓ CLI 0.9.0 is de nieuwste versie
+✓ Server https://miniengine.nl (standaard) is bereikbaar, Mini Engine 0.9.0
 ✗ Geen dev key voor https://miniengine.nl; uploaden kan nog niet. Spelen met me dev lukt wel.
     Vraag een dev key aan wie de server beheert en log in met: me auth
 ✓ AI-skills staan in ~/.claude/skills
